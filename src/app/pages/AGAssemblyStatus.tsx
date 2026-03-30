@@ -16,11 +16,11 @@ export function AGAssemblyStatus() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'finalized':
-        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-[#E8F5E9] text-[#2E7D32]">✅ Finalized</span>;
+        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-[#E8F5E9] text-[#2E7D32]"> Finalized</span>;
       case 'draft':
-        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-[#FFF3E0] text-[#F57C00]">⚠️ Draft</span>;
+        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-[#FFF3E0] text-[#F57C00]">Draft</span>;
       case 'not-started':
-        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-[#F5F5F5] text-[#999]">◯ Not Started</span>;
+        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-[#F5F5F5] text-[#999]">Not Started</span>;
       default:
         return null;
     }
@@ -63,8 +63,8 @@ export function AGAssemblyStatus() {
         </div>
         <div className="text-xs text-[#666]">
           {allFinalized
-            ? '✅ All AGs finalized - Ready to generate remaining 5 documents per package'
-            : `⚠️ ${5 - finalizedCount} AG(s) remaining - Complete all to unlock Step 2`}
+            ? ' All AGs finalized - Ready to generate remaining 5 documents per package'
+            : `${5 - finalizedCount} AG(s) remaining - Complete all to unlock Step 2`}
         </div>
       </div>
 
@@ -196,7 +196,7 @@ export function AGAssemblyStatus() {
       {allFinalized ? (
         <div className="bg-[#E8F5E9] border border-[#A5D6A7] rounded p-5 mb-6">
           <div className="flex items-start gap-3">
-            <span className="text-2xl">✅</span>
+            <span className="text-2xl"></span>
             <div className="flex-1">
               <div className="font-semibold text-sm text-[#2E7D32] mb-2">All 5 Assessor's Guides Finalized!</div>
               <div className="text-sm text-[#1B5E20] mb-4">
@@ -224,7 +224,7 @@ export function AGAssemblyStatus() {
               <div className="text-xs text-[#E65100] space-y-1">
                 {(['A', 'B', 'C', 'D', 'E'] as const).map((set) => (
                   <div key={set}>
-                    {agStatus[set] === 'finalized' ? '✅' : '❌'} Assessor's Guide Set {set}
+                    {agStatus[set] === 'finalized' ? '' : '❌'} Assessor's Guide Set {set}
                   </div>
                 ))}
               </div>

@@ -103,13 +103,13 @@ export function PackageNavigator() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'finalized':
-        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-[#E8F5E9] text-[#2E7D32]">✅ Finalized</span>;
+        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-[#E8F5E9] text-[#2E7D32]">Finalized</span>;
       case 'draft':
-        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-[#FFF3E0] text-[#F57C00]">⚠️ Draft</span>;
+        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-[#FFF3E0] text-[#F57C00]">Draft</span>;
       case 'not-started':
-        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-[#F5F5F5] text-[#999]">◯ Not Started</span>;
+        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-[#F5F5F5] text-[#999]">Not Started</span>;
       case 'locked':
-        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-[#F5F5F5] text-[#999]">🔒 Locked</span>;
+        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-[#F5F5F5] text-[#999]">Locked</span>;
       default:
         return null;
     }

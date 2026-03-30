@@ -112,7 +112,7 @@ export function WorkflowGuide({ onClose }: WorkflowGuideProps) {
           <div className="border-l-4 border-[#F57C00] pl-4">
             <div className="flex items-center gap-2 mb-2">
               <span className="px-2 py-1 bg-[#F57C00] text-white text-xs font-bold rounded">PHASE 3</span>
-              <h3 className="font-bold text-lg">5-Package Assembly (2 Steps)</h3>
+              <h3 className="font-bold text-lg">Package Assembly (2 Steps)</h3>
             </div>
             <p className="text-sm text-[#666] mb-3">
               Distribute Phase 2 pools into 5 complete CATS packages:

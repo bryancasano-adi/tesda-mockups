@@ -5,6 +5,7 @@ import { initialMCQItems, MCQItem } from '../data/mcqQuestions';
 import { MCQEditorModal } from '../components/MCQEditorModal';
 import { DeleteConfirmDialog } from '../components/DeleteConfirmDialog';
 import { MCQPreviewModal } from '../components/MCQPreviewModal';
+import { TOSPreviewModal } from '../components/TOSPreviewModal';
 
 export function MCQEditor() {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ export function MCQEditor() {
   const [deletingItemId, setDeletingItemId] = useState<number | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [showTOSPreview, setShowTOSPreview] = useState(false);
   const [isFinalized, setIsFinalized] = useState(false);
 
   const handleSaveItem = (item: MCQItem) => {
@@ -412,6 +414,13 @@ export function MCQEditor() {
           <Eye size={16} />
           Preview
         </button>
+        <button
+          onClick={() => setShowTOSPreview(true)}
+          className="px-4 py-2 bg-white text-[#1976D2] border border-[#1976D2] rounded text-sm font-medium hover:bg-[#E3F2FD] transition-colors flex items-center gap-2"
+        >
+          <Eye size={16} />
+          TOS Preview
+        </button>
       </div>
 
       {/* Modals */}
@@ -435,6 +444,16 @@ export function MCQEditor() {
       )}
 
       {showPreview && <MCQPreviewModal items={mcqItems} onClose={() => setShowPreview(false)} />}
+      {showTOSPreview && (
+        <TOSPreviewModal
+          tosData={tosData}
+          totalItems={totalItems}
+          factualCount={factualCount}
+          scenarioCount={scenarioCount}
+          applicationCount={applicationCount}
+          onClose={() => setShowTOSPreview(false)}
+        />
+      )}
     </div>
   );
 }

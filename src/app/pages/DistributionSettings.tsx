@@ -26,18 +26,18 @@ export function DistributionSettings() {
 
       {/* Prerequisites Panel */}
       <div className="bg-[#E8F5E9] border border-[#A5D6A7] rounded p-5 mb-6">
-        <div className="font-semibold text-sm text-[#2E7D32] mb-3">✅ Prerequisites Met</div>
+        <div className="font-semibold text-sm text-[#2E7D32] mb-3">Prerequisites Met</div>
         <div className="grid grid-cols-3 gap-4 text-xs text-[#1B5E20]">
           <div>
             <div className="font-medium mb-1">Phase 1</div>
-            <div>✅ Evidence Plan finalized</div>
-            <div>✅ Outline generated</div>
+            <div>- Evidence Plan finalized</div>
+            <div>- Outline generated</div>
           </div>
           <div>
             <div className="font-medium mb-1">Phase 2 - Pools</div>
-            <div>✅ Demonstration Test (5 variations)</div>
-            <div>✅ Questioning Tool (25 questions)</div>
-            <div>✅ Written Test (50 MCQ items + TOS)</div>
+            <div>- Demonstration Test (5 variations)</div>
+            <div>- Questioning Tool (25 questions)</div>
+            <div>- Written Test (50 MCQ items + TOS)</div>
           </div>
           <div>
             <div className="font-medium mb-1">Ready for</div>

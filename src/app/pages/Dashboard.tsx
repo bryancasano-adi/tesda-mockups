@@ -96,7 +96,7 @@ export function Dashboard() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-[#1976D2] uppercase">Phase 1</span>
-                    {phase1Complete && <span className="text-sm">✅</span>}
+                    {phase1Complete && <span className="text-sm"></span>}
                   </div>
                 </div>
               </div>
@@ -112,7 +112,7 @@ export function Dashboard() {
                   onClick={() => navigate('/evidence-plan')}
                   className="text-xs text-[#1976D2] hover:underline"
                 >
-                  View documents →
+                  View documents
                 </button>
               </div>
             </div>
@@ -123,7 +123,7 @@ export function Dashboard() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-[#2E7D32] uppercase">Phase 2</span>
-                    {phase2Complete && <span className="text-sm">✅</span>}
+                    {phase2Complete && <span className="text-sm"></span>}
                   </div>
                 </div>
               </div>
@@ -139,7 +139,7 @@ export function Dashboard() {
                   onClick={() => navigate('/demonstration-test')}
                   className="text-xs text-[#1976D2] hover:underline"
                 >
-                  View pools →
+                  View pools
                 </button>
               </div>
             </div>
@@ -151,15 +151,15 @@ export function Dashboard() {
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-[#F57C00] uppercase">Phase 3</span>
                     {totalCompleted === 30 ? (
-                      <span className="text-sm">✅</span>
+                      <span className="text-sm"></span>
                     ) : totalCompleted > 0 ? (
-                      <span className="text-sm">⚠️</span>
+                      <span className="text-sm"></span>
                     ) : null}
                   </div>
                 </div>
               </div>
               <div className="p-4">
-                <div className="font-semibold text-sm text-[#333] mb-2">5-Package Assembly</div>
+                <div className="font-semibold text-sm text-[#333] mb-2">Package Assembly</div>
                 <div className="mb-3">
                   <div className="h-1 bg-[#E0E0E0] rounded-full overflow-hidden">
                     <div
@@ -177,7 +177,7 @@ export function Dashboard() {
                   onClick={() => navigate('/package-navigator')}
                   className="text-xs text-[#1976D2] hover:underline"
                 >
-                  {totalCompleted > 0 ? 'Continue packages' : 'View settings'} →
+                  {totalCompleted > 0 ? 'Continue packages' : 'View settings'}
                 </button>
               </div>
             </div>
@@ -218,7 +218,7 @@ export function Dashboard() {
                 <span className="px-2 py-1 bg-[#1976D2] text-white text-xs font-bold rounded">PHASE 1</span>
                 <span className="font-bold text-[#333]">Foundation Documents</span>
               </div>
-              <span className="text-xs px-2 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded-full font-semibold">✅ Complete</span>
+              <span className="text-xs px-2 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded-full font-semibold"> Complete</span>
             </div>
             <div className="p-5">
               <table className="w-full">
@@ -240,7 +240,7 @@ export function Dashboard() {
                     </td>
                     <td className="py-3 text-sm text-[#666]">4-column table: MCQ, Demo, QT coverage</td>
                     <td className="text-center py-3">
-                      <span className="px-2 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded-full text-xs font-semibold">✅ Finalized</span>
+                      <span className="px-2 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded-full text-xs font-semibold"> Finalized</span>
                     </td>
                     <td className="text-center py-3">
                       <DocumentActions
@@ -262,7 +262,7 @@ export function Dashboard() {
                     </td>
                     <td className="py-3 text-sm text-[#666]">Auto-generated from Evidence Plan</td>
                     <td className="text-center py-3">
-                      <span className="px-2 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded-full text-xs font-semibold">✅ Generated</span>
+                      <span className="px-2 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded-full text-xs font-semibold"> Generated</span>
                     </td>
                     <td className="text-center py-3">
                       <DocumentActions
@@ -288,7 +288,7 @@ export function Dashboard() {
                 <span className="px-2 py-1 bg-[#2E7D32] text-white text-xs font-bold rounded">PHASE 2</span>
                 <span className="font-bold text-[#333]">Pool Generation</span>
               </div>
-              <span className="text-xs px-2 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded-full font-semibold">✅ Complete</span>
+              <span className="text-xs px-2 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded-full font-semibold"> Complete</span>
             </div>
             <div className="p-5">
               <table className="w-full">
@@ -310,7 +310,7 @@ export function Dashboard() {
                     </td>
                     <td className="py-3 text-sm text-[#666]">5 variations (A-E) + shared 100-pt rubric</td>
                     <td className="text-center py-3">
-                      <span className="px-2 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded-full text-xs font-semibold">✅ Finalized</span>
+                      <span className="px-2 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded-full text-xs font-semibold"> Finalized</span>
                     </td>
                     <td className="text-center py-3">
                       <DocumentActions
@@ -333,7 +333,7 @@ export function Dashboard() {
                     </td>
                     <td className="py-3 text-sm text-[#666]">25 questions (5 per PC × 4 Dimensions)</td>
                     <td className="text-center py-3">
-                      <span className="px-2 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded-full text-xs font-semibold">✅ Finalized</span>
+                      <span className="px-2 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded-full text-xs font-semibold"> Finalized</span>
                     </td>
                     <td className="text-center py-3">
                       <DocumentActions
@@ -356,7 +356,7 @@ export function Dashboard() {
                     </td>
                     <td className="py-3 text-sm text-[#666]">50 items + TOS</td>
                     <td className="text-center py-3">
-                      <span className="px-2 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded-full text-xs font-semibold">✅ Finalized</span>
+                      <span className="px-2 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded-full text-xs font-semibold"> Finalized</span>
                     </td>
                     <td className="text-center py-3">
                       <DocumentActions
@@ -380,25 +380,18 @@ export function Dashboard() {
             <div className="px-5 py-3 bg-[#FFF3E0] border-b border-[#FFB74D] flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <span className="px-2 py-1 bg-[#F57C00] text-white text-xs font-bold rounded">PHASE 3</span>
-                <span className="font-bold text-[#333]">5-Package Assembly</span>
+                <span className="font-bold text-[#333]">Package Assembly</span>
               </div>
-              <span className="text-xs px-2 py-1 bg-[#FFF3E0] text-[#F57C00] rounded-full font-semibold">⚠️ {totalCompleted}/30 docs</span>
+              <span className="text-xs px-2 py-1 bg-[#FFF3E0] text-[#F57C00] rounded-full font-semibold">{totalCompleted}/30 docs</span>
             </div>
             <div className="p-5">
-              <div className="mb-4 p-4 bg-[#E3F2FD] border border-[#90CAF9] rounded-lg">
-                <div className="text-sm font-semibold text-[#1565C0] mb-2">📦 Phase 3 produces 5 complete CATS packages</div>
-                <div className="text-xs text-[#1565C0]">
-                  Each package (A, B, C, D, E) contains 6 documents: Assessor's Guide, SIC, Written Test, Rating Sheet, SAG, and CARS
-                </div>
-              </div>
-
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-[#E0E0E0]">
                     <th className="text-left py-2 text-xs font-semibold text-[#666] uppercase">Step</th>
                     <th className="text-left py-2 text-xs font-semibold text-[#666] uppercase">Description</th>
                     <th className="text-center py-2 text-xs font-semibold text-[#666] uppercase">Status</th>
-                    <th className="text-right py-2 text-xs font-semibold text-[#666] uppercase">Actions</th>
+                    <th className="text-center py-2 text-xs font-semibold text-[#666] uppercase">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -411,14 +404,14 @@ export function Dashboard() {
                     </td>
                     <td className="py-3 text-sm text-[#666]">Configure how pools are distributed to 5 packages</td>
                     <td className="text-center py-3">
-                      <span className="px-2 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded-full text-xs font-semibold">✅ Configured</span>
+                      <span className="px-2 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded-full text-xs font-semibold"> Configured</span>
                     </td>
-                    <td className="text-right py-3">
+                    <td className="text-center py-3">
                       <button
                         onClick={() => navigate('/distribution-settings')}
-                        className="px-3 py-1.5 text-xs font-medium text-[#1976D2] hover:bg-[#E3F2FD] rounded transition-colors"
+                        className="px-3 py-1.5 text-xs font-medium text-white bg-[#1976D2] hover:bg-[#1565C0] rounded transition-colors"
                       >
-                        View →
+                        View
                       </button>
                     </td>
                   </tr>
@@ -431,14 +424,14 @@ export function Dashboard() {
                     </td>
                     <td className="py-3 text-sm text-[#666]">Create 5 Assessor's Guides (Sets A-E)</td>
                     <td className="text-center py-3">
-                      <span className="px-2 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded-full text-xs font-semibold">✅ 5 of 5 done</span>
+                      <span className="px-2 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded-full text-xs font-semibold"> 5 of 5 done</span>
                     </td>
-                    <td className="text-right py-3">
+                    <td className="text-center py-3">
                       <button
                         onClick={() => navigate('/ag-assembly')}
-                        className="px-3 py-1.5 text-xs font-medium text-[#1976D2] hover:bg-[#E3F2FD] rounded transition-colors"
+                        className="px-3 py-1.5 text-xs font-medium text-white bg-[#1976D2] hover:bg-[#1565C0] rounded transition-colors"
                       >
-                        View →
+                        View
                       </button>
                     </td>
                   </tr>
@@ -451,14 +444,14 @@ export function Dashboard() {
                     </td>
                     <td className="py-3 text-sm text-[#666]">Complete remaining docs for all 5 packages</td>
                     <td className="text-center py-3">
-                      <span className="px-2 py-1 bg-[#FFF3E0] text-[#F57C00] rounded-full text-xs font-semibold">⚠️ {totalCompleted}/30 docs</span>
+                      <span className="px-2 py-1 bg-[#FFF3E0] text-[#F57C00] rounded-full text-xs font-semibold">{totalCompleted}/30 docs</span>
                     </td>
-                    <td className="text-right py-3">
+                    <td className="text-center py-3">
                       <button
                         onClick={() => navigate('/package-navigator')}
                         className="px-3 py-1.5 text-xs font-medium bg-[#F57C00] text-white hover:bg-[#E65100] rounded transition-colors"
                       >
-                        Continue →
+                        Continue
                       </button>
                     </td>
                   </tr>
@@ -585,7 +578,7 @@ export function Dashboard() {
                 <tr className="border-b border-[#F0F0F0] hover:bg-[#FAFAFA]">
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-lg">✅</span>
+                      <span className="text-lg"></span>
                       <span className="text-sm font-medium">SAG</span>
                     </div>
                   </td>
@@ -614,11 +607,11 @@ export function Dashboard() {
             <div className="flex items-center justify-between text-xs">
               <div className="flex gap-4">
                 <div className="flex items-center gap-1">
-                  <span>✅</span>
+                  <span></span>
                   <span className="text-[#666]">Finalized</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <span>⚠️</span>
+                  <span></span>
                   <span className="text-[#666]">Draft</span>
                 </div>
                 <div className="flex items-center gap-1">
@@ -634,7 +627,7 @@ export function Dashboard() {
                 onClick={() => navigate('/package-navigator')}
                 className="px-4 py-2 bg-[#1976D2] text-white rounded text-xs font-semibold hover:bg-[#1565C0] transition-colors"
               >
-                Open Package Navigator →
+                Open Package Navigator
               </button>
             </div>
           </div>
