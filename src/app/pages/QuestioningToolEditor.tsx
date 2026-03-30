@@ -1,9 +1,49 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
+import { Eye, Edit2, Save, X, CheckCircle } from 'lucide-react';
+import { QuestioningToolPreviewModal } from '../components/QuestioningToolPreviewModal';
+import { initialQuestions, type Question } from '../data/questioningToolQuestions';
 
 export function QuestioningToolEditor() {
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<'tabular' | 'script'>('tabular');
+  const [showPreview, setShowPreview] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [isFinalized, setIsFinalized] = useState(false);
+
+  // Initial questions state - now using all 25 questions
+  const [questions, setQuestions] = useState<Question[]>(initialQuestions);
+
+  // Edit state for inline editing
+  const [editForm, setEditForm] = useState<Question | null>(null);
+
+  // Calculate distributions dynamically
+  const knowledgeCount = questions.filter((q) => q.testType === 'Knowledge').length;
+  const scenarioCount = questions.filter((q) => q.testType === 'Scenario').length;
+  const totalQuestions = questions.length;
+
+  const dimensionCounts = questions.reduce((acc, q) => {
+    acc[q.dimension] = (acc[q.dimension] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const handleEdit = (question: Question) => {
+    setEditingId(question.id);
+    setEditForm({ ...question });
+  };
+
+  const handleSave = () => {
+    if (editForm) {
+      setQuestions(questions.map((q) => (q.id === editForm.id ? editForm : q)));
+      setEditingId(null);
+      setEditForm(null);
+    }
+  };
+
+  const handleCancel = () => {
+    setEditingId(null);
+    setEditForm(null);
+  };
 
   return (
     <div className="p-6">
@@ -66,11 +106,11 @@ export function QuestioningToolEditor() {
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-sm">
                       <span className="text-[#666]">Knowledge-based:</span>
-                      <span className="font-semibold text-[#333]">14 (56%)</span>
+                      <span className="font-semibold text-[#333]">{knowledgeCount} ({((knowledgeCount / totalQuestions) * 100).toFixed(0)}%)</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-[#666]">Scenario-based:</span>
-                      <span className="font-semibold text-[#2E7D32]">11 (44%)</span>
+                      <span className="font-semibold text-[#2E7D32]">{scenarioCount} ({((scenarioCount / totalQuestions) * 100).toFixed(0)}%)</span>
                     </div>
                   </div>
                 </div>
@@ -79,22 +119,12 @@ export function QuestioningToolEditor() {
                     Dimensions of Competency
                   </div>
                   <div className="space-y-1.5">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[#666]">Task Skills:</span>
-                      <span className="font-semibold text-[#333]">10 questions</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[#666]">Task Management:</span>
-                      <span className="font-semibold text-[#333]">6 questions</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[#666]">Contingency Management:</span>
-                      <span className="font-semibold text-[#333]">5 questions</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[#666]">Job/Role Environment:</span>
-                      <span className="font-semibold text-[#333]">4 questions</span>
-                    </div>
+                    {Object.entries(dimensionCounts).map(([dimension, count]) => (
+                      <div key={dimension} className="flex justify-between text-sm">
+                        <span className="text-[#666]">{dimension}:</span>
+                        <span className="font-semibold text-[#333]">{count} questions</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -125,116 +155,136 @@ export function QuestioningToolEditor() {
                     <th className="text-left px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0] w-64">
                       Model Answer
                     </th>
+                    <th className="text-center px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0] w-24">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="hover:bg-[#FAFAFA]">
-                    <td className="px-3 py-3 text-sm text-center border border-[#E0E0E0] font-semibold">
-                      1
-                    </td>
-                    <td className="px-4 py-3 text-sm border border-[#E0E0E0]">
-                      What type of electrode would you use for welding low carbon steel in a flat position?
-                    </td>
-                    <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">Task Skills</td>
-                    <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
-                      <span className="inline-block px-2 py-1 rounded-full text-xs font-semibold bg-[#E3F2FD] text-[#1976D2]">
-                        Knowledge
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm border border-[#E0E0E0] text-[#666]">
-                      E6013 or E6011 electrodes, following WPS specifications
-                    </td>
-                  </tr>
-                  <tr className="bg-[#FFFEF5] hover:bg-[#FFF9E6]">
-                    <td className="px-3 py-3 text-sm text-center border border-[#E0E0E0] font-semibold">
-                      2
-                    </td>
-                    <td className="px-4 py-3 text-sm border border-[#E0E0E0]">
-                      <strong>Scenario:</strong> You notice that the electrode is sticking frequently during
-                      welding. What would you do to address this problem?
-                    </td>
-                    <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
-                      Contingency Management
-                    </td>
-                    <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
-                      <span className="inline-block px-2 py-1 rounded-full text-xs font-semibold bg-[#FFF3E0] text-[#F57C00]">
-                        Scenario
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm border border-[#E0E0E0] text-[#666]">
-                      Check and increase amperage if too low; ensure proper arc length; verify electrode is
-                      dry; adjust travel speed
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-[#FAFAFA]">
-                    <td className="px-3 py-3 text-sm text-center border border-[#E0E0E0] font-semibold">
-                      3
-                    </td>
-                    <td className="px-4 py-3 text-sm border border-[#E0E0E0]">
-                      Why is it important to clean the base metal before welding?
-                    </td>
-                    <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">Task Skills</td>
-                    <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
-                      <span className="inline-block px-2 py-1 rounded-full text-xs font-semibold bg-[#E3F2FD] text-[#1976D2]">
-                        Knowledge
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm border border-[#E0E0E0] text-[#666]">
-                      To prevent contamination, porosity, and weak welds; to ensure proper fusion and weld
-                      quality
-                    </td>
-                  </tr>
-                  <tr className="bg-[#FFFEF5] hover:bg-[#FFF9E6]">
-                    <td className="px-3 py-3 text-sm text-center border border-[#E0E0E0] font-semibold">
-                      4
-                    </td>
-                    <td className="px-4 py-3 text-sm border border-[#E0E0E0]">
-                      <strong>Scenario:</strong> While welding, you smell smoke and see small sparks near the
-                      welding cables. What should you do immediately?
-                    </td>
-                    <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
-                      Contingency Management
-                    </td>
-                    <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
-                      <span className="inline-block px-2 py-1 rounded-full text-xs font-semibold bg-[#FFF3E0] text-[#F57C00]">
-                        Scenario
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm border border-[#E0E0E0] text-[#666]">
-                      Stop welding immediately; disconnect power; inspect cables for damage; report to
-                      supervisor; do not resume until cables are replaced or repaired
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-[#FAFAFA]">
-                    <td className="px-3 py-3 text-sm text-center border border-[#E0E0E0] font-semibold">
-                      5
-                    </td>
-                    <td className="px-4 py-3 text-sm border border-[#E0E0E0]">
-                      How would you prioritize your tasks when preparing for a welding job?
-                    </td>
-                    <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
-                      Task Management
-                    </td>
-                    <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
-                      <span className="inline-block px-2 py-1 rounded-full text-xs font-semibold bg-[#E3F2FD] text-[#1976D2]">
-                        Knowledge
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm border border-[#E0E0E0] text-[#666]">
-                      Safety first (PPE, equipment check); review WPS; prepare materials; set up equipment;
-                      clean work area
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-[#FAFAFA]">
-                    <td
-                      colSpan={5}
-                      className="px-4 py-3 text-center text-sm text-[#999] italic border border-[#E0E0E0]"
-                    >
-                      ... 20 more questions (Total: 25 questions)
-                    </td>
-                  </tr>
+                  {questions.map((q) => (
+                    <tr key={q.id} className={q.id % 2 === 0 ? 'bg-[#FFFEF5] hover:bg-[#FFF9E6]' : 'hover:bg-[#FAFAFA]'}>
+                      <td className="px-3 py-3 text-sm text-center border border-[#E0E0E0] font-semibold">
+                        {q.id}
+                      </td>
+                      {editingId === q.id && editForm ? (
+                        // Edit mode
+                        <>
+                          <td className="px-4 py-3 text-sm border border-[#E0E0E0]">
+                            <textarea
+                              value={editForm.question}
+                              onChange={(e) => setEditForm({ ...editForm, question: e.target.value })}
+                              className="w-full px-2 py-1 border border-[#E0E0E0] rounded text-sm min-h-[60px]"
+                            />
+                          </td>
+                          <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
+                            <select
+                              value={editForm.dimension}
+                              onChange={(e) => setEditForm({ ...editForm, dimension: e.target.value })}
+                              className="w-full px-2 py-1 border border-[#E0E0E0] rounded text-sm"
+                            >
+                              <option>Task Skills</option>
+                              <option>Task Management</option>
+                              <option>Contingency Management</option>
+                              <option>Job/Role Environment</option>
+                            </select>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
+                            <select
+                              value={editForm.testType}
+                              onChange={(e) => setEditForm({ ...editForm, testType: e.target.value as 'Knowledge' | 'Scenario' })}
+                              className="w-full px-2 py-1 border border-[#E0E0E0] rounded text-sm"
+                            >
+                              <option value="Knowledge">Knowledge</option>
+                              <option value="Scenario">Scenario</option>
+                            </select>
+                          </td>
+                          <td className="px-4 py-3 text-sm border border-[#E0E0E0]">
+                            <textarea
+                              value={editForm.modelAnswer}
+                              onChange={(e) => setEditForm({ ...editForm, modelAnswer: e.target.value })}
+                              className="w-full px-2 py-1 border border-[#E0E0E0] rounded text-sm min-h-[60px]"
+                            />
+                          </td>
+                        </>
+                      ) : (
+                        // View mode
+                        <>
+                          <td className="px-4 py-3 text-sm border border-[#E0E0E0]">
+                            {q.testType === 'Scenario' ? <strong>Scenario:</strong> : null} {q.question}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">{q.dimension}</td>
+                          <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
+                            <span
+                              className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
+                                q.testType === 'Knowledge' ? 'bg-[#E3F2FD] text-[#1976D2]' : 'bg-[#FFF3E0] text-[#F57C00]'
+                              }`}
+                            >
+                              {q.testType}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-sm border border-[#E0E0E0] text-[#666]">
+                            {q.modelAnswer}
+                          </td>
+                        </>
+                      )}
+                      <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0] w-24">
+                        {editingId === q.id ? (
+                          <div className="flex gap-1 justify-center">
+                            <button
+                              onClick={handleSave}
+                              className="p-1.5 text-[#2E7D32] hover:bg-[#E8F5E9] rounded transition-colors"
+                              title="Save"
+                            >
+                              <Save size={16} />
+                            </button>
+                            <button
+                              onClick={handleCancel}
+                              className="p-1.5 text-[#C62828] hover:bg-[#FFEBEE] rounded transition-colors"
+                              title="Cancel"
+                            >
+                              <X size={16} />
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => handleEdit(q)}
+                            className="p-1.5 text-[#1976D2] hover:bg-[#E3F2FD] rounded transition-colors"
+                            title="Edit"
+                          >
+                            <Edit2 size={16} />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+
+          {/* Finalize Button */}
+          <div className="bg-white border border-[#E0E0E0] rounded p-5">
+            <div className="flex items-start gap-4">
+              <div className="flex-1">
+                <div className="font-semibold text-sm text-[#333] mb-1">Finalize Question Pool</div>
+                <div className="text-xs text-[#666]">
+                  Once finalized, this pool will be locked and ready for use in Phase 3 package assembly. All 25 questions will be used to generate the Interview Script.
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setIsFinalized(!isFinalized);
+                  alert(isFinalized ? 'Question pool unlocked for editing' : 'Question pool finalized successfully!');
+                }}
+                className={`px-5 py-2.5 rounded text-sm font-medium transition-colors flex items-center gap-2 whitespace-nowrap ${
+                  isFinalized
+                    ? 'bg-white text-[#666] border border-[#E0E0E0] hover:bg-[#F5F5F5]'
+                    : 'bg-[#2E7D32] text-white hover:bg-[#1B5E20]'
+                }`}
+              >
+                <CheckCircle size={16} />
+                {isFinalized ? 'Unfinalize Pool' : 'Finalize Pool'}
+              </button>
             </div>
           </div>
         </>
@@ -258,70 +308,36 @@ export function QuestioningToolEditor() {
             </div>
 
             <div className="space-y-5">
-              <div className="border-l-4 border-[#2E7D32] pl-4">
-                <div className="flex items-start gap-2 mb-2">
-                  <span className="inline-block px-2 py-0.5 rounded text-xs font-bold bg-[#2E7D32] text-white">
-                    Q1
-                  </span>
-                  <div className="flex-1">
-                    <div className="text-sm font-medium text-[#333] mb-1">
-                      What type of electrode would you use for welding low carbon steel in a flat position?
-                    </div>
-                    <div className="text-xs text-[#666] mb-2">
-                      <strong>Dimension:</strong> Task Skills | <strong>Type:</strong> Knowledge-based
-                    </div>
-                    <div className="p-3 bg-[#FAFAFA] rounded text-sm text-[#666]">
-                      <strong className="text-[#333]">Expected Answer:</strong> E6013 or E6011 electrodes,
-                      following WPS specifications
-                    </div>
-                    <div className="mt-2 flex items-center gap-4">
-                      <label className="flex items-center gap-2 text-sm cursor-pointer">
-                        <input type="radio" name="q1" className="w-4 h-4" />
-                        <span className="text-[#2E7D32] font-medium">S - Satisfactory</span>
-                      </label>
-                      <label className="flex items-center gap-2 text-sm cursor-pointer">
-                        <input type="radio" name="q1" className="w-4 h-4" />
-                        <span className="text-[#C62828] font-medium">NS - Not Satisfactory</span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="border-l-4 border-[#F57C00] pl-4">
-                <div className="flex items-start gap-2 mb-2">
-                  <span className="inline-block px-2 py-0.5 rounded text-xs font-bold bg-[#F57C00] text-white">
-                    Q2
-                  </span>
-                  <div className="flex-1">
-                    <div className="text-sm font-medium text-[#333] mb-1">
-                      <strong className="text-[#F57C00]">SCENARIO:</strong> You notice that the electrode is
-                      sticking frequently during welding. What would you do to address this problem?
-                    </div>
-                    <div className="text-xs text-[#666] mb-2">
-                      <strong>Dimension:</strong> Contingency Management | <strong>Type:</strong> Scenario-based
-                    </div>
-                    <div className="p-3 bg-[#FAFAFA] rounded text-sm text-[#666]">
-                      <strong className="text-[#333]">Expected Answer:</strong> Check and increase amperage if
-                      too low; ensure proper arc length; verify electrode is dry; adjust travel speed
-                    </div>
-                    <div className="mt-2 flex items-center gap-4">
-                      <label className="flex items-center gap-2 text-sm cursor-pointer">
-                        <input type="radio" name="q2" className="w-4 h-4" />
-                        <span className="text-[#2E7D32] font-medium">S - Satisfactory</span>
-                      </label>
-                      <label className="flex items-center gap-2 text-sm cursor-pointer">
-                        <input type="radio" name="q2" className="w-4 h-4" />
-                        <span className="text-[#C62828] font-medium">NS - Not Satisfactory</span>
-                      </label>
+              {questions.map((q) => (
+                <div key={q.id} className={`border-l-4 ${q.testType === 'Knowledge' ? 'border-[#2E7D32]' : 'border-[#F57C00]'} pl-4`}>
+                  <div className="flex items-start gap-2 mb-2">
+                    <span className="inline-block px-2 py-0.5 rounded text-xs font-bold bg-[#2E7D32] text-white">
+                      Q{q.id}
+                    </span>
+                    <div className="flex-1">
+                      <div className="text-sm font-medium text-[#333] mb-1">
+                        {q.testType === 'Scenario' ? <strong className="text-[#F57C00]">SCENARIO:</strong> : null} {q.question}
+                      </div>
+                      <div className="text-xs text-[#666] mb-2">
+                        <strong>Dimension:</strong> {q.dimension} | <strong>Type:</strong> {q.testType}-based
+                      </div>
+                      <div className="p-3 bg-[#FAFAFA] rounded text-sm text-[#666]">
+                        <strong className="text-[#333]">Expected Answer:</strong> {q.modelAnswer}
+                      </div>
+                      <div className="mt-2 flex items-center gap-4">
+                        <label className="flex items-center gap-2 text-sm cursor-pointer">
+                          <input type="radio" name={`q${q.id}`} className="w-4 h-4" />
+                          <span className="text-[#2E7D32] font-medium">S - Satisfactory</span>
+                        </label>
+                        <label className="flex items-center gap-2 text-sm cursor-pointer">
+                          <input type="radio" name={`q${q.id}`} className="w-4 h-4" />
+                          <span className="text-[#C62828] font-medium">NS - Not Satisfactory</span>
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              <div className="p-4 bg-[#F5F5F5] rounded text-center text-sm text-[#666] italic">
-                ... 23 more questions in ready-to-use format (Total: 25 questions)
-              </div>
+              ))}
             </div>
           </div>
         </div>
@@ -335,9 +351,24 @@ export function QuestioningToolEditor() {
           ← Back to Dashboard
         </button>
         <button className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors">
-          Download {viewMode === 'tabular' ? 'Tabular Format' : 'Interview Script'}
+          Save Draft
+        </button>
+        <button
+          onClick={() => setShowPreview(true)}
+          className="px-4 py-2 bg-white text-[#1976D2] border border-[#1976D2] rounded text-sm font-medium hover:bg-[#E3F2FD] transition-colors flex items-center gap-2"
+        >
+          <Eye size={16} />
+          Preview
         </button>
       </div>
+
+      {/* Preview Modal */}
+      {showPreview && (
+        <QuestioningToolPreviewModal
+          questions={questions}
+          onClose={() => setShowPreview(false)}
+        />
+      )}
     </div>
   );
 }

@@ -1,9 +1,84 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
+import { Eye, Plus, Edit2, Trash2, CheckCircle, Save } from 'lucide-react';
+import { initialMCQItems, MCQItem } from '../data/mcqQuestions';
+import { MCQEditorModal } from '../components/MCQEditorModal';
+import { DeleteConfirmDialog } from '../components/DeleteConfirmDialog';
+import { MCQPreviewModal } from '../components/MCQPreviewModal';
 
 export function MCQEditor() {
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState<'mcq' | 'tos'>('mcq');
+  const [mcqItems, setMcqItems] = useState<MCQItem[]>(initialMCQItems);
+  const [editingItem, setEditingItem] = useState<MCQItem | null>(null);
+  const [deletingItemId, setDeletingItemId] = useState<number | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [isFinalized, setIsFinalized] = useState(false);
+
+  const handleSaveItem = (item: MCQItem) => {
+    if (item.id === 0) {
+      // New item
+      const newId = Math.max(...mcqItems.map((i) => i.id)) + 1;
+      setMcqItems([...mcqItems, { ...item, id: newId }]);
+    } else {
+      // Edit existing
+      setMcqItems(mcqItems.map((i) => (i.id === item.id ? item : i)));
+    }
+  };
+
+  const handleDeleteItem = (id: number) => {
+    setMcqItems(mcqItems.filter((i) => i.id !== id));
+    setDeletingItemId(null);
+  };
+
+  const handleAddNew = () => {
+    setEditingItem({
+      id: 0,
+      question: '',
+      options: { a: '', b: '', c: '', d: '' },
+      correctAnswer: 'a',
+      type: 'Factual',
+      cognitiveLevel: 'Remember',
+      articleNumber: 1,
+    });
+    setShowAddModal(true);
+  };
+
+  // Calculate TOS data
+  const calculateTOS = () => {
+    const tosData = [
+      { article: '1. Occupational Safety and Health', target: 4, percentage: 10 },
+      { article: '2. Equipment Operation', target: 12, percentage: 30 },
+      { article: '3. Preventive Maintenance Servicing/Inspection', target: 6, percentage: 15 },
+      { article: '4. Job or Role in the Workplace', target: 2, percentage: 5 },
+      { article: '5. Equipment/Supply Identification and Usage', target: 15, percentage: 37.5 },
+      { article: '6. Mathematics/Computation', target: 1, percentage: 2.5 },
+    ];
+
+    return tosData.map((article, idx) => {
+      const articleNum = idx + 1;
+      const articleItems = mcqItems.filter((item) => item.articleNumber === articleNum);
+      
+      const factual = articleItems.filter((item) => item.type === 'Factual').map((item) => item.id);
+      const comprehension = articleItems.filter((item) => item.type === 'Scenario').map((item) => item.id);
+      const application = articleItems.filter((item) => item.type === 'Application').map((item) => item.id);
+      
+      return {
+        ...article,
+        factual: factual.length > 0 ? factual.join(',') : '–',
+        comprehension: comprehension.length > 0 ? comprehension.join(',') : '–',
+        application: application.length > 0 ? application.join(',') : '–',
+        total: articleItems.length,
+      };
+    });
+  };
+
+  const tosData = calculateTOS();
+  const totalItems = mcqItems.length;
+  const factualCount = mcqItems.filter((i) => i.type === 'Factual').length;
+  const scenarioCount = mcqItems.filter((i) => i.type === 'Scenario').length;
+  const applicationCount = mcqItems.filter((i) => i.type === 'Application').length;
 
   return (
     <div className="p-6">
@@ -19,10 +94,12 @@ export function MCQEditor() {
             </span>
             MCQ Pool + Table of Specifications
           </h1>
-          <p className="text-sm text-[#666]">50 Items · Factual / Scenario / Application · External Item Analysis</p>
+          <p className="text-sm text-[#666]">{totalItems} Items · Factual / Scenario / Application · External Item Analysis</p>
         </div>
-        <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[#FFF3E0] text-[#F57C00]">
-          Draft
+        <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+          isFinalized ? 'bg-[#E8F5E9] text-[#2E7D32]' : 'bg-[#FFF3E0] text-[#F57C00]'
+        }`}>
+          {isFinalized ? 'Finalized' : 'Draft'}
         </span>
       </div>
 
@@ -30,10 +107,10 @@ export function MCQEditor() {
       <div className="bg-white border border-[#E0E0E0] rounded mb-6 p-5">
         <div className="flex justify-between items-center mb-3">
           <span className="text-sm font-semibold text-[#333]">Item Development Progress</span>
-          <span className="text-sm text-[#666]">47 of 50 items (94%)</span>
+          <span className="text-sm text-[#666]">{totalItems} of 50 items ({((totalItems / 50) * 100).toFixed(0)}%)</span>
         </div>
         <div className="w-full h-2 bg-[#F0F0F0] rounded-full overflow-hidden">
-          <div className="h-full bg-[#F57C00]" style={{ width: '94%' }} />
+          <div className="h-full bg-[#1976D2]" style={{ width: `${(totalItems / 50) * 100}%` }} />
         </div>
       </div>
 
@@ -45,7 +122,7 @@ export function MCQEditor() {
             selectedTab === 'mcq' ? 'bg-[#1976D2] text-white' : 'bg-white text-[#666] hover:bg-[#F5F5F5]'
           }`}
         >
-          MCQ Items (47)
+          MCQ Items ({totalItems})
         </button>
         <button
           onClick={() => setSelectedTab('tos')}
@@ -61,219 +138,259 @@ export function MCQEditor() {
         <div className="bg-white border border-[#E0E0E0] rounded mb-6">
           <div className="px-5 py-4 border-b border-[#E0E0E0] flex justify-between items-center">
             <span className="text-[15px] font-semibold text-[#333]">Multiple Choice Questions</span>
-            <button className="px-4 py-2 bg-[#1976D2] text-white rounded text-sm font-medium hover:bg-[#1565C0]">
-              + Add Item
+            <button
+              onClick={handleAddNew}
+              className="px-4 py-2 bg-[#1976D2] text-white rounded text-sm font-medium hover:bg-[#1565C0] flex items-center gap-2"
+            >
+              <Plus size={16} />
+              Add Item
             </button>
           </div>
 
-          <div className="p-6 space-y-6">
-            {/* Sample MCQ Item */}
-            <div className="border border-[#E0E0E0] rounded-lg p-5 hover:border-[#1976D2] transition-colors">
-              <div className="flex justify-between items-start mb-3">
-                <div className="flex items-center gap-2">
-                  <span className="inline-block px-2 py-0.5 rounded text-xs font-bold bg-[#1976D2] text-white">
-                    Item 1
-                  </span>
-                  <span className="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-[#E3F2FD] text-[#1976D2]">
-                    Factual
-                  </span>
-                  <span className="text-xs text-[#999]">Remember / Understand</span>
+          <div className="p-6 space-y-4">
+            {mcqItems.map((item) => (
+              <div
+                key={item.id}
+                className="border border-[#E0E0E0] rounded-lg p-5 hover:border-[#1976D2] transition-colors"
+              >
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="inline-block px-2 py-0.5 rounded text-xs font-bold bg-[#1976D2] text-white">
+                      Item {item.id}
+                    </span>
+                    <span
+                      className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${
+                        item.type === 'Factual'
+                          ? 'bg-[#E3F2FD] text-[#1976D2]'
+                          : item.type === 'Scenario'
+                          ? 'bg-[#FFF3E0] text-[#F57C00]'
+                          : 'bg-[#E8F5E9] text-[#2E7D32]'
+                      }`}
+                    >
+                      {item.type}
+                    </span>
+                    <span className="text-xs text-[#999]">{item.cognitiveLevel}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setEditingItem(item);
+                        setShowAddModal(false);
+                      }}
+                      className="p-1.5 text-[#1976D2] hover:bg-[#E3F2FD] rounded transition-colors"
+                      title="Edit"
+                    >
+                      <Edit2 size={16} />
+                    </button>
+                    <button
+                      onClick={() => setDeletingItemId(item.id)}
+                      className="p-1.5 text-[#C62828] hover:bg-[#FFEBEE] rounded transition-colors"
+                      title="Delete"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <button className="text-[#1976D2] text-sm hover:underline">Edit</button>
-                  <button className="text-[#C62828] text-sm hover:underline">Delete</button>
+
+                <div
+                  className="text-sm text-[#333] mb-4 font-medium"
+                  dangerouslySetInnerHTML={{ __html: item.question }}
+                />
+
+                <div className="space-y-2 ml-4">
+                  <div className="flex items-start gap-2">
+                    <span
+                      className={`text-sm font-semibold ${item.correctAnswer === 'a' ? 'text-[#2E7D32]' : 'text-[#666]'}`}
+                    >
+                      A.
+                    </span>
+                    <span
+                      className={`text-sm ${item.correctAnswer === 'a' ? 'text-[#2E7D32] font-medium' : 'text-[#666]'}`}
+                    >
+                      {item.options.a}
+                      {item.correctAnswer === 'a' && ' ✓ (Correct Answer)'}
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span
+                      className={`text-sm font-semibold ${item.correctAnswer === 'b' ? 'text-[#2E7D32]' : 'text-[#666]'}`}
+                    >
+                      B.
+                    </span>
+                    <span
+                      className={`text-sm ${item.correctAnswer === 'b' ? 'text-[#2E7D32] font-medium' : 'text-[#666]'}`}
+                    >
+                      {item.options.b}
+                      {item.correctAnswer === 'b' && ' ✓ (Correct Answer)'}
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span
+                      className={`text-sm font-semibold ${item.correctAnswer === 'c' ? 'text-[#2E7D32]' : 'text-[#666]'}`}
+                    >
+                      C.
+                    </span>
+                    <span
+                      className={`text-sm ${item.correctAnswer === 'c' ? 'text-[#2E7D32] font-medium' : 'text-[#666]'}`}
+                    >
+                      {item.options.c}
+                      {item.correctAnswer === 'c' && ' ✓ (Correct Answer)'}
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span
+                      className={`text-sm font-semibold ${item.correctAnswer === 'd' ? 'text-[#2E7D32]' : 'text-[#666]'}`}
+                    >
+                      D.
+                    </span>
+                    <span
+                      className={`text-sm ${item.correctAnswer === 'd' ? 'text-[#2E7D32] font-medium' : 'text-[#666]'}`}
+                    >
+                      {item.options.d}
+                      {item.correctAnswer === 'd' && ' ✓ (Correct Answer)'}
+                    </span>
+                  </div>
                 </div>
               </div>
-
-              <div className="text-sm text-[#333] mb-4 font-medium">
-                Which electrode is most suitable for welding low carbon steel in a flat position?
-              </div>
-
-              <div className="space-y-2 ml-4">
-                <div className="flex items-start gap-2">
-                  <span className="text-sm font-semibold text-[#2E7D32]">A.</span>
-                  <span className="text-sm text-[#2E7D32] font-medium">E6013 ✓ (Correct Answer)</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-sm font-semibold text-[#666]">B.</span>
-                  <span className="text-sm text-[#666]">E7018</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-sm font-semibold text-[#666]">C.</span>
-                  <span className="text-sm text-[#666]">E6010</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-sm font-semibold text-[#666]">D.</span>
-                  <span className="text-sm text-[#666]">E8018</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Scenario-based item */}
-            <div className="border border-[#E0E0E0] rounded-lg p-5 hover:border-[#1976D2] transition-colors">
-              <div className="flex justify-between items-start mb-3">
-                <div className="flex items-center gap-2">
-                  <span className="inline-block px-2 py-0.5 rounded text-xs font-bold bg-[#1976D2] text-white">
-                    Item 2
-                  </span>
-                  <span className="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-[#FFF3E0] text-[#F57C00]">
-                    Scenario
-                  </span>
-                  <span className="text-xs text-[#999]">Understand / Apply</span>
-                </div>
-                <div className="flex gap-2">
-                  <button className="text-[#1976D2] text-sm hover:underline">Edit</button>
-                  <button className="text-[#C62828] text-sm hover:underline">Delete</button>
-                </div>
-              </div>
-
-              <div className="text-sm text-[#333] mb-4">
-                <strong className="text-[#F57C00]">SCENARIO:</strong> You are welding a plate-to-plate joint
-                when you notice the electrode is sticking frequently. What should you do first?
-              </div>
-
-              <div className="space-y-2 ml-4">
-                <div className="flex items-start gap-2">
-                  <span className="text-sm font-semibold text-[#666]">A.</span>
-                  <span className="text-sm text-[#666]">Change to a different electrode brand</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-sm font-semibold text-[#2E7D32]">B.</span>
-                  <span className="text-sm text-[#2E7D32] font-medium">
-                    Check and increase the amperage if it is too low ✓ (Correct Answer)
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-sm font-semibold text-[#666]">C.</span>
-                  <span className="text-sm text-[#666]">Reduce the travel speed</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-sm font-semibold text-[#666]">D.</span>
-                  <span className="text-sm text-[#666]">Stop welding and report the issue immediately</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-4 bg-[#F5F5F5] rounded text-center text-sm text-[#666] italic">
-              ... 45 more items (Total: 47 items drafted, 3 pending)
-            </div>
-
-            <div className="bg-[#FFF3E0] border-l-4 border-[#F57C00] p-4">
-              <div className="font-semibold text-sm text-[#F57C00] mb-2">Next Steps:</div>
-              <ol className="text-sm text-[#E65100] space-y-1 ml-4 list-decimal">
-                <li>Complete remaining 3 items</li>
-                <li>Download MCQ for pilot testing (minimum 20 students)</li>
-                <li>Perform external item analysis using difficulty index</li>
-                <li>Return to system: edit, retain, or discard items based on analysis</li>
-                <li>Regenerate TOS based on final MCQ</li>
-              </ol>
-            </div>
+            ))}
           </div>
         </div>
       ) : (
+        /* Table of Specifications */
         <div className="bg-white border border-[#E0E0E0] rounded mb-6">
           <div className="px-5 py-4 border-b border-[#E0E0E0]">
             <span className="text-[15px] font-semibold text-[#333]">
-              Table of Specifications (TOS) - Draft
+              Table of Specifications (TOS)
             </span>
           </div>
+
+          {/* Detailed TOS Table */}
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
+                <tr className="bg-[#1976D2]">
+                  <th colSpan={6} className="px-4 py-3 text-center font-bold text-white border border-[#E0E0E0]">
+                    TABLE OF SPECIFICATION
+                  </th>
+                </tr>
+                <tr className="bg-[#1976D2]">
+                  <th colSpan={6} className="px-4 py-2 text-center font-semibold text-white border border-[#E0E0E0]">
+                    SHIELDED METAL ARC WELDING (SMAW) – National Certificate II
+                  </th>
+                </tr>
+                <tr className="bg-[#1976D2]">
+                  <th colSpan={6} className="px-4 py-2 text-center font-semibold text-white border border-[#E0E0E0]">
+                    Written Test
+                  </th>
+                </tr>
                 <tr className="bg-[#FAFAFA]">
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0]">
-                    Element & PC
+                  <th rowSpan={2} className="text-left px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0] align-middle">
+                    ARTICLE NUMBER
                   </th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0]">
-                    Knowledge Focus
+                  <th colSpan={3} className="text-center px-4 py-2 text-xs font-semibold text-[#666] border border-[#E0E0E0]">
+                    TEST ITEM DISTRIBUTION
                   </th>
-                  <th className="text-center px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0]">
-                    Cognitive Level
+                  <th rowSpan={2} className="text-center px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0] align-middle">
+                    TOTAL NO. OF<br />ITEMS
                   </th>
-                  <th className="text-center px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0]">
-                    Item Placement
+                  <th rowSpan={2} className="text-center px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0] align-middle">
+                    PERCENTAGE<br />(%)
                   </th>
-                  <th className="text-center px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0]">
-                    No. of MCQs
+                </tr>
+                <tr className="bg-[#FAFAFA]">
+                  <th className="text-center px-4 py-2 text-xs font-semibold text-[#666] border border-[#E0E0E0]">
+                    TYPE I<br />Factual Knowledge
                   </th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0]">
-                    Item Numbers
+                  <th className="text-center px-4 py-2 text-xs font-semibold text-[#666] border border-[#E0E0E0]">
+                    TYPE 2<br />Comprehension
+                  </th>
+                  <th className="text-center px-4 py-2 text-xs font-semibold text-[#666] border border-[#E0E0E0]">
+                    TYPE 3<br />Application
                   </th>
                 </tr>
               </thead>
               <tbody>
-                <tr className="hover:bg-[#FAFAFA]">
-                  <td className="px-4 py-3 text-sm border border-[#E0E0E0]">
-                    Element 1, PC 1:<br />Electrode identification
-                  </td>
-                  <td className="px-4 py-3 text-sm border border-[#E0E0E0]">
-                    Electrode types and specifications
-                  </td>
-                  <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
-                    Remember / Understand
-                  </td>
-                  <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">Factual</td>
-                  <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0] font-semibold">3</td>
-                  <td className="px-4 py-3 text-sm border border-[#E0E0E0]">1, 8, 15</td>
-                </tr>
-                <tr className="hover:bg-[#FAFAFA]">
-                  <td className="px-4 py-3 text-sm border border-[#E0E0E0]">
-                    Element 1, PC 2:<br />Machine setup
-                  </td>
-                  <td className="px-4 py-3 text-sm border border-[#E0E0E0]">WPS interpretation</td>
-                  <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
-                    Understand / Apply
-                  </td>
-                  <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">Scenario</td>
-                  <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0] font-semibold">5</td>
-                  <td className="px-4 py-3 text-sm border border-[#E0E0E0]">2, 9, 16, 23, 30</td>
-                </tr>
-                <tr className="hover:bg-[#FAFAFA]">
-                  <td className="px-4 py-3 text-sm border border-[#E0E0E0]">
-                    Element 1, PC 4:<br />Safety compliance
-                  </td>
-                  <td className="px-4 py-3 text-sm border border-[#E0E0E0]">OSHS standards</td>
-                  <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">Apply</td>
-                  <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">Application</td>
-                  <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0] font-semibold">4</td>
-                  <td className="px-4 py-3 text-sm border border-[#E0E0E0]">3, 10, 17, 24</td>
-                </tr>
-                <tr className="hover:bg-[#FAFAFA]">
-                  <td
-                    colSpan={6}
-                    className="px-4 py-3 text-center text-sm text-[#999] italic border border-[#E0E0E0]"
-                  >
-                    ... Additional rows for remaining PCs
-                  </td>
-                </tr>
+                {tosData.map((row, idx) => (
+                  <tr key={idx} className="hover:bg-[#FAFAFA]">
+                    <td className="px-4 py-3 text-sm border border-[#E0E0E0]">{row.article}</td>
+                    <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">{row.factual}</td>
+                    <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">{row.comprehension}</td>
+                    <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">{row.application}</td>
+                    <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0] font-semibold">{row.total}</td>
+                    <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">{row.percentage}</td>
+                  </tr>
+                ))}
                 <tr className="bg-[#E8F5E9]">
-                  <td
-                    colSpan={4}
-                    className="px-4 py-3 text-sm font-bold text-right border border-[#E0E0E0]"
-                  >
-                    TOTAL
-                  </td>
-                  <td className="px-4 py-3 text-sm font-bold text-center border border-[#E0E0E0]">47</td>
-                  <td className="px-4 py-3 text-sm border border-[#E0E0E0]">1-47</td>
+                  <td className="px-4 py-3 text-sm font-bold text-right border border-[#E0E0E0]">TOTAL</td>
+                  <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0] font-semibold">{factualCount}</td>
+                  <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0] font-semibold">{scenarioCount}</td>
+                  <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0] font-semibold">{applicationCount}</td>
+                  <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0] font-bold">{totalItems}</td>
+                  <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0] font-bold">100%</td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <div className="p-5">
-            <div className="bg-[#E3F2FD] border-l-4 border-[#1976D2] p-4">
-              <div className="font-semibold text-sm text-[#1976D2] mb-2">TOS Reconciliation Status:</div>
-              <div className="space-y-1 text-sm text-[#1565C0]">
-                <div>✓ All MCQ items mapped to PCs marked for Multiple Choice</div>
-                <div>✓ Sum of MCQ items = 47 (Target: 50)</div>
-                <div>⚠️ 3 items pending to reach target of 50</div>
-                <div>✓ All item numbers accounted for (no gaps or duplicates)</div>
-                <div>✓ Cognitive levels align with item placement categories</div>
-              </div>
-            </div>
+
+          {/* Summary Table */}
+          <div className="p-5 border-t border-[#E0E0E0]">
+            <div className="text-xs font-semibold text-[#666] uppercase mb-3">Summary by Article</div>
+            <table className="w-full border border-[#E0E0E0]">
+              <thead>
+                <tr className="bg-[#FAFAFA]">
+                  <th className="text-left px-4 py-2 text-xs font-semibold text-[#666] border border-[#E0E0E0]">
+                    ARTICLE/DESCRIPTION
+                  </th>
+                  <th className="text-center px-4 py-2 text-xs font-semibold text-[#666] border border-[#E0E0E0]">
+                    NO. OF ITEMS
+                  </th>
+                  <th className="text-center px-4 py-2 text-xs font-semibold text-[#666] border border-[#E0E0E0]">
+                    PERCENTAGE (%)
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {tosData.map((row, idx) => (
+                  <tr key={idx} className="hover:bg-[#FAFAFA]">
+                    <td className="px-4 py-2 text-sm border border-[#E0E0E0]">{row.article}</td>
+                    <td className="px-4 py-2 text-sm text-center border border-[#E0E0E0]">{row.total}</td>
+                    <td className="px-4 py-2 text-sm text-center border border-[#E0E0E0]">{row.percentage}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
 
+      {/* Finalize Section */}
+      <div className="bg-white border border-[#E0E0E0] rounded p-5 mb-6">
+        <div className="flex items-start gap-4">
+          <div className="flex-1">
+            <div className="font-semibold text-sm text-[#333] mb-1">Finalize MCQ Pool</div>
+            <div className="text-xs text-[#666]">
+              Once finalized, this pool will be locked and ready for pilot testing and item analysis.
+              All {totalItems} items will be included in the Table of Specifications.
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              setIsFinalized(!isFinalized);
+              alert(isFinalized ? 'MCQ pool unlocked for editing' : 'MCQ pool finalized successfully!');
+            }}
+            className={`px-5 py-2.5 rounded text-sm font-medium transition-colors flex items-center gap-2 whitespace-nowrap ${
+              isFinalized
+                ? 'bg-white text-[#666] border border-[#E0E0E0] hover:bg-[#F5F5F5]'
+                : 'bg-[#2E7D32] text-white hover:bg-[#1B5E20]'
+            }`}
+          >
+            <CheckCircle size={16} />
+            {isFinalized ? 'Unfinalize Pool' : 'Finalize Pool'}
+          </button>
+        </div>
+      </div>
+
+      {/* Footer Actions */}
       <div className="flex gap-3 justify-end">
         <button
           onClick={() => navigate('/')}
@@ -281,13 +398,43 @@ export function MCQEditor() {
         >
           ← Back to Dashboard
         </button>
-        <button className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors">
-          Download for Pilot Testing
+        <button
+          onClick={() => alert('Draft saved successfully!')}
+          className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors flex items-center gap-2"
+        >
+          <Save size={16} />
+          Save Draft
         </button>
-        <button className="px-4 py-2 bg-[#1976D2] text-white rounded text-sm font-medium hover:bg-[#1565C0] transition-colors">
-          Continue Editing
+        <button
+          onClick={() => setShowPreview(true)}
+          className="px-4 py-2 bg-white text-[#1976D2] border border-[#1976D2] rounded text-sm font-medium hover:bg-[#E3F2FD] transition-colors flex items-center gap-2"
+        >
+          <Eye size={16} />
+          Preview
         </button>
       </div>
+
+      {/* Modals */}
+      {(editingItem || showAddModal) && (
+        <MCQEditorModal
+          item={editingItem}
+          onSave={handleSaveItem}
+          onClose={() => {
+            setEditingItem(null);
+            setShowAddModal(false);
+          }}
+        />
+      )}
+
+      {deletingItemId && (
+        <DeleteConfirmDialog
+          itemNumber={deletingItemId}
+          onConfirm={() => handleDeleteItem(deletingItemId)}
+          onCancel={() => setDeletingItemId(null)}
+        />
+      )}
+
+      {showPreview && <MCQPreviewModal items={mcqItems} onClose={() => setShowPreview(false)} />}
     </div>
   );
 }

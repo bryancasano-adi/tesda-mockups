@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
+import { ChevronRight, ChevronDown, Eye, Download, FileText, Printer } from 'lucide-react';
+import { EvidencePlanPreviewModal } from '../components/EvidencePlanPreviewModal';
 
 interface PC {
   id: string;
@@ -13,7 +15,8 @@ interface PC {
 
 export function EvidencePlanEditor() {
   const navigate = useNavigate();
-  const [showValidation, setShowValidation] = useState(true);
+  const [showValidation, setShowValidation] = useState(false); // Default collapsed
+  const [showPreview, setShowPreview] = useState(false); // Preview modal
   const [expandedUnits, setExpandedUnits] = useState<{ [key: string]: boolean }>({
     unit1: true,
     unit2: false,
@@ -164,10 +167,20 @@ export function EvidencePlanEditor() {
               <tr>
                 <td
                   colSpan={6}
-                  className="px-3.5 py-2.5 text-sm font-semibold text-white bg-[#1E3A5F] border border-[#E0E0E0]"
+                  onClick={() => toggleUnit('unit1')}
+                  className="px-3.5 py-2.5 text-sm font-semibold text-white bg-[#1E3A5F] border border-[#E0E0E0] cursor-pointer hover:bg-[#2C4E6F] transition-colors"
                 >
-                  <span className="mr-1.5">🔒</span>
-                  CORE 1: Perform Shielded Metal Arc Welding — Plate to Plate Joint
+                  <div className="flex items-center gap-2">
+                    {expandedUnits.unit1 ? (
+                      <ChevronDown size={16} className="flex-shrink-0" />
+                    ) : (
+                      <ChevronRight size={16} className="flex-shrink-0" />
+                    )}
+                    <span className="mr-1.5">🔒</span>
+                    <span className="flex-1">
+                      CORE 1: Perform Shielded Metal Arc Welding — Plate to Plate Joint
+                    </span>
+                  </div>
                 </td>
               </tr>
 
@@ -296,16 +309,16 @@ export function EvidencePlanEditor() {
                       </div>
                     </td>
                     <td className="px-3.5 py-3 border border-[#E0E0E0] text-center">
-                      <input type="checkbox" checked className="w-[18px] h-[18px] cursor-pointer accent-[#1976D2]" />
+                      <input type="checkbox" defaultChecked className="w-[18px] h-[18px] cursor-pointer accent-[#1976D2]" />
                     </td>
                     <td className="px-3.5 py-3 border border-[#E0E0E0] text-center">
-                      <input type="checkbox" checked className="w-[18px] h-[18px] cursor-pointer accent-[#1976D2]" />
+                      <input type="checkbox" defaultChecked className="w-[18px] h-[18px] cursor-pointer accent-[#1976D2]" />
                     </td>
                     <td className="px-3.5 py-3 border border-[#E0E0E0] text-center">
-                      <input type="checkbox" checked className="w-[18px] h-[18px] cursor-pointer accent-[#1976D2]" />
+                      <input type="checkbox" defaultChecked className="w-[18px] h-[18px] cursor-pointer accent-[#1976D2]" />
                     </td>
                     <td className="px-3.5 py-3 border border-[#E0E0E0] text-center bg-[#FAFAFE]">
-                      <input type="checkbox" checked className="w-[18px] h-[18px] cursor-pointer accent-[#1976D2]" />
+                      <input type="checkbox" defaultChecked className="w-[18px] h-[18px] cursor-pointer accent-[#1976D2]" />
                     </td>
                     <td className="px-3.5 py-3 border border-[#E0E0E0] text-center whitespace-nowrap">
                       <button
@@ -338,10 +351,10 @@ export function EvidencePlanEditor() {
                       <input type="checkbox" className="w-[18px] h-[18px] cursor-pointer accent-[#1976D2]" />
                     </td>
                     <td className="px-3.5 py-3 border border-[#E0E0E0] text-center">
-                      <input type="checkbox" checked className="w-[18px] h-[18px] cursor-pointer accent-[#1976D2]" />
+                      <input type="checkbox" defaultChecked className="w-[18px] h-[18px] cursor-pointer accent-[#1976D2]" />
                     </td>
                     <td className="px-3.5 py-3 border border-[#E0E0E0] text-center">
-                      <input type="checkbox" checked className="w-[18px] h-[18px] cursor-pointer accent-[#1976D2]" />
+                      <input type="checkbox" defaultChecked className="w-[18px] h-[18px] cursor-pointer accent-[#1976D2]" />
                     </td>
                     <td className="px-3.5 py-3 border border-[#E0E0E0] text-center bg-[#FAFAFE]">
                       <input type="checkbox" className="w-[18px] h-[18px] cursor-pointer accent-[#1976D2]" />
@@ -382,7 +395,7 @@ export function EvidencePlanEditor() {
                       <input type="checkbox" className="w-[18px] h-[18px] cursor-pointer accent-[#1976D2]" />
                     </td>
                     <td className="px-3.5 py-3 border border-[#E0E0E0] text-center">
-                      <input type="checkbox" checked className="w-[18px] h-[18px] cursor-pointer accent-[#1976D2]" />
+                      <input type="checkbox" defaultChecked className="w-[18px] h-[18px] cursor-pointer accent-[#1976D2]" />
                     </td>
                     <td className="px-3.5 py-3 border border-[#E0E0E0] text-center">
                       <input type="checkbox" className="w-[18px] h-[18px] cursor-pointer accent-[#1976D2]" />
@@ -433,21 +446,21 @@ export function EvidencePlanEditor() {
               <tr>
                 <td
                   colSpan={6}
-                  className="px-3.5 py-2.5 text-sm font-semibold text-white bg-[#1E3A5F] border border-[#E0E0E0]"
+                  onClick={() => toggleUnit('unit2')}
+                  className="px-3.5 py-2.5 text-sm font-semibold text-white bg-[#1E3A5F] border border-[#E0E0E0] cursor-pointer hover:bg-[#2C4E6F] transition-colors"
                 >
-                  <span className="mr-1.5">🔒</span>
-                  CORE 2: Perform Shielded Metal Arc Welding — Pipe to Pipe Joint
-                  <span className="float-right text-xs font-normal opacity-70">3 elements · 9 PCs</span>
-                </td>
-              </tr>
-              <tr>
-                <td colSpan={6} className="px-3.5 py-3 bg-[#F8FBFF] text-center border border-[#E0E0E0]">
-                  <button
-                    onClick={() => toggleUnit('unit2')}
-                    className="text-sm text-[#1976D2] font-medium hover:underline"
-                  >
-                    ▼ Expand Unit 2 (3 elements, 9 PCs)
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {expandedUnits.unit2 ? (
+                      <ChevronDown size={16} className="flex-shrink-0" />
+                    ) : (
+                      <ChevronRight size={16} className="flex-shrink-0" />
+                    )}
+                    <span className="mr-1.5">🔒</span>
+                    <span className="flex-1">
+                      CORE 2: Perform Shielded Metal Arc Welding — Pipe to Pipe Joint
+                    </span>
+                    <span className="text-xs font-normal opacity-70">3 elements · 9 PCs</span>
+                  </div>
                 </td>
               </tr>
 
@@ -455,21 +468,21 @@ export function EvidencePlanEditor() {
               <tr>
                 <td
                   colSpan={6}
-                  className="px-3.5 py-2.5 text-sm font-semibold text-white bg-[#1E3A5F] border border-[#E0E0E0]"
+                  onClick={() => toggleUnit('unit3')}
+                  className="px-3.5 py-2.5 text-sm font-semibold text-white bg-[#1E3A5F] border border-[#E0E0E0] cursor-pointer hover:bg-[#2C4E6F] transition-colors"
                 >
-                  <span className="mr-1.5">🔒</span>
-                  CORE 3: Repair Welds
-                  <span className="float-right text-xs font-normal opacity-70">2 elements · 5 PCs</span>
-                </td>
-              </tr>
-              <tr>
-                <td colSpan={6} className="px-3.5 py-3 bg-[#F8FBFF] text-center border border-[#E0E0E0]">
-                  <button
-                    onClick={() => toggleUnit('unit3')}
-                    className="text-sm text-[#1976D2] font-medium hover:underline"
-                  >
-                    ▼ Expand Unit 3 (2 elements, 5 PCs)
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {expandedUnits.unit3 ? (
+                      <ChevronDown size={16} className="flex-shrink-0" />
+                    ) : (
+                      <ChevronRight size={16} className="flex-shrink-0" />
+                    )}
+                    <span className="mr-1.5">🔒</span>
+                    <span className="flex-1">
+                      CORE 3: Repair Welds
+                    </span>
+                    <span className="text-xs font-normal opacity-70">2 elements · 5 PCs</span>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -564,6 +577,13 @@ export function EvidencePlanEditor() {
           >
             ← Back to Dashboard
           </button>
+          <button
+            onClick={() => setShowPreview(true)}
+            className="px-4 py-2 bg-white text-[#1976D2] border border-[#1976D2] rounded text-sm font-medium hover:bg-[#E3F2FD] transition-colors flex items-center gap-2"
+          >
+            <Eye size={16} />
+            Preview
+          </button>
           <button className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors">
             Save Draft
           </button>
@@ -572,6 +592,9 @@ export function EvidencePlanEditor() {
           </button>
         </div>
       </div>
+
+      {/* Preview Modal */}
+      {showPreview && <EvidencePlanPreviewModal onClose={() => setShowPreview(false)} />}
     </div>
   );
 }
