@@ -278,7 +278,7 @@ export function OutlineView() {
       <div className="flex gap-3 justify-end">
         <button
           className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors"
-          onClick={() => navigateToPage("")}
+          onClick={() => navigateToPage("/")}
         >
           ← Back to Dashboard
         </button>

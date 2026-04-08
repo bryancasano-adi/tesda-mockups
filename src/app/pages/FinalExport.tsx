@@ -522,7 +522,7 @@ export function FinalExport() {
         </button>
         <button
           className="px-4 py-2 bg-blue-500 text-white border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#1976D2] transition-colors"
-          onClick={() => navigateToPage("")}
+          onClick={() => navigateToPage("/")}
         >
           Return to Dashboard
         </button>
