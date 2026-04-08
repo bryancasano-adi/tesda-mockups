@@ -15,7 +15,7 @@ import { AGAssemblyStatus } from "./pages/AGAssemblyStatus";
 import { PackageNavigator } from "./pages/PackageNavigator";
 import { AssessorsGuide } from "./pages/AssessorsGuide";
 import { SICView } from "./pages/SICView";
-import { WrittenTestPreview } from "./pages/WrittenTestPreview";
+import { WrittenTestView } from "./pages/WrittenTestView";
 import { RatingSheetView } from "./pages/RatingSheetView";
 import { SAGView } from "./pages/SAGView";
 import { CARSView } from "./pages/CARSView";
@@ -42,7 +42,7 @@ export const router = createBrowserRouter([
       { path: "package-navigator", Component: PackageNavigator },
       { path: "assessors-guide", Component: AssessorsGuide },
       { path: "sic", Component: SICView },
-      { path: "written-test", Component: WrittenTestPreview },
+      { path: "written-test", Component: WrittenTestView },
       { path: "rating-sheet", Component: RatingSheetView },
       { path: "sag", Component: SAGView },
       { path: "cars", Component: CARSView },

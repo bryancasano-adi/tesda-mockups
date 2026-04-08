@@ -1,9 +1,18 @@
-import { useState, useRef, useEffect } from 'react';
-import { MoreHorizontal, Eye, Download, Edit, FileText, Trash2, CheckCircle, RefreshCw } from 'lucide-react';
+import { useState, useRef, useEffect } from "react";
+import {
+  ArrowPathIcon,
+  CheckCircleIcon,
+  DocumentTextIcon,
+  EllipsisHorizontalIcon,
+  EyeIcon,
+  FolderArrowDownIcon,
+  PencilSquareIcon,
+  TrashIcon,
+} from "@heroicons/react/24/solid";
 
 interface DocumentActionsProps {
   documentName: string;
-  status: 'finalized' | 'draft' | 'not-started';
+  status: "finalized" | "draft" | "not-started";
   onView: () => void;
   onEdit?: () => void;
   onDownload?: () => void;
@@ -31,17 +40,20 @@ export function DocumentActions({
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     }
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
 
@@ -53,13 +65,13 @@ export function DocumentActions({
   return (
     <div className="flex items-center justify-center gap-2">
       {/* Dropdown Menu - Ellipsis First */}
-      <div className="relative" ref={dropdownRef}>
+      <div ref={dropdownRef} className="relative">
         <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="p-1.5 hover:bg-[#F5F5F5] rounded transition-colors"
           aria-label="Document actions"
+          className="p-1.5 hover:bg-[#F5F5F5] rounded transition-colors text-gray-600"
+          onClick={() => setIsOpen(!isOpen)}
         >
-          <MoreHorizontal size={18} className="text-[#666]" />
+          <EllipsisHorizontalIcon className="h-5 w-5 inline" />
         </button>
 
         {isOpen && (
@@ -67,39 +79,41 @@ export function DocumentActions({
             {/* Generate */}
             {showGenerate && (
               <button
+                className="w-full px-4 py-2 text-left text-sm hover:bg-[#F5F5F5] flex items-center gap-3 text-gray-700 font-medium"
                 onClick={() => handleAction(onView)}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-[#F5F5F5] flex items-center gap-3"
               >
-                <FileText size={16} className="text-[#666]" />
+                <DocumentTextIcon className="h-5 w-5 inline" />
                 <span>Generate</span>
               </button>
             )}
 
             {/* View/Edit */}
             <button
-              onClick={() => handleAction(status === 'finalized' ? onView : (onEdit || onView))}
-              className="w-full px-4 py-2 text-left text-sm hover:bg-[#E3F2FD] bg-[#E3F2FD] flex items-center gap-3 border-l-2 border-[#1976D2]"
+              className="w-full px-4 py-2 text-left text-sm hover:bg-[#E3F2FD] bg-[#E3F2FD] flex items-center gap-3 border-l-2 border-[#1976D2] text-gray-700 font-medium"
+              onClick={() =>
+                handleAction(status === "finalized" ? onView : onEdit || onView)
+              }
             >
-              {status === 'finalized' ? (
+              {status === "finalized" ? (
                 <>
-                  <Eye size={16} className="text-[#1976D2]" />
-                  <span className="font-medium text-[#1976D2]">View</span>
+                  <EyeIcon className="h-5 w-5 inline" />
+                  <span>View</span>
                 </>
               ) : (
                 <>
-                  <Edit size={16} className="text-[#1976D2]" />
-                  <span className="font-medium text-[#1976D2]">Edit</span>
+                  <PencilSquareIcon className="h-5 w-5 inline" />
+                  <span>Edit</span>
                 </>
               )}
             </button>
 
             {/* Download */}
-            {status === 'finalized' && onDownload && (
+            {status === "finalized" && onDownload && (
               <button
+                className="w-full px-4 py-2 text-left text-sm hover:bg-[#F5F5F5] flex items-center gap-3 text-gray-700 font-medium"
                 onClick={() => handleAction(onDownload)}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-[#F5F5F5] flex items-center gap-3"
               >
-                <Download size={16} className="text-[#666]" />
+                <FolderArrowDownIcon className="h-5 w-5 inline" />
                 <span>Download</span>
               </button>
             )}
@@ -107,23 +121,25 @@ export function DocumentActions({
             {/* View Logs */}
             {showLogs && (
               <button
-                onClick={() => handleAction(() => alert('View Logs for ' + documentName))}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-[#F5F5F5] flex items-center gap-3"
+                className="w-full px-4 py-2 text-left text-sm hover:bg-[#F5F5F5] flex items-center gap-3 text-gray-700 font-medium"
+                onClick={() =>
+                  handleAction(() => alert("View Logs for " + documentName))
+                }
               >
-                <FileText size={16} className="text-[#666]" />
+                <DocumentTextIcon className="h-5 w-5 inline" />
                 <span>View Logs</span>
               </button>
             )}
 
             {/* Finalize */}
-            {status === 'draft' && onFinalize && (
+            {status === "draft" && onFinalize && (
               <>
                 <div className="my-1 border-t border-[#E0E0E0]" />
                 <button
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-[#E3F2FD] flex items-center gap-3 text-[#1976D2] font-medium text-gray-700 font-medium"
                   onClick={() => handleAction(onFinalize)}
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-[#E3F2FD] flex items-center gap-3 text-[#1976D2] font-medium"
                 >
-                  <CheckCircle size={16} />
+                  <CheckCircleIcon className="h-5 w-5 inline" />
                   <span>Finalize</span>
                 </button>
               </>
@@ -134,10 +150,10 @@ export function DocumentActions({
               <>
                 <div className="my-1 border-t border-[#E0E0E0]" />
                 <button
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-[#FFEBEE] flex items-center gap-3 text-gray-700 font-medium"
                   onClick={() => handleAction(onDelete)}
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-[#FFEBEE] flex items-center gap-3 text-[#D32F2F]"
                 >
-                  <Trash2 size={16} />
+                  <TrashIcon className="h-5 w-5 inline" />
                   <span>Delete</span>
                 </button>
               </>
@@ -149,11 +165,11 @@ export function DocumentActions({
       {/* Refresh Button - Second */}
       {onRefresh && (
         <button
-          onClick={onRefresh}
-          className="p-1.5 hover:bg-[#E3F2FD] rounded transition-colors"
           aria-label="Refresh"
+          className="p-1.5 hover:bg-[#E3F2FD] rounded transition-colors text-gray-700 font-medium"
+          onClick={onRefresh}
         >
-          <RefreshCw size={16} className="text-[#1976D2]" />
+          <ArrowPathIcon className="h-5 w-5 inline" />
         </button>
       )}
     </div>

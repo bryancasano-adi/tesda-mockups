@@ -1,16 +1,264 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useState } from "react";
+import { EyeIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
+import { ImageWithFallback } from "../components/figma/ImageWithFallback";
+
+import {
+  DOCUMENT_ID,
+  SECTOR_PROJECT_ID,
+  usePageNavigation,
+} from "./pageUtils";
+
+import {
+  Page,
+  Table,
+  Row,
+  Footer,
+  RatingSheetPreviewModal,
+} from "../components/RatingSheetPreviewModal";
+import { Breadcrumbs } from "./Dashboard";
 
 export function RatingSheetView() {
-  const navigate = useNavigate();
+  const { navigateToPage } = usePageNavigation();
   const [editMode, setEditMode] = useState(false);
-  const [status, setStatus] = useState<'draft' | 'finalized'>('draft');
-  const [selectedTab, setSelectedTab] = useState<'demo' | 'oral' | 'written' | 'conversion'>('demo');
+  const [status, setStatus] = useState<"draft" | "finalized">("draft");
+  const [showPreview, setShowPreview] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = 4;
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+  };
+
+  const handleJumpToSection = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = Number(e.target.value);
+
+    if (value) setCurrentPage(value);
+  };
+
+  /* ✅ EXACT SAME CONTENT AS MODAL — JUST SPLIT */
+  const renderPage = () => {
+    switch (currentPage) {
+      case 1:
+        return (
+          <Page>
+            <div className="text-center">
+              <div className="border p-2 text-xs mb-6">
+                “No part of the Competency Assessment Tools (CATs) may be
+                produced, distributed, or transmitted in any form or by any
+                means, including photocopying, recording, or other electronic or
+                mechanical methods, without prior written consent of TESDA.”
+              </div>
+
+              <ImageWithFallback
+                alt="logo"
+                className="mx-auto mb-2"
+                height={80}
+                src="/tesda-cropped-logo.png"
+                width={80}
+              />
+
+              <div className="font-semibold text-sm mb-6">
+                TECHNICAL EDUCATION AND SKILLS DEVELOPMENT AUTHORITY
+              </div>
+
+              <div className="text-2xl mt-10">National Assessment</div>
+              <div className="mt-6">for</div>
+
+              <div className="text-red-600 font-bold text-2xl mt-6">
+                QUALIFICATION TITLE
+              </div>
+
+              <div className="mt-2">(Full Qualification)</div>
+
+              <div className="text-2xl font-bold mt-16">RATING SHEET</div>
+            </div>
+          </Page>
+        );
+
+      case 2:
+        return (
+          <Page>
+            <div className="text-xs text-right mb-2">
+              TESDA-OP-QSO-02-F09
+              <br />
+              Rev. No. 01 12/05/17
+            </div>
+
+            <Table>
+              <tr>
+                <td className="w-40">Reference No.</td>
+                <td colSpan={10} />
+              </tr>
+            </Table>
+
+            <div className="font-bold mt-3 text-sm">
+              RATING SHEET FOR DEMONSTRATION/OBSERVATION WITH ORAL QUESTIONING
+            </div>
+
+            <Table>
+              <Row span="Candidate’s name:" />
+              <Row span="Assessor’s name:" />
+              <Row red span="Qualification:" value="QUALIFICATION TITLE" />
+              <Row span="Units of Competency Covered" />
+              <Row span="Date of Assessment:" />
+              <Row span="Time of Assessment:" />
+            </Table>
+
+            <div className="text-xs mt-3">
+              <strong>INSTRUCTION:</strong> Put a tick (✔) mark...
+            </div>
+
+            <table className="w-full border mt-3 text-xs">
+              <thead>
+                <tr>
+                  <th className="border p-2 text-left w-1/2">
+                    Part I. Performance
+                  </th>
+                  <th className="border w-20">Satisfactory</th>
+                  <th className="border w-20">Not Satisfactory</th>
+                  <th className="border w-32">Remarks</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <tr key={i}>
+                    <td className="border p-2">•</td>
+                    <td className="border" />
+                    <td className="border" />
+                    <td className="border" />
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <div className="mt-4 text-sm">
+              The candidate’s demonstration was:
+            </div>
+
+            <div className="flex gap-10 mt-2 text-sm">
+              <span>Satisfactory ☐</span>
+              <span>Not Satisfactory ☐</span>
+            </div>
+
+            <Footer page="1" />
+          </Page>
+        );
+
+      case 3:
+        return (
+          <Page>
+            <Table>
+              <Row span="Qualification:" />
+              <Row
+                span="Units of Competency Covered"
+                value="BASIC AND COMMON COMPETENCIES"
+              />
+            </Table>
+
+            <div className="mt-4 font-semibold">PART II. Oral Questioning</div>
+
+            <div className="text-xs mt-2">
+              <strong>INSTRUCTIONS:</strong>
+              <ol className="ml-4 list-decimal">
+                <li>Ask at least 3 questions</li>
+                <li>Put a tick (✔)</li>
+                <li>Mark response</li>
+                <li>Complete feedback</li>
+              </ol>
+            </div>
+
+            <table className="w-full border mt-3 text-xs">
+              <thead>
+                <tr>
+                  <th className="border p-1 text-left">Standard Questions</th>
+                  <th className="border w-20">Tick ✔</th>
+                  <th className="border w-16">YES</th>
+                  <th className="border w-16">NO</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <tr key={i}>
+                    <td className="border p-1">{i + 1}.</td>
+                    <td className="border" />
+                    <td className="border" />
+                    <td className="border" />
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <div className="mt-3 text-sm">Feedback to candidate:</div>
+            <div className="border h-24" />
+
+            <div className="mt-4 text-sm">
+              The candidate’s required knowledge was:
+            </div>
+
+            <div className="flex gap-10 mt-2 text-sm">
+              <span>Satisfactory ☐</span>
+              <span>Not Satisfactory ☐</span>
+            </div>
+
+            <div className="mt-4 text-sm">
+              The candidate’s overall performance was:
+            </div>
+
+            <div className="flex gap-10 mt-2 text-sm">
+              <span>Satisfactory ☐</span>
+              <span>Not Satisfactory ☐</span>
+            </div>
+
+            <Footer page="2" />
+          </Page>
+        );
+
+      case 4:
+        return (
+          <Page>
+            <Table>
+              <Row span="Candidate’s Signature:" value="Date:" />
+              <Row span="Assessor’s Signature:" value="Date:" />
+            </Table>
+
+            <Footer page="3" />
+          </Page>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   return (
-    <div className="p-6">
+    <div className="p-6 text-gray-800">
+      {/* HEADER */}
       <div className="text-sm text-[#666] mb-4">
-        Training Projects › Shielded Metal Arc Welding NC II › CATS Development › Rating Sheet
+        <Breadcrumbs
+          items={[
+            {
+              label: "Sector Details",
+              href: `/`,
+            },
+            {
+              label: "Sector Projects",
+              href: `/`,
+            },
+            {
+              label: "Competency Assessment Tools (CATs)",
+              href: `/`,
+            },
+            {
+              label: "Rating Sheet (Rubrics)",
+              href: `/rating-sheet`,
+            },
+          ]}
+        />
       </div>
 
       <div className="flex justify-between items-start mb-5">
@@ -21,436 +269,131 @@ export function RatingSheetView() {
             </span>
             Rating Sheet (Rubrics)
           </h1>
-          <p className="text-sm text-[#666]">Compiled Scoring Guide - Auto-generated from Phase 2 Tests</p>
+          <p className="text-sm text-[#666]">
+            Compiled Scoring Guide - Auto-generated from Phase 2 Tests
+          </p>
         </div>
         <span
-          className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-            status === 'finalized' ? 'bg-[#E8F5E9] text-[#2E7D32]' : 'bg-[#FFF3E0] text-[#F57C00]'
+          className={`inline-block px-3 py-1 rounded text-xs font-semibold ${
+            status === "finalized"
+              ? "bg-[#E8F5E9] text-[#2E7D32]"
+              : "bg-[#FFF3E0] text-[#F57C00]"
           }`}
         >
-          {status === 'finalized' ? '✅ Finalized' : '⚠️ Draft'}
+          {status === "finalized" ? "Finalized" : "Draft"}
         </span>
       </div>
 
-      {/* Edit Mode Toggle & Actions */}
+      {/* Edit Mode Toggle */}
       <div className="bg-white border border-[#E0E0E0] rounded p-4 mb-5 flex justify-between items-center">
         <div className="flex items-center gap-4">
           <label className="flex items-center gap-2 cursor-pointer">
             <span className="text-sm text-[#666]">Edit Mode:</span>
             <div className="relative inline-block w-12 h-6">
               <input
-                type="checkbox"
                 checked={editMode}
-                onChange={() => setEditMode(!editMode)}
                 className="sr-only peer"
+                type="checkbox"
+                onChange={() => setEditMode(!editMode)}
               />
-              <div className="w-12 h-6 bg-[#E0E0E0] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-6 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1976D2]"></div>
+              <div className="w-12 h-6 bg-[#E0E0E0] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-6 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1976D2]" />
             </div>
-            <span className={`text-sm font-medium ${editMode ? 'text-[#1976D2]' : 'text-[#999]'}`}>
-              {editMode ? 'ON' : 'OFF'}
+            <span
+              className={`text-sm font-medium ${editMode ? "text-[#1976D2]" : "text-[#999]"}`}
+            >
+              {editMode ? "ON" : "OFF"}
             </span>
           </label>
-          {!editMode && (
-            <span className="text-xs text-[#999] bg-[#FAFAFA] px-2 py-1 rounded">
-              🔒 Most content auto-compiled from Phase 2
+          {editMode && (
+            <span className="text-xs text-[#F57C00] bg-[#FFF3E0] px-2 py-1 rounded">
+              <InformationCircleIcon className="w-5 h-5 inline text-blue-500" />{" "}
+              Locked sections cannot be edited
             </span>
-          )}
-        </div>
-        <div className="flex gap-2">
-          <button className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors">
-            Download Preview
-          </button>
-          {status === 'draft' && (
-            <button
-              onClick={() => setStatus('finalized')}
-              className="px-4 py-2 bg-[#2E7D32] text-white rounded text-sm font-medium hover:bg-[#1B5E20] transition-colors"
-            >
-              Finalize Document
-            </button>
           )}
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="bg-white border border-[#E0E0E0] rounded">
-        <div className="flex border-b border-[#E0E0E0]">
-          <button
-            onClick={() => setSelectedTab('demo')}
-            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-              selectedTab === 'demo'
-                ? 'text-[#1976D2] border-[#1976D2] bg-[#F5FAFF]'
-                : 'text-[#666] border-transparent hover:bg-[#FAFAFA]'
-            }`}
+      {/* VIEWER CONTAINER (same as AssessorsGuide) */}
+      <div className="bg-white border border-[#E0E0E0] rounded overflow-hidden">
+        {/* Page Navigation */}
+        <div className="px-5 py-3 bg-[#FAFAFA] border-b border-[#E0E0E0] flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <button
+              className={`px-3 py-1.5 bg-white text-[#666] border border-[#E0E0E0] rounded text-xs font-medium transition-colors ${
+                currentPage === 1
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-[#F5F5F5]"
+              }`}
+              disabled={currentPage === 1}
+              onClick={handlePreviousPage}
+            >
+              ◀ Previous
+            </button>
+            <span className="text-sm text-[#666]">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              className={`px-3 py-1.5 bg-white text-[#666] border border-[#E0E0E0] rounded text-xs font-medium transition-colors ${
+                currentPage === totalPages
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-[#F5F5F5]"
+              }`}
+              disabled={currentPage === totalPages}
+              onClick={handleNextPage}
+            >
+              Next ▶
+            </button>
+          </div>
+          <select
+            className="px-3 py-1.5 bg-white border border-[#E0E0E0] rounded text-sm text-[#666]"
+            value=""
+            onChange={handleJumpToSection}
           >
-            Section A: Demonstration (S/NS + Scorecard)
-          </button>
-          <button
-            onClick={() => setSelectedTab('oral')}
-            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-              selectedTab === 'oral'
-                ? 'text-[#1976D2] border-[#1976D2] bg-[#F5FAFF]'
-                : 'text-[#666] border-transparent hover:bg-[#FAFAFA]'
-            }`}
-          >
-            Section B: Oral Questions + Answers
-          </button>
+            <option value="">Jump...</option>
+            <option value="1">Cover</option>
+            <option value="2">Performance</option>
+            <option value="3">Oral</option>
+            <option value="4">Signatures</option>
+          </select>
         </div>
 
-        <div className="p-6">
-          {/* Demonstration Scoring */}
-          {selectedTab === 'demo' && (
-            <div>
-              <div className="mb-4 p-3 bg-[#E3F2FD] border border-[#90CAF9] rounded text-sm text-[#1565C0]">
-                🔒 Auto-compiled from Demonstration Test rubrics (Phase 2)
-              </div>
-
-              <h3 className="font-semibold text-sm text-[#333] mb-3">
-                TASK A: Perform Plate-to-Plate Welding
-              </h3>
-
-              <div className="overflow-x-auto border border-[#E0E0E0] rounded">
-                <table className="w-full">
-                  <thead>
-                    <tr className="bg-[#FAFAFA]">
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-[#666] border-b border-[#E0E0E0] w-12">
-                        No.
-                      </th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-[#666] border-b border-[#E0E0E0]">
-                        Performance Criteria
-                      </th>
-                      <th className="text-center px-4 py-3 text-xs font-semibold text-[#666] border-b border-[#E0E0E0] w-24">
-                        Points
-                      </th>
-                      <th className="text-center px-4 py-3 text-xs font-semibold text-[#666] border-b border-[#E0E0E0] w-24">
-                        Score
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="hover:bg-[#FAFAFA]">
-                      <td className="px-4 py-3 text-sm border-b border-[#F0F0F0]">1</td>
-                      <td className="px-4 py-3 text-sm border-b border-[#F0F0F0]">
-                        Electrode identification and selection according to WPS
-                      </td>
-                      <td className="px-4 py-3 text-center text-sm border-b border-[#F0F0F0]">15</td>
-                      <td className="px-4 py-3 text-center border-b border-[#F0F0F0]">
-                        <input
-                          type="number"
-                          className="w-16 px-2 py-1 border border-[#E0E0E0] rounded text-sm text-center"
-                          placeholder="0"
-                          max={15}
-                        />
-                      </td>
-                    </tr>
-                    <tr className="bg-[#FFFDE7] hover:bg-[#FFF9C4]">
-                      <td className="px-4 py-3 text-sm border-b border-[#F0F0F0]">2</td>
-                      <td className="px-4 py-3 text-sm border-b border-[#F0F0F0]">
-                        Root pass execution according to WPS{' '}
-                        <span className="text-[#F57C00] font-bold">*</span>
-                      </td>
-                      <td className="px-4 py-3 text-center text-sm border-b border-[#F0F0F0]">25</td>
-                      <td className="px-4 py-3 text-center border-b border-[#F0F0F0]">
-                        <input
-                          type="number"
-                          className="w-16 px-2 py-1 border border-[#E0E0E0] rounded text-sm text-center"
-                          placeholder="0"
-                          max={25}
-                        />
-                      </td>
-                    </tr>
-                    <tr className="hover:bg-[#FAFAFA]">
-                      <td className="px-4 py-3 text-sm border-b border-[#F0F0F0]">3</td>
-                      <td className="px-4 py-3 text-sm border-b border-[#F0F0F0]">Fill and cover pass quality</td>
-                      <td className="px-4 py-3 text-center text-sm border-b border-[#F0F0F0]">20</td>
-                      <td className="px-4 py-3 text-center border-b border-[#F0F0F0]">
-                        <input
-                          type="number"
-                          className="w-16 px-2 py-1 border border-[#E0E0E0] rounded text-sm text-center"
-                          placeholder="0"
-                          max={20}
-                        />
-                      </td>
-                    </tr>
-                    <tr className="bg-[#FFFDE7] hover:bg-[#FFF9C4]">
-                      <td className="px-4 py-3 text-sm border-b border-[#F0F0F0]">4</td>
-                      <td className="px-4 py-3 text-sm border-b border-[#F0F0F0]">
-                        Visual inspection and acceptance criteria{' '}
-                        <span className="text-[#F57C00] font-bold">*</span>
-                      </td>
-                      <td className="px-4 py-3 text-center text-sm border-b border-[#F0F0F0]">20</td>
-                      <td className="px-4 py-3 text-center border-b border-[#F0F0F0]">
-                        <input
-                          type="number"
-                          className="w-16 px-2 py-1 border border-[#E0E0E0] rounded text-sm text-center"
-                          placeholder="0"
-                          max={20}
-                        />
-                      </td>
-                    </tr>
-                    <tr className="hover:bg-[#FAFAFA]">
-                      <td className="px-4 py-3 text-sm">5</td>
-                      <td className="px-4 py-3 text-sm">Safety compliance and work area management</td>
-                      <td className="px-4 py-3 text-center text-sm">20</td>
-                      <td className="px-4 py-3 text-center">
-                        <input
-                          type="number"
-                          className="w-16 px-2 py-1 border border-[#E0E0E0] rounded text-sm text-center"
-                          placeholder="0"
-                          max={20}
-                        />
-                      </td>
-                    </tr>
-                    <tr className="bg-[#E8F5E9]">
-                      <td colSpan={2} className="px-4 py-3 text-sm font-bold text-right">
-                        TOTAL SCORE
-                      </td>
-                      <td className="px-4 py-3 text-sm font-bold text-center">100</td>
-                      <td className="px-4 py-3 text-sm font-bold text-center">0</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* Oral Questioning Scoring */}
-          {selectedTab === 'oral' && (
-            <div>
-              <div className="mb-4 p-3 bg-[#E3F2FD] border border-[#90CAF9] rounded text-sm text-[#1565C0]">
-                🔒 Auto-compiled from Questioning Tool (Phase 2) - Binary Scoring (S/NS)
-              </div>
-
-              <h3 className="font-semibold text-sm text-[#333] mb-3">ORAL QUESTIONING SCORING GUIDE</h3>
-
-              <div className="overflow-x-auto border border-[#E0E0E0] rounded">
-                <table className="w-full">
-                  <thead>
-                    <tr className="bg-[#FAFAFA]">
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-[#666] border-b border-[#E0E0E0] w-12">
-                        No.
-                      </th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-[#666] border-b border-[#E0E0E0]">
-                        Question Topic
-                      </th>
-                      <th className="text-center px-4 py-3 text-xs font-semibold text-[#666] border-b border-[#E0E0E0] w-32">
-                        Result
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      'WPS interpretation and electrode selection',
-                      'Root pass procedure and quality standards',
-                      'Defect identification and repair methods',
-                      'Safety procedures and PPE requirements',
-                      'Visual inspection acceptance criteria',
-                    ].map((topic, index) => (
-                      <tr key={index} className="hover:bg-[#FAFAFA]">
-                        <td className="px-4 py-3 text-sm border-b border-[#F0F0F0]">{index + 1}</td>
-                        <td className="px-4 py-3 text-sm border-b border-[#F0F0F0]">{topic}</td>
-                        <td className="px-4 py-3 text-center border-b border-[#F0F0F0]">
-                          <select className="px-3 py-1 border border-[#E0E0E0] rounded text-sm">
-                            <option value="">-</option>
-                            <option value="S">✅ S (Satisfactory)</option>
-                            <option value="NS">❌ NS (Not Satisfactory)</option>
-                          </select>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="mt-4 p-3 bg-[#FFFDE7] border border-[#FFE082] rounded text-sm">
-                <strong>Scoring:</strong> Candidate must achieve "S" (Satisfactory) on all questions to pass the
-                oral questioning component.
-              </div>
-            </div>
-          )}
-
-          {/* Written Test Answer Sheet */}
-          {selectedTab === 'written' && (
-            <div>
-              <div className="mb-4 p-3 bg-[#E3F2FD] border border-[#90CAF9] rounded text-sm text-[#1565C0]">
-                🔒 Auto-compiled from Written Test (Phase 2)
-              </div>
-
-              <h3 className="font-semibold text-sm text-[#333] mb-3">WRITTEN TEST ANSWER SHEET</h3>
-
-              <div className="grid grid-cols-3 gap-4">
-                {/* Set A */}
-                <div className="border border-[#E0E0E0] rounded p-4">
-                  <h4 className="font-semibold text-sm text-[#333] mb-3">SET A</h4>
-                  <div className="grid grid-cols-5 gap-2 text-xs">
-                    {Array.from({ length: 30 }, (_, i) => (
-                      <div key={i} className="text-center">
-                        <div className="text-[#999]">{i + 1}.</div>
-                        <div className="font-semibold">A</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Set B */}
-                <div className="border border-[#E0E0E0] rounded p-4">
-                  <h4 className="font-semibold text-sm text-[#333] mb-3">SET B</h4>
-                  <div className="grid grid-cols-5 gap-2 text-xs">
-                    {Array.from({ length: 30 }, (_, i) => (
-                      <div key={i} className="text-center">
-                        <div className="text-[#999]">{i + 1}.</div>
-                        <div className="font-semibold">B</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Set C */}
-                <div className="border border-[#E0E0E0] rounded p-4">
-                  <h4 className="font-semibold text-sm text-[#333] mb-3">SET C</h4>
-                  <div className="grid grid-cols-5 gap-2 text-xs">
-                    {Array.from({ length: 30 }, (_, i) => (
-                      <div key={i} className="text-center">
-                        <div className="text-[#999]">{i + 1}.</div>
-                        <div className="font-semibold">C</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Score Conversion Table */}
-          {selectedTab === 'conversion' && (
-            <div>
-              <h3 className="font-semibold text-sm text-[#333] mb-3">SCORE CONVERSION TABLES</h3>
-
-              <div className="space-y-6">
-                {/* Demonstration Score Conversion */}
-                <div>
-                  <h4 className="text-sm font-semibold text-[#666] mb-2">Demonstration Test</h4>
-                  <div className="overflow-x-auto border border-[#E0E0E0] rounded">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="bg-[#FAFAFA]">
-                          <th className="text-center px-4 py-2 text-xs font-semibold text-[#666] border-b border-[#E0E0E0]">
-                            Raw Score
-                          </th>
-                          <th className="text-center px-4 py-2 text-xs font-semibold text-[#666] border-b border-[#E0E0E0]">
-                            Percentage
-                          </th>
-                          <th className="text-center px-4 py-2 text-xs font-semibold text-[#666] border-b border-[#E0E0E0]">
-                            Rating
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="hover:bg-[#FAFAFA]">
-                          <td className="px-4 py-2 text-sm text-center border-b border-[#F0F0F0]">90-100</td>
-                          <td className="px-4 py-2 text-sm text-center border-b border-[#F0F0F0]">90-100%</td>
-                          <td className="px-4 py-2 text-sm text-center border-b border-[#F0F0F0]">
-                            Outstanding
-                          </td>
-                        </tr>
-                        <tr className="hover:bg-[#FAFAFA]">
-                          <td className="px-4 py-2 text-sm text-center border-b border-[#F0F0F0]">80-89</td>
-                          <td className="px-4 py-2 text-sm text-center border-b border-[#F0F0F0]">80-89%</td>
-                          <td className="px-4 py-2 text-sm text-center border-b border-[#F0F0F0]">
-                            Very Satisfactory
-                          </td>
-                        </tr>
-                        <tr className="bg-[#E8F5E9] hover:bg-[#C8E6C9]">
-                          <td className="px-4 py-2 text-sm text-center border-b border-[#F0F0F0]">75-79</td>
-                          <td className="px-4 py-2 text-sm text-center border-b border-[#F0F0F0]">75-79%</td>
-                          <td className="px-4 py-2 text-sm text-center font-semibold border-b border-[#F0F0F0]">
-                            Satisfactory (PASSING)
-                          </td>
-                        </tr>
-                        <tr className="bg-[#FFEBEE] hover:bg-[#FFCDD2]">
-                          <td className="px-4 py-2 text-sm text-center">0-74</td>
-                          <td className="px-4 py-2 text-sm text-center">0-74%</td>
-                          <td className="px-4 py-2 text-sm text-center font-semibold text-[#C62828]">
-                            Not Yet Competent
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                {/* Written Test Score Conversion */}
-                <div>
-                  <h4 className="text-sm font-semibold text-[#666] mb-2">Written Test (30 items)</h4>
-                  <div className="overflow-x-auto border border-[#E0E0E0] rounded">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="bg-[#FAFAFA]">
-                          <th className="text-center px-4 py-2 text-xs font-semibold text-[#666] border-b border-[#E0E0E0]">
-                            Correct Answers
-                          </th>
-                          <th className="text-center px-4 py-2 text-xs font-semibold text-[#666] border-b border-[#E0E0E0]">
-                            Percentage
-                          </th>
-                          <th className="text-center px-4 py-2 text-xs font-semibold text-[#666] border-b border-[#E0E0E0]">
-                            Rating
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="hover:bg-[#FAFAFA]">
-                          <td className="px-4 py-2 text-sm text-center border-b border-[#F0F0F0]">27-30</td>
-                          <td className="px-4 py-2 text-sm text-center border-b border-[#F0F0F0]">90-100%</td>
-                          <td className="px-4 py-2 text-sm text-center border-b border-[#F0F0F0]">
-                            Outstanding
-                          </td>
-                        </tr>
-                        <tr className="hover:bg-[#FAFAFA]">
-                          <td className="px-4 py-2 text-sm text-center border-b border-[#F0F0F0]">24-26</td>
-                          <td className="px-4 py-2 text-sm text-center border-b border-[#F0F0F0]">80-87%</td>
-                          <td className="px-4 py-2 text-sm text-center border-b border-[#F0F0F0]">
-                            Very Satisfactory
-                          </td>
-                        </tr>
-                        <tr className="bg-[#E8F5E9] hover:bg-[#C8E6C9]">
-                          <td className="px-4 py-2 text-sm text-center border-b border-[#F0F0F0]">23</td>
-                          <td className="px-4 py-2 text-sm text-center border-b border-[#F0F0F0]">77%</td>
-                          <td className="px-4 py-2 text-sm text-center font-semibold border-b border-[#F0F0F0]">
-                            Satisfactory (PASSING)
-                          </td>
-                        </tr>
-                        <tr className="bg-[#FFEBEE] hover:bg-[#FFCDD2]">
-                          <td className="px-4 py-2 text-sm text-center">0-22</td>
-                          <td className="px-4 py-2 text-sm text-center">0-73%</td>
-                          <td className="px-4 py-2 text-sm text-center font-semibold text-[#C62828]">
-                            Not Yet Competent
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+        {/* Document Content */}
+        <div className="p-8 max-h-[600px] overflow-y-auto">{renderPage()}</div>
       </div>
 
       {/* Footer Actions */}
       <div className="mt-6 flex justify-between">
         <button
-          onClick={() => navigate('/')}
           className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors"
+          onClick={() => navigateToPage("package-navigator")}
         >
-          ← Back to Dashboard
+          ← Back to Package Navigator
         </button>
         <div className="flex gap-2">
           <button className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors">
             Save Draft
           </button>
-          <button className="px-4 py-2 bg-[#1976D2] text-white rounded text-sm font-medium hover:bg-[#1565C0] transition-colors">
-            Export to XLSX
+          <button
+            className="px-4 py-2 bg-white text-[#1976D2] border border-[#1976D2] rounded text-sm font-medium hover:bg-[#E3F2FD] transition-colors flex items-center gap-2"
+            onClick={() => setShowPreview(true)}
+          >
+            <EyeIcon className="w-5 h-5 inline" />
+            Preview
           </button>
+          {status === "draft" && (
+            <button
+              className="px-4 py-2 bg-[#2E7D32] text-white rounded text-sm font-medium hover:bg-[#1B5E20] transition-colors"
+              onClick={() => setStatus("finalized")}
+            >
+              Finalize
+            </button>
+          )}
         </div>
+
+        {/* Preview Modal */}
+        {showPreview && (
+          <RatingSheetPreviewModal onClose={() => setShowPreview(false)} />
+        )}
       </div>
     </div>
   );
