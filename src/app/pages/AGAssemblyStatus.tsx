@@ -1,21 +1,13 @@
 import { useState } from "react";
-import {
-  InformationCircleIcon,
-  FolderOpenIcon,
-  LockClosedIcon,
-  XMarkIcon,
-  CheckIcon,
-  FolderArrowDownIcon,
-  EyeIcon,
-  PencilSquareIcon,
-} from "@heroicons/react/24/solid";
+import { CheckIcon, XMarkIcon } from "@heroicons/react/24/solid";
 
 import {
+  Breadcrumbs,
   DOCUMENT_ID,
-  SECTOR_PROJECT_ID,
+  PROJECT_ID,
+  SECTOR_ID,
   usePageNavigation,
 } from "./pageUtils";
-import { Breadcrumbs } from "./Dashboard";
 
 export function AGAssemblyStatus() {
   const { navigateToPage } = usePageNavigation();
@@ -67,19 +59,19 @@ export function AGAssemblyStatus() {
           items={[
             {
               label: "Sector Details",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/`,
             },
             {
               label: "Sector Projects",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
             },
             {
               label: "Assessor's Guide Assembly",
-              href: `/ag-assembly`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=ag-assembly`,
             },
           ]}
         />
@@ -118,27 +110,8 @@ export function AGAssemblyStatus() {
         </div>
         <div className="text-xs text-[#666]">
           {allFinalized
-            ? " All AGs finalized - Ready to generate remaining 5 documents per package"
-            : `${5 - finalizedCount} AG(s) remaining - Complete all to unlock Step 2`}
-        </div>
-      </div>
-
-      {/* Info Banner */}
-      <div className="bg-[#E3F2FD] border border-[#90CAF9] rounded p-4 mb-6">
-        <div className="flex items-start gap-3">
-          <span className="text-xl">
-            <InformationCircleIcon className="w-8 h-8 inline text-blue-500" />
-          </span>
-          <div className="flex-1 text-sm text-[#1565C0]">
-            <strong>Phase 3 Two-Step Model:</strong>
-            <div className="mt-1 text-xs">
-              <strong>Step 1 (Current):</strong> Assemble and finalize 5
-              {`Assessor's Guides from Phase 2 pools`}
-              <br />
-              <strong>Step 2 (Locked):</strong> Generate 5 remaining documents
-              (SIC, Written Test, Rating Sheet, SAG, CARS) per finalized AG
-            </div>
-          </div>
+            ? " All AGs Finalized"
+            : `${5 - finalizedCount} AG(s) Remaining`}
         </div>
       </div>
 
@@ -149,10 +122,10 @@ export function AGAssemblyStatus() {
             key={set}
             className={`bg-white border-2 rounded-lg transition-all ${
               agStatus[set] === "finalized"
-                ? "border-[#2E7D32] bg-[#F1F8F4]"
+                ? "border-green-500"
                 : agStatus[set] === "draft"
-                  ? "border-[#F57C00]"
-                  : "border-[#E0E0E0]"
+                  ? "border-yellow-500"
+                  : "border-gray-300"
             }`}
           >
             <div className="p-5">
@@ -164,20 +137,6 @@ export function AGAssemblyStatus() {
                     </h3>
                     {getStatusBadge(agStatus[set])}
                   </div>
-                  <div className="text-xs text-[#666]">
-                    Package {set} • Main compiled document
-                  </div>
-                </div>
-                <div className="text-4xl">
-                  <FolderOpenIcon
-                    className={`w-8 h-8 inline ${
-                      agStatus[set] === "finalized"
-                        ? "text-[#2E7D32] bg-[#F1F8F4]"
-                        : agStatus[set] === "draft"
-                          ? "text-[#F57C00]"
-                          : "text-[#E0E0E0]"
-                    }`}
-                  />
                 </div>
               </div>
 
@@ -251,11 +210,9 @@ export function AGAssemblyStatus() {
                 {agStatus[set] === "draft" && (
                   <>
                     <button className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors">
-                      <EyeIcon className="w-4 h-4 inline mr-1 mt-[-3px]" />
                       View
                     </button>
                     <button className="px-4 py-2 bg-white text-[#1976D2] border border-[#1976D2] rounded text-sm font-medium hover:bg-[#E3F2FD] transition-colors">
-                      <PencilSquareIcon className="w-4 h-4 inline mr-1 mt-[-3px]" />
                       Edit
                     </button>
                     <button
@@ -271,11 +228,9 @@ export function AGAssemblyStatus() {
                 {agStatus[set] === "finalized" && (
                   <>
                     <button className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors">
-                      <EyeIcon className="w-4 h-4 inline mr-1 mt-[-3px]" />
                       View
                     </button>
                     <button className="px-4 py-2 bg-green-700 text-white border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#1B5E20] transition-colors">
-                      <FolderArrowDownIcon className="w-4 h-4 inline mr-1 mt-[-3px]" />
                       Download
                     </button>
                   </>
@@ -300,21 +255,12 @@ export function AGAssemblyStatus() {
                 documents for each package (SIC, Written Test, Rating Sheet,
                 SAG, CARS).
               </div>
-              <button
-                className="px-6 py-2 bg-[#2E7D32] text-white rounded text-sm font-medium hover:bg-[#1B5E20] transition-colors"
-                onClick={() => navigateToPage("/package-navigator")}
-              >
-                Proceed to Step 2: Package Navigator →
-              </button>
             </div>
           </div>
         </div>
       ) : (
         <div className="bg-[#FFF3E0] border-l-4 border-[#F57C00] p-5">
           <div className="flex items-start gap-3">
-            <span className="text-xl">
-              <LockClosedIcon className="w-6 h-6 inline text-orange-500" />
-            </span>
             <div className="flex-1">
               <div className="font-semibold text-sm text-[#E65100] mb-2">
                 Step 2 Locked
@@ -342,13 +288,7 @@ export function AGAssemblyStatus() {
       )}
 
       {/* Footer Actions */}
-      <div className="mt-6 flex justify-between">
-        <button
-          className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors"
-          onClick={() => navigateToPage("/")}
-        >
-          ← Back to Dashboard
-        </button>
+      <div className="mt-6 flex justify-end">
         <div className="flex gap-3">
           <button
             className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors"
@@ -357,7 +297,8 @@ export function AGAssemblyStatus() {
             ← Back to Distribution Settings
           </button>
           <button
-            className="px-6 py-2 bg-[#2E7D32] text-white rounded text-sm font-medium hover:bg-[#1B5E20] transition-colors"
+            className="px-6 py-2 bg-[#2E7D32] text-white rounded text-sm font-medium hover:bg-[#1B5E20] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            disabled={!allFinalized}
             onClick={() => navigateToPage("package-navigator")}
           >
             Proceed to Package Navigator →

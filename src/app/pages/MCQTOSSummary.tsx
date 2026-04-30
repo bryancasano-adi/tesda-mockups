@@ -1,21 +1,21 @@
 import { CheckIcon, InformationCircleIcon } from "@heroicons/react/24/solid";
-import { EyeIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 
 import {
+  Breadcrumbs,
   DOCUMENT_ID,
-  SECTOR_PROJECT_ID,
+  SECTOR_ID,
+  PROJECT_ID,
   usePageNavigation,
 } from "./pageUtils";
 
 import { MCQTOSPreviewModal } from "../components/MCQTOSPreviewModal";
-import { Breadcrumbs } from "./Dashboard";
 
 export function MCQTOSSummary() {
   const { navigateToPage } = usePageNavigation();
   const [showPreview, setShowPreview] = useState(false);
 
-  // Simulated TOS data auto-generated from MCQ items
+  // Simulated TOS data auto-generated from Written Test items
   const tosData = [
     {
       unitTitle: "Prepare and Maintain Tools and Equipment",
@@ -54,19 +54,19 @@ export function MCQTOSSummary() {
           items={[
             {
               label: "Sector Details",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/`,
             },
             {
               label: "Sector Projects",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
             },
             {
-              label: "MCQ Table of Specifications (TOS) Summary",
-              href: `/mcq-tos`,
+              label: "Written Test Table of Specifications (TOS) Summary",
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=mcq-tos`,
             },
           ]}
         />
@@ -77,10 +77,10 @@ export function MCQTOSSummary() {
           <span className="inline-block px-2.5 py-0.5 rounded text-[11px] font-bold tracking-wide bg-[#C8E6C9] text-[#1B5E20] mr-2">
             PHASE 2
           </span>
-          MCQ Table of Specifications (TOS) Summary
+          Written Test Table of Specifications (TOS) Summary
         </h1>
         <p className="text-sm text-[#666]">
-          Auto-generated from 50 MCQ items • Reference-only document
+          Auto-generated from 50 Written Test items • Reference-only document
         </p>
       </div>
 
@@ -92,9 +92,9 @@ export function MCQTOSSummary() {
           </span>
           <div className="flex-1 text-sm text-[#1565C0]">
             <strong>Auto-Generated TOS:</strong> This table is automatically
-            calculated from your 50 MCQ items based on their assigned unit
-            competency and cognitive level tags. Any changes to MCQ items will
-            automatically update this TOS. This is for{" "}
+            calculated from your 50 Written Test items based on their assigned
+            unit competency and cognitive level tags. Any changes to Written
+            Test items will automatically update this TOS. This is for{" "}
             <strong>reference and reconciliation only</strong> — the official
             TOS is generated per-package during Phase 3 distribution.
           </div>
@@ -218,8 +218,8 @@ export function MCQTOSSummary() {
                 </div>
               </div>
               <div className="text-xs text-[#1B5E20]">
-                Total items in TOS ({totals.total}) matches MCQ pool count (50
-                items)
+                Total items in TOS ({totals.total}) matches Written Test pool
+                count (50 items)
               </div>
             </div>
 
@@ -319,19 +319,12 @@ export function MCQTOSSummary() {
           className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors"
           onClick={() => navigateToPage("mcq")}
         >
-          ← Back to MCQ Editor
-        </button>
-        <button
-          className="px-4 py-2 bg-white text-[#1976D2] border border-[#1976D2] rounded text-sm font-medium hover:bg-[#E3F2FD] transition-colors"
-          onClick={() => setShowPreview(true)}
-        >
-          <EyeIcon className="w-5 h-5 inline mr-2" />
-          Preview
+          ← Back to Written Test Editor
         </button>
       </div>
       {showPreview && (
         <MCQTOSPreviewModal
-          title="MCQ TOS Master Pool Preview"
+          title="Written Test TOS Master Pool Preview"
           tosData={tosData}
           onClose={() => setShowPreview(false)}
         />

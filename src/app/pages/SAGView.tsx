@@ -1,15 +1,14 @@
 import { useState } from "react";
-import { EyeIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { LockClosedIcon } from "@heroicons/react/24/solid";
 
 import {
+  Breadcrumbs,
   DOCUMENT_ID,
-  SECTOR_PROJECT_ID,
+  SECTOR_ID,
+  PROJECT_ID,
   usePageNavigation,
 } from "./pageUtils";
-
-import { SAGPreviewModal } from "../components/SAGPreviewModal";
-import { Breadcrumbs } from "./Dashboard";
 
 export function SAGView() {
   const { navigateToPage } = usePageNavigation();
@@ -23,19 +22,19 @@ export function SAGView() {
           items={[
             {
               label: "Sector Details",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/`,
             },
             {
               label: "Sector Projects",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
             },
             {
               label: "Self-Assessment Guide (SAG)",
-              href: `/sag`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=sag`,
             },
           ]}
         />
@@ -347,31 +346,6 @@ export function SAGView() {
         >
           ← Back to Package Navigator
         </button>
-        <div className="flex gap-2">
-          <button className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors">
-            Save Draft
-          </button>
-          <button
-            className="px-4 py-2 bg-white text-[#1976D2] border border-[#1976D2] rounded text-sm font-medium hover:bg-[#E3F2FD] transition-colors flex items-center gap-2"
-            onClick={() => setShowPreview(true)}
-          >
-            <EyeIcon className="w-5 h-5 inline" />
-            Preview
-          </button>
-          {status === "draft" && (
-            <button
-              className="px-4 py-2 bg-[#2E7D32] text-white rounded text-sm font-medium hover:bg-[#1B5E20] transition-colors"
-              onClick={() => setStatus("finalized")}
-            >
-              Finalize
-            </button>
-          )}
-        </div>
-
-        {/* Preview Modal */}
-        {showPreview && (
-          <SAGPreviewModal onClose={() => setShowPreview(false)} />
-        )}
       </div>
     </div>
   );

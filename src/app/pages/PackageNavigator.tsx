@@ -13,11 +13,12 @@ import {
 import { FolderArrowDownIcon } from "@heroicons/react/24/outline";
 
 import {
+  Breadcrumbs,
   DOCUMENT_ID,
-  SECTOR_PROJECT_ID,
+  SECTOR_ID,
+  PROJECT_ID,
   usePageNavigation,
 } from "./pageUtils";
-import { Breadcrumbs } from "./Dashboard";
 
 export function PackageNavigator() {
   const { navigateToPage } = usePageNavigation();
@@ -164,19 +165,19 @@ export function PackageNavigator() {
           items={[
             {
               label: "Sector Details",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/`,
             },
             {
               label: "Sector Projects",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
             },
             {
               label: "Package Navigator",
-              href: `/package-navigator`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=package-navigator`,
             },
           ]}
         />
@@ -417,20 +418,8 @@ export function PackageNavigator() {
       </div>
 
       {/* Footer Actions */}
-      <div className="flex justify-between">
-        <button
-          className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors"
-          onClick={() => navigateToPage("/")}
-        >
-          ← Back to Dashboard
-        </button>
+      <div className="flex justify-end">
         <div className="flex gap-2">
-          <button
-            className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors"
-            onClick={() => navigateToPage("ag-assembly")}
-          >
-            ← Back to Assessors Guide Assembly
-          </button>
           <button
             className="px-4 py-2 bg-[#2E7D32] text-white rounded text-sm font-medium hover:bg-[#1B5E20] transition-colors"
             onClick={() => navigateToPage("export")}

@@ -1,11 +1,12 @@
 import { useState } from "react";
 
 import {
+  Breadcrumbs,
   DOCUMENT_ID,
-  SECTOR_PROJECT_ID,
+  SECTOR_ID,
+  PROJECT_ID,
   usePageNavigation,
 } from "./pageUtils";
-import { Breadcrumbs } from "./Dashboard";
 
 export function MCQConfig() {
   const { navigateToPage } = usePageNavigation();
@@ -24,19 +25,19 @@ export function MCQConfig() {
           items={[
             {
               label: "Sector Details",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/`,
             },
             {
               label: "Sector Projects",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
             },
             {
-              label: "MCQ Configuration Panel",
-              href: `/mcq-config`,
+              label: "Written Test - Configuration Panel",
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=mcq-config`,
             },
           ]}
         />
@@ -47,7 +48,7 @@ export function MCQConfig() {
           <span className="inline-block px-2.5 py-0.5 rounded text-[11px] font-bold tracking-wide bg-[#C8E6C9] text-[#1B5E20] mr-2">
             PHASE 2
           </span>
-          MCQ Configuration Panel
+          Written Test - Configuration Panel
         </h1>
         <p className="text-sm text-[#666]">
           Configure item count and category distribution for Written Test pool
@@ -67,7 +68,7 @@ export function MCQConfig() {
               className="text-sm font-medium text-[#333]"
               htmlFor="itemCountInput"
             >
-              Number of MCQ items in master pool:
+              Number of Written Test Items in Master Pool:
             </label>
             <input
               className="w-24 px-3 py-2 border border-[#E0E0E0] rounded text-sm font-bold text-[#1976D2]"
@@ -339,7 +340,7 @@ export function MCQConfig() {
       <div className="flex justify-between">
         <button
           className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors"
-          onClick={() => navigateToPage("/")}
+          onClick={() => navigateToPage("")}
         >
           ← Back to Dashboard
         </button>
@@ -352,7 +353,7 @@ export function MCQConfig() {
           disabled={!isValid}
           onClick={() => navigateToPage("mcq")}
         >
-          Save & Continue to MCQ Editor →
+          Save & Continue to Written Test Editor →
         </button>
       </div>
     </div>

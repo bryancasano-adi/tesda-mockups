@@ -1,5 +1,7 @@
+"use client";
+
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   ArrowRightIcon,
   CheckIcon,
@@ -20,22 +22,19 @@ type Crumb = {
   href?: string;
 };
 
-export const SECTOR_PROJECT_ID = "06e4823d-1048-4e0b-afff-eab593d2f6cd";
-export const DOCUMENT_ID = "f4dbe6f6-0ded-4b46-a7a0-29097e28ca25";
+export const SECTOR_ID = "6271d427-bb95-4d6d-8fe1-85a7f28e1b33";
+export const PROJECT_ID = "607e0c3a-35d4-4486-b140-f80aa07505bf";
+export const DOCUMENT_ID = "2fa19c87-ccd0-4d0b-aa99-bc3a3e25be03";
 
 export function Breadcrumbs({ items }: { items: Crumb[] }) {
-  const navigate = useNavigate();
   return (
     <div className="mb-4 text-sm text-gray-500 flex items-center gap-1">
       {items.map((item, i) => (
         <div key={i} className="flex items-center gap-1">
           {item.href ? (
-            <button
-              className="hover:text-gray-900 hover:underline text-left"
-              onClick={() => navigate(item.href!)}
-            >
+            <a className="hover:text-gray-900 hover:underline" href={item.href}>
               {item.label}
-            </button>
+            </a>
           ) : (
             <span className="text-gray-700 font-medium">{item.label}</span>
           )}
@@ -48,7 +47,7 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
 
 export function Dashboard() {
   const navigate = useNavigate();
-  
+
   const [viewMode, setViewMode] = useState<"workflow" | "package">("workflow");
   const [showGuide, setShowGuide] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<
@@ -143,15 +142,15 @@ export function Dashboard() {
         items={[
           {
             label: "Sector Details",
-            href: `/`,
+            href: `/home/sector-projects/${SECTOR_ID}/`,
           },
           {
             label: "Sector Projects",
-            href: `/`,
+            href: `/home/sector-projects/${SECTOR_ID}/${PROJECT_ID}`,
           },
           {
             label: "Competency Assessment Tools (CATs)",
-            href: `/`,
+            href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
           },
         ]}
       />
@@ -187,10 +186,8 @@ export function Dashboard() {
           </div>
           <div className="flex justify-between text-xs">
             <span className="text-[#666]">
-              {overallProgress}% — {phase1Complete ? "Phase 1 complete, " : ""}
-              {phase2Complete
-                ? "Phase 2 complete"
-                : "Phase 2 in progress (2 of 3 pools finalized)"}
+              {overallProgress}% — {phase1Complete ? "Phase 1 Complete, " : ""}
+              {phase2Complete ? "Phase 2 Complete" : "Phase 2 In Progress"}
               {totalCompleted > 0 &&
                 totalCompleted < 30 &&
                 `, ${totalCompleted} of 30 docs`}
@@ -223,19 +220,17 @@ export function Dashboard() {
               </div>
               <div className="p-4">
                 <div className="font-semibold text-sm text-[#333] mb-2">
-                  Foundation
+                  Foundation Documents
                 </div>
                 <div className="mb-3">
                   <div className="h-1 bg-[#E0E0E0] rounded overflow-hidden">
                     <div
-                      className="h-full bg-[#2E7D32]"
+                      className="h-full bg-blue-600 transition-all duration-500"
                       style={{ width: "100%" }}
                     />
                   </div>
                 </div>
-                <div className="text-xs text-[#2E7D32] mb-2">
-                  Complete — Evidence Plan finalized
-                </div>
+                <div className="text-xs text-blue-600 mb-2">Complete</div>
               </div>
             </div>
 
@@ -263,9 +258,7 @@ export function Dashboard() {
                     />
                   </div>
                 </div>
-                <div className="text-xs text-[#2E7D32] mb-2">
-                  Complete — 3 pools finalized
-                </div>
+                <div className="text-xs text-[#2E7D32] mb-2">Complete</div>
               </div>
             </div>
 
@@ -301,8 +294,8 @@ export function Dashboard() {
                   className={`text-xs mb-2 ${totalCompleted === 30 ? "text-[#2E7D32]" : "text-[#F57C00]"}`}
                 >
                   {totalCompleted === 30
-                    ? "Complete — All 30 documents finalized"
-                    : `In progress — ${totalCompleted} of 30 docs`}
+                    ? "Complete"
+                    : `In Progress — ${totalCompleted} of 30 docs`}
                 </div>
               </div>
             </div>
@@ -383,7 +376,7 @@ export function Dashboard() {
                       </div>
                     </td>
                     <td className="py-3 text-sm text-[#666]">
-                      4-column table: MCQ, Demo, QT coverage
+                      4-column Table: Written, Demonstration, Oral Test
                     </td>
                     <td className="text-center py-3">
                       <span className="px-2 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded text-xs font-semibold">
@@ -398,9 +391,7 @@ export function Dashboard() {
                         status="finalized"
                         onDownload={() => alert("Download Evidence Plan")}
                         onRefresh={() => alert("Refresh Evidence Plan")}
-                        onView={() =>
-                          navigate("/evidence-plan")
-                        }
+                        onView={() => navigate("/evidence-plan")}
                       />
                     </td>
                   </tr>
@@ -500,13 +491,9 @@ export function Dashboard() {
                         showLogs={true}
                         status="finalized"
                         onDownload={() => alert("Download Demonstration Test")}
-                        onEdit={() =>
-                          navigate("/demonstration-test")
-                        }
+                        onEdit={() => navigate("/demonstration-test")}
                         onRefresh={() => alert("Refresh Demonstration Test")}
-                        onView={() =>
-                          navigate("/demonstration-test")
-                        }
+                        onView={() => navigate("/demonstration-test")}
                       />
                     </td>
                   </tr>
@@ -532,17 +519,14 @@ export function Dashboard() {
                     </td>
                     <td className="text-center py-3">
                       <DocumentActions
-                        documentName="Questioning Tool"
+                        documentName="Oral Test"
+                        showGenerate={true}
                         showLogs={true}
                         status="finalized"
-                        onDownload={() => alert("Download Questioning Tool")}
-                        onEdit={() =>
-                          navigate("/questioning-tool")
-                        }
+                        onDownload={() => alert("Download Oral Test")}
+                        onEdit={() => navigate("/questioning-tool")}
                         onRefresh={() => alert("Refresh Questioning Tool")}
-                        onView={() =>
-                          navigate("/questioning-tool")
-                        }
+                        onView={() => navigate("/questioning-tool")}
                       />
                     </td>
                   </tr>
@@ -573,9 +557,7 @@ export function Dashboard() {
                         onDownload={() => alert("Download Written Test")}
                         onEdit={() => navigate("/mcq")}
                         onRefresh={() => alert("Refresh Written Test")}
-                        onView={() =>
-                          navigate("/mcq-config")
-                        }
+                        onView={() => navigate("/mcq-config")}
                       />
                     </td>
                   </tr>
@@ -636,9 +618,7 @@ export function Dashboard() {
                     <td className="text-center py-3">
                       <button
                         className="px-3 py-1.5 text-xs font-medium text-white bg-[#1976D2] hover:bg-[#1565C0] rounded transition-colors"
-                        onClick={() =>
-                          navigate("/distribution-settings")
-                        }
+                        onClick={() => navigate("/distribution-settings")}
                       >
                         View
                       </button>
@@ -664,9 +644,7 @@ export function Dashboard() {
                     <td className="text-center py-3">
                       <button
                         className="px-3 py-1.5 text-xs font-medium text-white bg-[#1976D2] hover:bg-[#1565C0] rounded transition-colors"
-                        onClick={() =>
-                          navigate("/ag-assembly")
-                        }
+                        onClick={() => navigate("/ag-assembly")}
                       >
                         View
                       </button>
@@ -691,9 +669,7 @@ export function Dashboard() {
                     <td className="text-center py-3">
                       <button
                         className="px-3 py-1.5 text-xs font-medium bg-[#F57C00] text-white hover:bg-[#E65100] rounded transition-colors"
-                        onClick={() =>
-                          navigate("/package-navigator")
-                        }
+                        onClick={() => navigate("/package-navigator")}
                       >
                         Continue
                       </button>
@@ -708,11 +684,6 @@ export function Dashboard() {
         /* PACKAGE VIEW */
         <div className="bg-white border border-[#E0E0E0] rounded-lg overflow-hidden">
           <div className="p-5 border-b border-[#E0E0E0]">
-            <div className="text-sm text-[#666] mb-4">
-              View all 30 documents organized by package. Each package (A-E)
-              contains 6 documents.
-            </div>
-
             {/* Package Progress Cards */}
             <div className="grid grid-cols-5 gap-3 mb-6">
               {Object.entries(packageStatuses).map(([pkg, status]) => (
@@ -723,7 +694,7 @@ export function Dashboard() {
                       ? "border-[#1976D2] bg-[#E3F2FD]"
                       : status.completed === 6
                         ? "border-[#2E7D32] bg-[#F1F8F4]"
-                        : "border-orange-500 bg-white hover:border-[#1976D2]"
+                        : "border-yellow-500 bg-white hover:border-[#1976D2]"
                   }`}
                   onClick={() => setSelectedPackage(pkg as any)}
                 >
@@ -732,7 +703,7 @@ export function Dashboard() {
                       {status.completed === 6 ? (
                         <CheckIcon className="w-7 h-7 inline text-green-500" />
                       ) : (
-                        <InboxStackIcon className="w-7 h-7 inline text-orange-500" />
+                        <InboxStackIcon className="w-7 h-7 inline text-yellow-500" />
                       )}
                     </div>
                     <div className="font-bold text-sm text-gray-700">
@@ -741,7 +712,7 @@ export function Dashboard() {
                   </div>
                   <div className="w-full h-2 bg-[#E0E0E0] rounded overflow-hidden mb-2">
                     <div
-                      className={`h-full ${status.completed === 6 ? "bg-[#2E7D32]" : "bg-[#F57C00]"}`}
+                      className={`h-full ${status.completed === 6 ? "bg-green-500" : "bg-yellow-500"} transition-all duration-500`}
                       style={{ width: `${(status.completed / 6) * 100}%` }}
                     />
                   </div>

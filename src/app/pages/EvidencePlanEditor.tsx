@@ -1,28 +1,26 @@
 import { useState, Fragment } from "react";
 import {
-  CheckBadgeIcon,
   ChevronDownIcon,
   ChevronRightIcon,
-  EyeIcon,
   PencilSquareIcon,
   TrashIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import {
   CheckIcon,
-  LockClosedIcon,
   ExclamationTriangleIcon,
   StarIcon,
 } from "@heroicons/react/24/solid";
 
-import {
+import Tooltip, {
+  Breadcrumbs,
   DOCUMENT_ID,
-  SECTOR_PROJECT_ID,
+  PROJECT_ID,
+  SECTOR_ID,
   usePageNavigation,
 } from "./pageUtils";
 
 import { EvidencePlanPreviewModal } from "../components/EvidencePlanPreviewModal";
-import { Breadcrumbs } from "./Dashboard";
 
 interface CustomColumn {
   id: string;
@@ -39,7 +37,7 @@ interface PerformanceCriteria {
   [key: string]: boolean | string; // For dynamic columns
 }
 
-interface Unit {
+export interface Unit {
   id: string;
   name: string;
   elements: Element[];
@@ -80,9 +78,7 @@ export function EvidencePlanEditor() {
     unit3: false,
   });
 
-  const [customColumns, setCustomColumns] = useState<CustomColumn[]>([
-    { id: "portfolio", name: "Portfolio" },
-  ]);
+  const [customColumns, setCustomColumns] = useState<CustomColumn[]>([]);
 
   const [units, setUnits] = useState<Unit[]>([
     {
@@ -535,22 +531,10 @@ export function EvidencePlanEditor() {
     setShowValidation(true);
   };
 
-  const getTotalPCs = () => {
-    return units.reduce((total, unit) => {
-      return (
-        total +
-        unit.elements.reduce((elemTotal, element) => {
-          return elemTotal + element.pcs.length;
-        }, 0)
-      );
-    }, 0);
-  };
-
   const getMethodCounts = () => {
     let mcqCount = 0;
     let demoCount = 0;
     let qtCount = 0;
-    let portfolioCount = 0;
 
     units.forEach((unit) => {
       unit.elements.forEach((element) => {
@@ -558,15 +542,14 @@ export function EvidencePlanEditor() {
           if (pc.mcq) mcqCount++;
           if (pc.demo) demoCount++;
           if (pc.qt) qtCount++;
-          if (pc.portfolio) portfolioCount++;
         });
       });
     });
 
-    return { mcqCount, demoCount, qtCount, portfolioCount };
+    return { mcqCount, demoCount, qtCount };
   };
 
-  const { mcqCount, demoCount, qtCount, portfolioCount } = getMethodCounts();
+  const { mcqCount, demoCount, qtCount } = getMethodCounts();
 
   return (
     <div className="p-6 max-w-[1400px] mx-auto text-gray-800">
@@ -575,19 +558,19 @@ export function EvidencePlanEditor() {
         items={[
           {
             label: "Sector Details",
-            href: `/`,
+            href: `/home/sector-projects/${SECTOR_ID}/`,
           },
           {
             label: "Sector Projects",
-            href: `/`,
+            href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
           },
           {
             label: "Competency Assessment Tools (CATs)",
-            href: `/`,
+            href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
           },
           {
             label: "Evidence Plan",
-            href: `/evidence-plan`,
+            href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=evidence-plan`,
           },
         ]}
       />
@@ -615,9 +598,6 @@ export function EvidencePlanEditor() {
         <div className="flex gap-10 flex-wrap">
           <div className="flex-1 min-w-[200px]">
             <div className="text-xs font-semibold text-[#999] uppercase tracking-wide mb-1">
-              <span className="mr-1.5">
-                <LockClosedIcon className="w-4 h-4 inline text-yellow-500 mt-[-5px]" />
-              </span>{" "}
               Qualification Title
             </div>
             <div className="text-sm text-[#333] font-medium">
@@ -626,9 +606,6 @@ export function EvidencePlanEditor() {
           </div>
           <div className="flex-1 min-w-[200px]">
             <div className="text-xs font-semibold text-[#999] uppercase tracking-wide mb-1">
-              <span className="mr-1.5">
-                <LockClosedIcon className="w-4 h-4 inline text-yellow-500 mt-[-5px]" />
-              </span>{" "}
               Units of Competency Covered
             </div>
             <div className="text-sm text-[#333] font-medium">3 Core Units</div>
@@ -641,9 +618,6 @@ export function EvidencePlanEditor() {
         <div className="px-5 py-4 border-b border-[#E0E0E0] flex justify-between items-center">
           <span className="text-[15px] font-semibold text-[#333]">
             Assessment Tool Mapping
-            <span className="ml-2 text-xs text-[#999] font-normal">
-              3 units ● 8 elements ● {getTotalPCs()} PCs
-            </span>
           </span>
           <button
             className="px-3 py-1.5 bg-white text-[#666] border border-[#E0E0E0] rounded text-xs font-medium hover:bg-[#F5F5F5] transition-colors"
@@ -661,23 +635,20 @@ export function EvidencePlanEditor() {
                   Performance Criteria
                 </th>
                 <th className="text-center px-3.5 py-2.5 text-xs font-semibold text-[#666] bg-[#FAFAFA] border border-[#E0E0E0] w-[100px]">
-                  Multiple Choice
+                  Written
                   <div className="text-[9px] font-normal text-[#BDBDBD] mt-0.5">
-                    <LockClosedIcon className="w-4 h-4 inline text-yellow-500 mt-[-5px]" />{" "}
                     default
                   </div>
                 </th>
                 <th className="text-center px-3.5 py-2.5 text-xs font-semibold text-[#666] bg-[#FAFAFA] border border-[#E0E0E0] w-[100px]">
-                  Demonstration
+                  Demo
                   <div className="text-[9px] font-normal text-[#BDBDBD] mt-0.5">
-                    <LockClosedIcon className="w-4 h-4 inline text-yellow-500 mt-[-5px]" />{" "}
                     default
                   </div>
                 </th>
                 <th className="text-center px-3.5 py-2.5 text-xs font-semibold text-[#666] bg-[#FAFAFA] border border-[#E0E0E0] w-[100px]">
-                  Questioning Tool
+                  Oral
                   <div className="text-[9px] font-normal text-[#BDBDBD] mt-0.5">
-                    <LockClosedIcon className="w-4 h-4 inline text-yellow-500 mt-[-5px]" />{" "}
                     default
                   </div>
                 </th>
@@ -719,18 +690,7 @@ export function EvidencePlanEditor() {
                         ) : (
                           <ChevronRightIcon className="w-5 h-5 inline" />
                         )}
-                        <span className="mr-1.5">
-                          <LockClosedIcon className="w-4 h-4 inline text-yellow-500 mt-[-5px]" />
-                        </span>
                         <span className="flex-1">{unit.name}</span>
-                        <span className="text-xs font-normal opacity-70">
-                          {unit.elements.length} elements ●{" "}
-                          {unit.elements.reduce(
-                            (sum, el) => sum + el.pcs.length,
-                            0,
-                          )}{" "}
-                          PCs
-                        </span>
                       </div>
                     </td>
                   </tr>
@@ -745,9 +705,6 @@ export function EvidencePlanEditor() {
                             className="px-3.5 py-2 text-sm font-semibold text-[#333] bg-[#E8EDF2] border border-[#E0E0E0]"
                             colSpan={5 + customColumns.length}
                           >
-                            <span className="mr-1 text-xs text-[#BDBDBD]">
-                              <LockClosedIcon className="w-4 h-4 inline text-yellow-500 mt-[-5px]" />
-                            </span>
                             {element.name}
                           </td>
                         </tr>
@@ -771,26 +728,47 @@ export function EvidencePlanEditor() {
                               <td className="px-3.5 py-3 border border-[#E0E0E0]">
                                 <div className="flex items-start gap-2">
                                   <button
-                                    className="text-sm text-[#BDBDBD] cursor-pointer hover:text-[#1976D2] flex-shrink-0 mt-0.5"
+                                    className="text-sm text-blue-500 p-1 cursor-pointer hover:text-[#1976D2] flex-shrink-0 mt-1"
                                     title="Edit"
                                     onClick={() =>
                                       handleEditPC(unit.id, element.id, pc.id)
                                     }
                                   >
-                                    <PencilSquareIcon className="w-4 h-4 inline text-blue-500 mt-[-3px]" />
+                                    <PencilSquareIcon className="w-4 h-4 inline text-blue-500" />
                                   </button>
                                   <div
                                     className={`flex-1 text-sm leading-relaxed ${hasWarning ? "text-[#E65100]" : ""}`}
                                   >
                                     {pc.text}
-                                    {pc.critical && (
-                                      <span className="text-[#F57C00] font-bold text-base ml-1">
-                                        *
-                                      </span>
-                                    )}
+
+                                    <Tooltip
+                                      content={`Mark as Critical Aspect`}
+                                    >
+                                      <button
+                                        className={`text-lg transition-colors p-1 ${
+                                          pc.critical
+                                            ? "text-[#F9A825]"
+                                            : "text-[#E0E0E0] hover:text-[#F57C00]"
+                                        }`}
+                                        title="Mark as Critical Aspect"
+                                        onClick={() =>
+                                          handleStarToggle(
+                                            unit.id,
+                                            element.id,
+                                            pc.id,
+                                          )
+                                        }
+                                      >
+                                        <StarIcon
+                                          className={`w-4 h-4 inline ${pc.critical ? "fill-yellow-500 text-yellow-500" : "text-gray-300"}`}
+                                        />
+                                      </button>
+                                    </Tooltip>
+
+                                    <br />
                                     {hasWarning && (
-                                      <span className="text-xs text-[#F57C00] ml-2">
-                                        <ExclamationTriangleIcon className="w-5 h-5 inline text-[#F57C00] mt-[-2px]" />{" "}
+                                      <span className="text-xs text-orange-500 ml-2">
+                                        <ExclamationTriangleIcon className="w-3 h-3 inline text-orange-500 mt-[-2px]" />{" "}
                                         Only 1 method selected
                                       </span>
                                     )}
@@ -872,21 +850,6 @@ export function EvidencePlanEditor() {
                                 >
                                   <TrashIcon className="w-4 h-4 inline text-red-500" />
                                 </button>
-                                <button
-                                  className={`text-lg transition-colors p-1 ${
-                                    pc.critical
-                                      ? "text-[#F9A825]"
-                                      : "text-[#E0E0E0] hover:text-[#F57C00]"
-                                  }`}
-                                  title="Critical Aspect"
-                                  onClick={() =>
-                                    handleStarToggle(unit.id, element.id, pc.id)
-                                  }
-                                >
-                                  <StarIcon
-                                    className={`w-4 h-4 inline ${pc.critical ? "fill-yellow-500 text-yellow-500" : "text-gray-300"}`}
-                                  />
-                                </button>
                               </td>
                             </tr>
                           );
@@ -930,11 +893,11 @@ export function EvidencePlanEditor() {
             }}
           >
             <span className="text-sm font-semibold text-[#E65100]">
-              <ExclamationTriangleIcon className="w-5 h-5 inline" /> Validation
-              Issues (3)
+              <ExclamationTriangleIcon className="w-5 h-5 inline" /> VALIDATION
+              RESULTS (3)
             </span>
             <span className="text-xs text-[#999]">
-              {showValidation ? "Click to collapse ▲" : "Click to expand ▼"}
+              {showValidation ? "Collapse ▲" : "Expand ▼"}
             </span>
           </div>
           {showValidation && (
@@ -992,7 +955,7 @@ export function EvidencePlanEditor() {
       )}
 
       {/* Footer Bar */}
-      <div className="sticky bottom-0 bg-white border-t border-[#E0E0E0] px-5 py-3 flex justify-between items-center gap-3">
+      {/* <div className="sticky bottom-0 bg-white border-t border-[#E0E0E0] px-5 py-3 flex justify-between items-center gap-3">
         <div className="text-sm text-[#666] flex items-center gap-3">
           <span>
             Total: <strong className="text-[#333]">{getTotalPCs()} PCs</strong>{" "}
@@ -1011,14 +974,11 @@ export function EvidencePlanEditor() {
             QT: <strong className="text-[#333]">{qtCount}</strong>
           </span>
           <span className="text-[#E0E0E0]">●</span>
-          <span className="text-[#6B21A8]">
-            Portfolio: <strong>{portfolioCount}</strong>
-          </span>
         </div>
         <div className="flex gap-2">
           <button
             className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors"
-            onClick={() => navigateToPage("/")}
+            onClick={() => navigateToPage("")}
           >
             ← Back to Dashboard
           </button>
@@ -1043,7 +1003,7 @@ export function EvidencePlanEditor() {
             Finalize
           </button>
         </div>
-      </div>
+      </div> */}
 
       {/* Preview Modal */}
       {showPreview && (

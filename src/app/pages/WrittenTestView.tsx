@@ -2,14 +2,15 @@ import { useMemo, useState } from "react";
 import { EyeIcon } from "@heroicons/react/24/outline";
 
 import {
+  Breadcrumbs,
   DOCUMENT_ID,
-  SECTOR_PROJECT_ID,
+  SECTOR_ID,
+  PROJECT_ID,
   usePageNavigation,
 } from "./pageUtils";
 
 import { initialMCQItems, MCQItem } from "../data/mcqQuestions";
 import { WrittenTestPreviewModal } from "../components/WrittenTestPreviewModal";
-import { Breadcrumbs } from "./Dashboard";
 
 // Shuffle helper
 function shuffleArray<T>(array: T[]): T[] {
@@ -64,19 +65,19 @@ export function WrittenTestView() {
           items={[
             {
               label: "Sector Details",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/`,
             },
             {
               label: "Sector Projects",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
             },
             {
               label: "Written Test Preview",
-              href: `/written-test`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=written-test`,
             },
           ]}
         />

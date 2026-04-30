@@ -1,10 +1,9 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter } from "react-router-dom";
 import { RootLayout } from "./components/RootLayout";
 import { Dashboard } from "./pages/Dashboard";
 import { EvidencePlanEditor } from "./pages/EvidencePlanEditor";
 import { OutlineView } from "./pages/OutlineView";
 import { DemonstrationTestEditor } from "./pages/DemonstrationTestEditor";
-import { DemoToolsEquipment } from "./pages/DemoToolsEquipment";
 import { QuestioningToolEditor } from "./pages/QuestioningToolEditor";
 import { MCQConfig } from "./pages/MCQConfig";
 import { MCQEditor } from "./pages/MCQEditor";
@@ -31,7 +30,6 @@ export const router = createBrowserRouter([
       { path: "evidence-plan", Component: EvidencePlanEditor },
       { path: "outline", Component: OutlineView },
       { path: "demonstration-test", Component: DemonstrationTestEditor },
-      { path: "demo-tools", Component: DemoToolsEquipment },
       { path: "questioning-tool", Component: QuestioningToolEditor },
       { path: "mcq-config", Component: MCQConfig },
       { path: "mcq", Component: MCQEditor },

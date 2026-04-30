@@ -2,18 +2,16 @@ import { useState } from "react";
 import {
   ArrowTrendingUpIcon,
   ChartBarIcon,
-  EyeIcon,
-} from "@heroicons/react/24/solid";
-import {
-  CheckCircleIcon,
   PencilSquareIcon,
   PlusIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
 
 import {
+  Breadcrumbs,
   DOCUMENT_ID,
-  SECTOR_PROJECT_ID,
+  SECTOR_ID,
+  PROJECT_ID,
   usePageNavigation,
 } from "./pageUtils";
 
@@ -22,7 +20,6 @@ import { MCQEditorModal } from "../components/MCQEditorModal";
 import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
 import { MCQPreviewModal } from "../components/MCQPreviewModal";
 import { TOSPreviewModal } from "../components/TOSPreviewModal";
-import { Breadcrumbs } from "./Dashboard";
 
 export function MCQEditor() {
   const { navigateToPage } = usePageNavigation();
@@ -70,22 +67,40 @@ export function MCQEditor() {
     const tosData = [
       {
         article: "1. Occupational Safety and Health",
+        pc: "PC-1",
         target: 4,
         percentage: 10,
       },
-      { article: "2. Equipment Operation", target: 12, percentage: 30 },
+      {
+        article: "2. Equipment Operation",
+        pc: "PC-2",
+        target: 12,
+        percentage: 30,
+      },
       {
         article: "3. Preventive Maintenance Servicing/Inspection",
+        pc: "PC-3",
         target: 6,
         percentage: 15,
       },
-      { article: "4. Job or Role in the Workplace", target: 2, percentage: 5 },
+      {
+        article: "4. Job or Role in the Workplace",
+        pc: "PC-4",
+        target: 2,
+        percentage: 5,
+      },
       {
         article: "5. Equipment/Supply Identification and Usage",
+        pc: "PC-5",
         target: 15,
         percentage: 37.5,
       },
-      { article: "6. Mathematics/Computation", target: 1, percentage: 2.5 },
+      {
+        article: "6. Mathematics/Computation",
+        pc: "PC-6",
+        target: 1,
+        percentage: 2.5,
+      },
     ];
 
     return tosData.map((article, idx) => {
@@ -129,19 +144,19 @@ export function MCQEditor() {
           items={[
             {
               label: "Sector Details",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/`,
             },
             {
               label: "Sector Projects",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
             },
             {
-              label: "MCQ + Table of Specifications",
-              href: `/mcq`,
+              label: "Written Test + Table of Specifications",
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=mcq`,
             },
           ]}
         />
@@ -153,7 +168,7 @@ export function MCQEditor() {
             <span className="inline-block px-2.5 py-0.5 rounded text-[11px] font-bold tracking-wide bg-[#E8F5E9] text-[#2E7D32] mr-2">
               PHASE 2
             </span>
-            MCQ + Table of Specifications
+            Written Test + Table of Specifications
           </h1>
           <p className="text-sm text-[#666]">
             {totalItems} Items ● Factual / Scenario / Application ● External
@@ -190,27 +205,52 @@ export function MCQEditor() {
       </div>
 
       {/* Tab Toggle */}
-      <div className="inline-flex border border-[#E0E0E0] rounded overflow-hidden mb-6">
-        <button
-          className={`px-5 py-2 text-sm font-medium transition-colors ${
-            selectedTab === "mcq"
-              ? "bg-[#1976D2] text-white"
-              : "bg-white text-[#666] hover:bg-[#F5F5F5]"
-          }`}
-          onClick={() => setSelectedTab("mcq")}
-        >
-          MCQ Items ({totalItems})
-        </button>
-        <button
-          className={`px-5 py-2 text-sm font-medium transition-colors ${
-            selectedTab === "tos"
-              ? "bg-[#1976D2] text-white"
-              : "bg-white text-[#666] hover:bg-[#F5F5F5]"
-          }`}
-          onClick={() => setSelectedTab("tos")}
-        >
-          Table of Specifications
-        </button>
+      <div className="inline-flex rounded overflow-hidden mb-6 gap-1 justify-between items-center w-full">
+        <div>
+          <button
+            className={`px-5 py-2 text-sm font-medium transition-colors border border-gray-300 ${
+              selectedTab === "mcq"
+                ? "bg-[#1976D2] text-white"
+                : "bg-white text-[#666] hover:bg-[#F5F5F5]"
+            }`}
+            onClick={() => setSelectedTab("mcq")}
+          >
+            Written Test Items ({totalItems})
+          </button>
+          <button
+            className={`px-5 py-2 text-sm font-medium transition-colors border border-gray-300 ${
+              selectedTab === "tos"
+                ? "bg-[#1976D2] text-white"
+                : "bg-white text-[#666] hover:bg-[#F5F5F5]"
+            }`}
+            onClick={() => setSelectedTab("tos")}
+          >
+            Table of Specifications
+          </button>
+        </div>
+
+        {selectedTab === "mcq" && (
+          <>
+            <button
+              className="px-4 py-2 bg-blue-500 text-white border border-blue-500 rounded text-sm font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
+              onClick={() => navigateToPage("mcq-analysis")}
+            >
+              <ArrowTrendingUpIcon className="w-5 h-5 inline" />
+              External Analysis Guide
+            </button>
+          </>
+        )}
+        {selectedTab === "tos" && (
+          <>
+            <button
+              className="px-4 py-2 bg-blue-500 text-white border border-blue-500 rounded text-sm font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
+              onClick={() => navigateToPage("mcq-tos")}
+            >
+              <ChartBarIcon className="w-5 h-5 inline" />
+              TOS Summary
+            </button>
+          </>
+        )}
       </div>
 
       {selectedTab === "mcq" ? (
@@ -356,7 +396,7 @@ export function MCQEditor() {
                 <tr className="bg-[#1976D2]">
                   <th
                     className="px-4 py-3 text-center font-bold text-white border border-[#E0E0E0]"
-                    colSpan={6}
+                    colSpan={10}
                   >
                     TABLE OF SPECIFICATION
                   </th>
@@ -364,7 +404,7 @@ export function MCQEditor() {
                 <tr className="bg-[#1976D2]">
                   <th
                     className="px-4 py-2 text-center font-semibold text-white border border-[#E0E0E0]"
-                    colSpan={6}
+                    colSpan={8}
                   >
                     SHIELDED METAL ARC WELDING (SMAW) – National Certificate II
                   </th>
@@ -372,7 +412,7 @@ export function MCQEditor() {
                 <tr className="bg-[#1976D2]">
                   <th
                     className="px-4 py-2 text-center font-semibold text-white border border-[#E0E0E0]"
-                    colSpan={6}
+                    colSpan={8}
                   >
                     Written Test
                   </th>
@@ -383,6 +423,12 @@ export function MCQEditor() {
                     rowSpan={2}
                   >
                     ARTICLE NUMBER
+                  </th>
+                  <th
+                    className="text-center px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0] align-middle"
+                    rowSpan={2}
+                  >
+                    PERFORMANCE CRITERIA
                   </th>
                   <th
                     className="text-center px-4 py-2 text-xs font-semibold text-[#666] border border-[#E0E0E0]"
@@ -429,6 +475,9 @@ export function MCQEditor() {
                       {row.article}
                     </td>
                     <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
+                      {row.pc}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
                       {row.factual}
                     </td>
                     <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
@@ -448,6 +497,9 @@ export function MCQEditor() {
                 <tr className="bg-[#E8F5E9]">
                   <td className="px-4 py-3 text-sm font-bold text-right border border-[#E0E0E0]">
                     TOTAL
+                  </td>
+                  <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0] font-semibold">
+                    0
                   </td>
                   <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0] font-semibold">
                     {factualCount}
@@ -507,92 +559,6 @@ export function MCQEditor() {
           </div>
         </div>
       )}
-
-      {/* Finalize Section */}
-      <div className="bg-white border border-[#E0E0E0] rounded p-5 mb-6">
-        <div className="flex items-start gap-4">
-          <div className="flex-1">
-            <div className="font-semibold text-sm text-[#333] mb-1">
-              Finalize MCQ Pool
-            </div>
-            <div className="text-xs text-[#666]">
-              Once finalized, this pool will be locked and ready for pilot
-              testing and item analysis. All {totalItems} items will be included
-              in the Table of Specifications.
-            </div>
-          </div>
-          <button
-            className={`px-5 py-2.5 rounded text-sm font-medium transition-colors flex items-center gap-2 whitespace-nowrap ${
-              isFinalized
-                ? "bg-white text-[#666] border border-[#E0E0E0] hover:bg-[#F5F5F5]"
-                : "bg-[#2E7D32] text-white hover:bg-[#1B5E20]"
-            }`}
-            onClick={() => {
-              setIsFinalized(!isFinalized);
-              alert(
-                isFinalized
-                  ? "MCQ pool unlocked for editing"
-                  : "MCQ pool finalized successfully!",
-              );
-            }}
-          >
-            <CheckCircleIcon className="w-5 h-5 inline" />
-            {isFinalized ? "Unfinalize" : "Finalize"}
-          </button>
-        </div>
-      </div>
-
-      {/* Footer Actions */}
-      <div className="flex gap-3 justify-end">
-        <button
-          className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors"
-          onClick={() => navigateToPage("/")}
-        >
-          ← Back to Dashboard
-        </button>
-        <button
-          className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors flex items-center gap-2"
-          onClick={() => alert("Draft saved successfully!")}
-        >
-          Save Draft
-        </button>
-        {selectedTab === "mcq" && (
-          <>
-            <button
-              className="px-4 py-2 bg-white text-[#1976D2] border border-[#1976D2] rounded text-sm font-medium hover:bg-[#E3F2FD] transition-colors flex items-center gap-2"
-              onClick={() => setShowPreview(true)}
-            >
-              <EyeIcon className="w-5 h-5 inline" />
-              Preview
-            </button>
-            <button
-              className="px-4 py-2 bg-blue-500 text-white border border-blue-500 rounded text-sm font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
-              onClick={() => navigateToPage("mcq-analysis")}
-            >
-              <ArrowTrendingUpIcon className="w-5 h-5 inline" />
-              MCQ External Analysis Guide
-            </button>
-          </>
-        )}
-        {selectedTab === "tos" && (
-          <>
-            <button
-              className="px-4 py-2 bg-white text-[#1976D2] border border-[#1976D2] rounded text-sm font-medium hover:bg-[#E3F2FD] transition-colors flex items-center gap-2"
-              onClick={() => setShowTOSPreview(true)}
-            >
-              <EyeIcon className="w-5 h-5 inline" />
-              Preview
-            </button>
-            <button
-              className="px-4 py-2 bg-blue-500 text-white border border-blue-500 rounded text-sm font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
-              onClick={() => navigateToPage("mcq-tos")}
-            >
-              <ChartBarIcon className="w-5 h-5 inline" />
-              MCQ TOS Summary
-            </button>
-          </>
-        )}
-      </div>
 
       {/* Modals */}
       {(editingItem || showAddModal) && (

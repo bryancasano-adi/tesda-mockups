@@ -8,11 +8,12 @@ import {
 } from "@heroicons/react/24/solid";
 
 import {
+  Breadcrumbs,
   DOCUMENT_ID,
-  SECTOR_PROJECT_ID,
+  SECTOR_ID,
+  PROJECT_ID,
   usePageNavigation,
 } from "./pageUtils";
-import { Breadcrumbs } from "./Dashboard";
 
 export function MCQExternalAnalysis() {
   const { navigateToPage } = usePageNavigation();
@@ -24,19 +25,19 @@ export function MCQExternalAnalysis() {
           items={[
             {
               label: "Sector Details",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/`,
             },
             {
               label: "Sector Projects",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
             },
             {
-              label: "MCQ External Analysis Guide",
-              href: `/mcq-analysis`,
+              label: "Written Test External Analysis Guide",
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=mcq-analysis`,
             },
           ]}
         />
@@ -47,7 +48,7 @@ export function MCQExternalAnalysis() {
           <span className="inline-block px-2.5 py-0.5 rounded text-[11px] font-bold tracking-wide bg-[#C8E6C9] text-[#1B5E20] mr-2">
             PHASE 2
           </span>
-          MCQ External Analysis Guide
+          Written Test External Analysis Guide
         </h1>
         <p className="text-sm text-[#666]">
           Step-by-step pilot test workflow • Download for external validation
@@ -62,10 +63,10 @@ export function MCQExternalAnalysis() {
           </span>
           <div className="flex-1 text-sm text-[#1565C0]">
             <strong>External Pilot Testing:</strong> Before finalizing your 50
-            MCQ items, conduct a pilot test with a sample group to validate item
-            quality, difficulty, and discrimination. This guide provides the
-            step-by-step process for conducting and analyzing the pilot test
-            externally.
+            Written Test items, conduct a pilot test with a sample group to
+            validate item quality, difficulty, and discrimination. This guide
+            provides the step-by-step process for conducting and analyzing the
+            pilot test externally.
           </div>
         </div>
       </div>
@@ -85,7 +86,7 @@ export function MCQExternalAnalysis() {
               </span>
               <div className="flex-1 text-left">
                 <div className="font-semibold text-sm text-[#333] mb-1">
-                  MCQ Test Booklet (50 items)
+                  Written Test Booklet (50 items)
                 </div>
                 <div className="text-xs text-[#666]">
                   Formatted for pilot testing • No answers shown
@@ -162,9 +163,9 @@ export function MCQExternalAnalysis() {
                   Prepare Pilot Test
                 </div>
                 <div className="text-sm text-[#666] mb-2">
-                  Download the MCQ Test Booklet and Answer Sheet Template. Print
-                  30-50 copies (recommended sample size: 30-50 participants from
-                  target population).
+                  Download the Written Test Booklet and Answer Sheet Template.
+                  Print 30-50 copies (recommended sample size: 30-50
+                  participants from target population).
                 </div>
                 <div className="text-xs text-[#999] bg-[#FAFAFA] p-2 rounded border border-[#E0E0E0]">
                   <strong>Best Practice:</strong> Include participants with
@@ -348,7 +349,7 @@ export function MCQExternalAnalysis() {
           className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors"
           onClick={() => navigateToPage("mcq")}
         >
-          ← Return to MCQ Editor
+          ← Return to Written Test Editor
         </button>
         <button className="px-4 py-2 bg-[#1976D2] text-white rounded text-sm font-medium hover:bg-[#1565C0] transition-colors">
           <FolderArrowDownIcon className="w-5 h-5 inline mr-2 mt-[-3px]" />

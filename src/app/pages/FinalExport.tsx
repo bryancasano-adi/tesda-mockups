@@ -8,11 +8,12 @@ import {
 } from "@heroicons/react/24/solid";
 
 import {
+  Breadcrumbs,
   DOCUMENT_ID,
-  SECTOR_PROJECT_ID,
+  SECTOR_ID,
+  PROJECT_ID,
   usePageNavigation,
 } from "./pageUtils";
-import { Breadcrumbs } from "./Dashboard";
 
 export function FinalExport() {
   const { navigateToPage } = usePageNavigation();
@@ -40,19 +41,19 @@ export function FinalExport() {
           items={[
             {
               label: "Sector Details",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/`,
             },
             {
               label: "Sector Projects",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
             },
             {
               label: "Final Export",
-              href: `/exoort`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=exoort`,
             },
           ]}
         />
@@ -522,7 +523,7 @@ export function FinalExport() {
         </button>
         <button
           className="px-4 py-2 bg-blue-500 text-white border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#1976D2] transition-colors"
-          onClick={() => navigateToPage("/")}
+          onClick={() => navigateToPage("")}
         >
           Return to Dashboard
         </button>

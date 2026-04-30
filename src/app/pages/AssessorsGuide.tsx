@@ -1,20 +1,18 @@
 import { useState } from "react";
-import {
-  EyeIcon,
-  InformationCircleIcon,
-  LockClosedIcon,
-} from "@heroicons/react/24/solid";
+import { InformationCircleIcon } from "@heroicons/react/24/solid";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { CheckIcon } from "@heroicons/react/24/outline";
+import React from "react";
 
 import {
+  Breadcrumbs,
   DOCUMENT_ID,
-  SECTOR_PROJECT_ID,
+  SECTOR_ID,
+  PROJECT_ID,
   usePageNavigation,
 } from "./pageUtils";
 
-import { AGPreviewModal } from "../components/AGPreviewModal";
-import { Breadcrumbs } from "./Dashboard";
+import { Unit } from "./EvidencePlanEditor";
 
 export function AssessorsGuide() {
   const { navigateToPage } = usePageNavigation();
@@ -22,6 +20,135 @@ export function AssessorsGuide() {
   const [status, setStatus] = useState<"draft" | "finalized">("draft");
   const [currentPage, setCurrentPage] = useState(1);
   const [showPreview, setShowPreview] = useState(false);
+
+  const [units, setUnits] = useState<Unit[]>([
+    {
+      id: "unit1",
+      name: "CORE 1: Perform Shielded Metal Arc Welding — Plate to Plate Joint",
+      elements: [
+        {
+          id: "elem1_1",
+          name: "Element 1: Prepare materials and welding equipment",
+          pcs: [
+            {
+              id: "pc1",
+              text: "Identify type and size of electrode to be used in accordance with Welding Procedure Specification (WPS)",
+              critical: true,
+              mcq: true,
+              demo: true,
+              qt: true,
+              portfolio: true,
+            },
+            {
+              id: "pc2",
+              text: "Set up welding machine and accessories as per WPS requirements",
+              critical: false,
+              mcq: false,
+              demo: true,
+              qt: true,
+              portfolio: false,
+            },
+            {
+              id: "pc3",
+              text: "Clean base metals in accordance with standard operating procedures",
+              critical: false,
+              mcq: false,
+              demo: true,
+              qt: false,
+              portfolio: false,
+            },
+            {
+              id: "pc4",
+              text: "Prepare work area and ensure compliance with Occupational Safety and Health Standards (OSHS)",
+              critical: false,
+              mcq: true,
+              demo: true,
+              qt: true,
+              portfolio: false,
+            },
+            {
+              id: "pc8",
+              text: "Select appropriate electrodes for pipe welding as per WPS",
+              critical: true,
+              mcq: true,
+              demo: true,
+              qt: true,
+              portfolio: false,
+            },
+            {
+              id: "pc9",
+              text: "Set up welding machine for pipe welding operations",
+              critical: false,
+              mcq: true,
+              demo: true,
+              qt: false,
+              portfolio: false,
+            },
+            {
+              id: "pc10",
+              text: "Prepare pipe surfaces according to welding requirements",
+              critical: false,
+              mcq: false,
+              demo: true,
+              qt: true,
+              portfolio: false,
+            },
+          ],
+        },
+        {
+          id: "elem1_2",
+          name: "Element 2: Perform root pass on plate to plate joint",
+          pcs: [
+            {
+              id: "pc5",
+              text: "Perform root pass in accordance with WPS",
+              critical: true,
+              mcq: true,
+              demo: true,
+              qt: true,
+              portfolio: true,
+            },
+            {
+              id: "pc6",
+              text: "Clean and inspect root pass using visual and mechanical methods",
+              critical: false,
+              mcq: false,
+              demo: true,
+              qt: true,
+              portfolio: false,
+            },
+            {
+              id: "pc7",
+              text: "Repair root pass defects as required",
+              critical: false,
+              mcq: false,
+              demo: true,
+              qt: false,
+              portfolio: false,
+            },
+            {
+              id: "pc11",
+              text: "Execute root pass on pipe joints following WPS",
+              critical: true,
+              mcq: true,
+              demo: true,
+              qt: true,
+              portfolio: true,
+            },
+            {
+              id: "pc12",
+              text: "Perform fill passes maintaining proper bead sequence",
+              critical: false,
+              mcq: false,
+              demo: true,
+              qt: true,
+              portfolio: false,
+            },
+          ],
+        },
+      ],
+    },
+  ]);
 
   const totalPages = 10;
 
@@ -56,162 +183,296 @@ export function AssessorsGuide() {
       case 1:
         return renderCoverPage();
       case 2:
-        return renderArrangementsPage();
+        return renderArrangementsPage1();
       case 3:
-        return renderEvidencePlan();
+        return renderArrangementsPage2();
       case 4:
-        return renderSpecificInstructions();
+        return renderEvidencePlan();
       case 5:
-        return renderDemonstrationGuide();
+        return renderSpecificInstructions1();
       case 6:
-        return renderQuestionsBasic();
+        return renderSpecificInstructions2();
       case 7:
-        return renderQuestionsCore();
+        return renderDemonstrationGuide();
       case 8:
-        return renderToolsEquipment();
+        return renderQuestionsBasic();
       case 9:
-        return renderAnswerKey();
+        return renderQuestionsCore();
       case 10:
-        return renderCopyright();
+        return renderToolsEquipment();
+      case 11:
+        return renderAnswerKey();
       default:
         return renderCoverPage();
     }
   };
 
   const renderCoverPage = () => (
-    <div className="text-center space-y-6 py-8">
+    <div className="text-center space-y-4 py-6">
+      <div className="p-1 text-sm leading-relaxed text-black font-semibold border border-black inline-block mb-10 mt-[-10px] text-justify">
+        “No part of this Competency Assessment Tools (CATs) may be produced,
+        distributed, or transmitted in any form or by any means, including
+        photocopying, recording, or other electronic or mechanical methods,
+        without prior written consent of TESDA. Any violation hereof shall be
+        subject to the penalties provided for by applicable laws, rules and
+        regulations.”
+      </div>
+
       <div className="flex justify-center mb-6">
         <ImageWithFallback
           alt="TESDA Logo"
+          className="max-w-full h-auto"
           height={300}
           src="/tesda-cropped-logo.png"
           width={300}
         />
       </div>
 
-      <h1 className="text-2xl font-bold text-[#1E3A5F]">
+      <h1 className="text-2xl font-bold text-black uppercase">
         TECHNICAL EDUCATION AND SKILLS DEVELOPMENT AUTHORITY
       </h1>
 
-      <div className="space-y-4 my-8">
-        <p className="text-lg font-semibold text-[#333]">National Assessment</p>
-        <p className="text-lg font-semibold text-[#333]">for</p>
+      <div className="space-y-6 my-10">
+        <p className="text-xl font-semibold text-black uppercase">
+          National Assessment
+        </p>
+        <p className="text-xl font-semibold text-black uppercase">for</p>
       </div>
 
-      <h2 className="text-3xl font-bold text-[#1976D2] my-6">
+      <h2 className="text-3xl font-bold text-black my-6">
         SHIELDED METAL ARC WELDING (SMAW) NC II
       </h2>
 
-      <h3 className="text-2xl font-bold text-[#333] mt-8">
+      <h3 className="text-2xl font-bold text-black mt-8">
         ASSESSOR&apos;S GUIDE
       </h3>
     </div>
   );
 
-  const renderArrangementsPage = () => (
-    <div className="space-y-4">
-      <h2 className="text-base font-bold text-[#333] mb-4">
+  const renderArrangementsPage1 = () => (
+    <div className="space-y-4 text-black">
+      <h2 className="text-center font-bold mb-4">
         NATIONAL ASSESSMENT AND CERTIFICATION ARRANGEMENTS
       </h2>
 
-      <ol className="list-decimal ml-6 space-y-3 text-sm text-[#666]">
+      <ol className="list-decimal ml-6 space-y-3 text-sm">
         <li>
           To attain the National Qualification of{" "}
-          <span className="text-[#FF0000] font-bold">
-            Shielded Metal Arc Welding (SMAW) NC II
-          </span>
-          , the candidate must demonstrate competence in all the units listed
-          below. A successful candidate shall be awarded a National Certificate
-          signed by the TESDA Director General.
+          <strong>Shielded Metal Arc Welding (SMAW) NC II</strong>, the
+          candidate must demonstrate competence in all the units listed below. A
+          successful candidate shall be awarded a National Certificate signed by
+          the TESDA Director General.
         </li>
       </ol>
 
-      <div className="mt-4">
-        <p className="font-bold text-sm text-[#FF0000]">
-          Unit Code BASIC COMPETENCIES
-        </p>
-        <ul className="ml-4 space-y-1 text-sm text-[#666]">
-          <li>400311210 Participate in Workplace Communication</li>
-          <li>400311211 Work in Team Environment</li>
-          <li>400311212 Solve/Address General Workplace Problems</li>
-          <li>400311213 Develop Career and Life Decisions</li>
-          <li>400311214 Contribute to Workplace Innovation</li>
-          <li>400311215 Present Relevant Information</li>
-          <li>
-            400311216 Practice Occupational Safety and Health Policies and
-            Procedures
-          </li>
-          <li>
-            400311218 Exercise Efficient and Effective Sustainable Practices in
-            the Workplace
-          </li>
-          <li>400311327 Practice Entrepreneurial Skills in the Workplace</li>
-        </ul>
+      <div className="mt-4 mx-4">
+        <table className="w-full text-sm border border-gray-300">
+          <thead>
+            <tr className="bg-gray-100 text-left">
+              <th className="border border-gray-300 px-2 py-1">UNIT CODE</th>
+              <th className="border border-gray-300 px-2 py-1">
+                BASIC COMPETENCY
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="border border-gray-300 px-2 py-1">400311210</td>
+              <td className="border border-gray-300 px-2 py-1">
+                Participate in Workplace Communication
+              </td>
+            </tr>
+            <tr>
+              <td className="border border-gray-300 px-2 py-1">400311211</td>
+              <td className="border border-gray-300 px-2 py-1">
+                Work in Team Environment
+              </td>
+            </tr>
+            <tr>
+              <td className="border border-gray-300 px-2 py-1">400311212</td>
+              <td className="border border-gray-300 px-2 py-1">
+                Solve/Address General Workplace Problems
+              </td>
+            </tr>
+            <tr>
+              <td className="border border-gray-300 px-2 py-1">400311213</td>
+              <td className="border border-gray-300 px-2 py-1">
+                Develop Career and Life Decisions
+              </td>
+            </tr>
+            <tr>
+              <td className="border border-gray-300 px-2 py-1">400311214</td>
+              <td className="border border-gray-300 px-2 py-1">
+                Contribute to Workplace Innovation
+              </td>
+            </tr>
+            <tr>
+              <td className="border border-gray-300 px-2 py-1">400311215</td>
+              <td className="border border-gray-300 px-2 py-1">
+                Present Relevant Information
+              </td>
+            </tr>
+            <tr>
+              <td className="border border-gray-300 px-2 py-1">400311216</td>
+              <td className="border border-gray-300 px-2 py-1">
+                Practice Occupational Safety and Health Policies and Procedures
+              </td>
+            </tr>
+            <tr>
+              <td className="border border-gray-300 px-2 py-1">400311218</td>
+              <td className="border border-gray-300 px-2 py-1">
+                Exercise Efficient and Effective Sustainable Practices in the
+                Workplace
+              </td>
+            </tr>
+            <tr>
+              <td className="border border-gray-300 px-2 py-1">400311327</td>
+              <td className="border border-gray-300 px-2 py-1">
+                Practice Entrepreneurial Skills in the Workplace
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <div className="mt-4">
-        <p className="font-bold text-sm text-[#FF0000]">
-          Unit Code COMMON COMPETENCIES
-        </p>
-        <ul className="ml-4 space-y-1 text-sm text-[#666]">
-          <li>Apply Quality Standards</li>
-          <li>Maintain an Effective Relationship with Clients and Customers</li>
-          <li>Manage Own Performance</li>
-          <li>Perform Computer Operations</li>
-        </ul>
+      <div className="mt-4 mx-4">
+        <table className="w-full text-sm border border-gray-300">
+          <thead>
+            <tr className="bg-gray-100 text-left">
+              <th className="border border-gray-300 px-2 py-1">UNIT CODE</th>
+              <th className="border border-gray-300 px-2 py-1">
+                COMMON COMPETENCY
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="border border-gray-300 px-2 py-1">1</td>
+              <td className="border border-gray-300 px-2 py-1">
+                Apply Quality Standards
+              </td>
+            </tr>
+            <tr>
+              <td className="border border-gray-300 px-2 py-1">2</td>
+              <td className="border border-gray-300 px-2 py-1">
+                Maintain an Effective Relationship with Clients and Customers
+              </td>
+            </tr>
+            <tr>
+              <td className="border border-gray-300 px-2 py-1">3</td>
+              <td className="border border-gray-300 px-2 py-1">
+                Manage Own Performance
+              </td>
+            </tr>
+            <tr>
+              <td className="border border-gray-300 px-2 py-1">4</td>
+              <td className="border border-gray-300 px-2 py-1">
+                Perform Computer Operations
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <div className="mt-4">
-        <p className="font-bold text-sm text-[#FF0000]">
-          Unit Code CORE COMPETENCIES
-        </p>
-        <ul className="ml-4 space-y-1 text-sm text-[#666]">
-          <li>Perform Shielded Metal Arc Welding - Plate to Plate Joint</li>
-          <li>Perform Shielded Metal Arc Welding - Pipe to Pipe Joint</li>
-          <li>Repair Welds</li>
-        </ul>
+      <div className="mt-4 mx-4">
+        <table className="w-full text-sm border border-gray-300">
+          <thead>
+            <tr className="bg-gray-100 text-left">
+              <th className="border border-gray-300 px-2 py-1">UNIT CODE</th>
+              <th className="border border-gray-300 px-2 py-1">
+                CORE COMPETENCY
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="border border-gray-300 px-2 py-1">CS-AFF611319</td>
+              <td className="border border-gray-300 px-2 py-1">
+                Maintain Records of Financial Transactions
+              </td>
+            </tr>
+            <tr>
+              <td className="border border-gray-300 px-2 py-1">CS-AFF611320</td>
+              <td className="border border-gray-300 px-2 py-1">
+                Handle Disbursement and Payment
+              </td>
+            </tr>
+            <tr>
+              <td className="border border-gray-300 px-2 py-1">CS-AFF611321</td>
+              <td className="border border-gray-300 px-2 py-1">
+                Process Procurement and Inventory of Supplies, Materials and
+                Equipment
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <ol
-        className="list-decimal ml-6 space-y-3 text-sm text-[#666] mt-6"
-        start={2}
-      >
-        <li>Assessment shall cover all the core units of competency.</li>
+      <ol className="list-decimal ml-6 space-y-3 text-sm mt-6" start={2}>
+        <li>
+          The qualification of SHIELDED METAL ARC WELDING (SMAW) NC II may be
+          attained through demonstration of competence in a single comprehensive
+          project-type assessment covering all required units of competency of
+          this qualification.{" "}
+        </li>
+        <li>
+          Assessment shall cover all competencies with basic and common
+          integrated or assessed concurrently with the core units of competency.
+        </li>
         <li>
           The following are qualified to apply for assessment and certification:
           <ul className="ml-6 list-disc mt-2">
             <li>
-              Graduate of formal and non-formal including enterprise-based
-              training programs
+              Graduating learners/trainees of WTR-, Recognized TVET Program or
+              formal/non-formal/informal including institution-based trainings,
+              community-based trainings or government/NGOs sponsored trainings
+              relevant to Halal Awareness; or
             </li>
-            <li>Experienced workers (wage employed or self-employed)</li>
+            <li>
+              Workers with industry experience (wage-employed or self-employed)
+              who gained competencies in Halal Awareness and/or Halal Assurance
+              Management Systems or other related industry fields for at least
+              two (2) years of continuous service in the last five (5) years,
+              such as:
+            </li>
           </ul>
         </li>
+      </ol>
+    </div>
+  );
+
+  const renderArrangementsPage2 = () => (
+    <div className="space-y-4 text-black">
+      <ol className="list-decimal ml-6 space-y-3 text-sm" start={5}>
         <li>
-          The guidelines on assessment and certification are discussed in
-          details in the &ldquo;Operating Procedures on Assessment and
-          Certification&rdquo; and &ldquo;Guidelines on the Implementation of
-          the Philippine TVET Competency Assessment and Certification System
-          (PTCACS)&rdquo;.
+          Candidates who have gained competencies through informal training and
+          previous work or life experiences may opt to apply for Recognition of
+          Prior Learning (RPL) through portfolio assessment.
+          <br />
+          <br />
+          To qualify for portfolio assessment, the candidate must have gained
+          competencies through education, informal training, and previous work
+          or life experiences for at least 3 years within the last five (5)
+          years.
         </li>
       </ol>
     </div>
   );
 
   const renderEvidencePlan = () => (
-    <div className="space-y-4">
+    <div className="space-y-4 text-black">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-base font-bold text-[#333]">EVIDENCE PLAN</h2>
+        <h2 className="text-base font-bold">EVIDENCE PLAN</h2>
       </div>
 
-      <table className="w-full border-collapse border border-[#000] text-sm text-gray-800">
+      <table className="w-full border-collapse border border-[#000] text-sm">
         <tbody>
           <tr>
-            <td className="border border-[#000] p-2 font-semibold w-32">
+            <td className="border border-[#000] p-2 font-semibold w-50">
               Qualification Title
             </td>
             <td className="border border-[#000] p-2" colSpan={4}>
-              <span className="text-[#1976D2] font-bold">
+              <span className="font-bold">
                 SHIELDED METAL ARC WELDING (SMAW) NC II
               </span>
             </td>
@@ -225,6 +486,8 @@ export function AssessorsGuide() {
                 <li>
                   Perform Shielded Metal Arc Welding - Plate to Plate Joint
                 </li>
+                <li>Perform Shielded Metal Arc Welding - Pipe to Pipe Joint</li>
+                <li>Repair Welds</li>
               </ul>
             </td>
           </tr>
@@ -237,53 +500,60 @@ export function AssessorsGuide() {
                 The evidence must show that the candidate...
               </p>
             </td>
-            <td className="border border-[#000] p-2 text-center font-bold text-[#FF0000]">
-              Demonstration/Observation
+            <td className="border border-[#000] p-2 text-center font-bold">
+              Demonstration
             </td>
-            <td className="border border-[#000] p-2 text-center font-bold text-[#FF0000]">
+            <td className="border border-[#000] p-2 text-center font-bold">
               Oral Questioning
             </td>
-            <td className="border border-[#000] p-2 text-center font-bold text-[#FF0000]">
+            <td className="border border-[#000] p-2 text-center font-bold">
               Written Test
             </td>
           </tr>
-          <tr>
-            <td className="border border-[#000] p-2 font-bold" colSpan={5}>
-              Prepare materials and welding equipment
-            </td>
-          </tr>
-          <tr>
-            <td className="border border-[#000] p-2" colSpan={2}>
-              Identifies and selects electrodes according to WPS
-            </td>
-            <td className="border border-[#000] p-1 text-center">
-              <CheckIcon className="inline w-5 h-5 text-gray-600" />
-            </td>
-            <td className="border border-[#000] p-1" />
-            <td className="border border-[#000] p-1" />
-          </tr>
-          <tr>
-            <td className="border border-[#000] p-2" colSpan={2}>
-              Performs welding machine setup and adjustment
-            </td>
-            <td className="border border-[#000] p-1 text-center">
-              <CheckIcon className="inline w-5 h-5 text-gray-600" />
-            </td>
-            <td className="border border-[#000] p-1 text-center">
-              <CheckIcon className="inline w-5 h-5 text-gray-600" />
-            </td>
-            <td className="border border-[#000] p-1" />
-          </tr>
-          <tr>
-            <td className="border border-[#000] p-2" colSpan={2}>
-              Prepares and cleans base metals according to WPS requirements
-            </td>
-            <td className="border border-[#000] p-1 text-center">
-              <CheckIcon className="inline w-5 h-5 text-gray-600" />
-            </td>
-            <td className="border border-[#000] p-1" />
-            <td className="border border-[#000] p-1" />
-          </tr>
+
+          {units.map((unit) => (
+            <React.Fragment key={unit.id}>
+              {unit.elements.map((element) => (
+                <React.Fragment key={element.id}>
+                  {/* Element Title */}
+                  <tr>
+                    <td
+                      className="bg-gray-100 border border-[#000] p-2 font-bold"
+                      colSpan={5}
+                    >
+                      {element.name}
+                    </td>
+                  </tr>
+
+                  {element.pcs.map((pc) => (
+                    <tr key={pc.id}>
+                      <td className="border border-[#000] p-2" colSpan={2}>
+                        {pc.text}
+                      </td>
+
+                      <td className="border border-[#000] p-1 text-center">
+                        {pc.demo && (
+                          <CheckIcon className="inline w-5 h-5 text-gray-600" />
+                        )}
+                      </td>
+
+                      <td className="border border-[#000] p-1 text-center">
+                        {pc.qt && (
+                          <CheckIcon className="inline w-5 h-5 text-gray-600" />
+                        )}
+                      </td>
+
+                      <td className="border border-[#000] p-1 text-center">
+                        {pc.mcq && (
+                          <CheckIcon className="inline w-5 h-5 text-gray-600" />
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </React.Fragment>
+              ))}
+            </React.Fragment>
+          ))}
         </tbody>
       </table>
 
@@ -294,191 +564,202 @@ export function AssessorsGuide() {
     </div>
   );
 
-  const renderSpecificInstructions = () => (
-    <div className="space-y-4">
-      <div
-        className={`p-6 border-2 ${editMode ? "border-[#1976D2]" : "border-[#E0E0E0]"} rounded bg-white relative`}
-      >
-        {editMode && (
-          <div className="absolute top-2 right-2 px-2 py-1 bg-[#E3F2FD] rounded text-xs text-[#1976D2]">
-            Editable
-          </div>
-        )}
+  const renderSpecificInstructions1 = () => (
+    <div className="p-6 bg-white max-w-4xl mx-auto text-sm text-black">
+      <h2 className="text-left font-bold mb-4">
+        SPECIFIC INSTRUCTIONS FOR THE ASSESSOR
+      </h2>
 
-        <h2 className="text-base font-bold text-[#333] mb-4">
-          SPECIFIC INSTRUCTIONS FOR THE ASSESSOR
-        </h2>
-
-        <div className="space-y-4">
-          <div>
-            <label
-              className="block text-sm font-semibold text-[#666] mb-2"
-              htmlFor="qualificationTitleInput"
-            >
-              Qualification Title:
-            </label>
-            {editMode ? (
-              <input
-                className="w-full px-3 py-2 border border-[#E0E0E0] rounded text-sm"
-                defaultValue="Shielded Metal Arc Welding (SMAW) NC II"
-                id="qualificationTitleInput"
-                type="text"
-              />
-            ) : (
-              <div className="text-sm text-[#333]">
-                Shielded Metal Arc Welding (SMAW) NC II
-              </div>
-            )}
-          </div>
-
-          <div>
-            <label
-              className="block text-sm font-semibold text-[#666] mb-2"
-              htmlFor="unitCompetenciesInput"
-            >
-              Unit of Competencies:
-            </label>
-            {editMode ? (
-              <textarea
-                className="w-full px-3 py-2 border border-[#E0E0E0] rounded text-sm"
-                defaultValue="• Perform Shielded Metal Arc Welding - Plate to Plate Joint"
-                id="unitCompetenciesInput"
-                rows={3}
-              />
-            ) : (
-              <ul className="list-disc ml-5 text-sm text-[#333]">
+      {/* Top Table */}
+      <table className="w-full border border-black mb-4">
+        <tbody>
+          <tr>
+            <td className="border border-black p-2 w-1/3 font-semibold">
+              Qualification Title
+            </td>
+            <td className="border border-black p-2">
+              Shielded Metal Arc Welding (SMAW) NC II
+            </td>
+          </tr>
+          <tr>
+            <td className="border border-black p-2 font-semibold">
+              Unit of Competencies
+            </td>
+            <td className="border border-black p-2" colSpan={4}>
+              <ul className="list-disc ml-5">
                 <li>
                   Perform Shielded Metal Arc Welding - Plate to Plate Joint
                 </li>
+                <li>Perform Shielded Metal Arc Welding - Pipe to Pipe Joint</li>
+                <li>Repair Welds</li>
               </ul>
-            )}
-          </div>
-
-          <div>
-            <label
-              className="block text-sm font-semibold text-[#666] mb-2"
-              htmlFor="timeAllottedInput"
-            >
+            </td>
+          </tr>
+          <tr>
+            <td className="border border-black p-2 font-semibold">
               Time Allotted:
-            </label>
-            {editMode ? (
-              <div className="flex gap-3">
-                <input
-                  className="px-3 py-2 border border-[#E0E0E0] rounded text-sm w-40"
-                  defaultValue="4 hours"
-                  id="timeAllottedInput"
-                  placeholder="Per candidate"
-                  type="text"
-                />
-                <span className="text-sm text-[#666] self-center">
-                  per candidate /
-                </span>
-                <input
-                  className="px-3 py-2 border border-[#E0E0E0] rounded text-sm w-40"
-                  defaultValue="8 hours"
-                  id="timeAllottedInput"
-                  placeholder="For 10 candidates"
-                  type="text"
-                />
-                <span className="text-sm text-[#666] self-center">
-                  for 10 candidates
-                </span>
+            </td>
+            <td className="border border-black p-2">
+              ____ per candidate or ____ for 10 candidates
+            </td>
+          </tr>
+          <tr>
+            <td className="p-6" colSpan={2}>
+              {/* Instructions */}
+              <div className="space-y-2">
+                <p>
+                  1. Conduct an orientation to candidates on the procedures of
+                  the assessment <b>(10 minutes).</b>
+                </p>
+
+                <p>
+                  2. Provide each candidate with a complete set of supplies and
+                  materials, tools and equipment, the necessary ingredients, and
+                  a copy of the Specific Instructions to the Candidate.
+                </p>
+
+                <p>
+                  3. For safety reasons, you may instruct the candidate to
+                  temporarily halt or completely end the demonstration at any
+                  given time.
+                </p>
+
+                <p>
+                  4. To assess the candidate’s competence, instruct the
+                  candidates to perform the following tasks:
+                </p>
+
+                <div className="ml-6">
+                  <p>
+                    4.1. Instruct the candidate to make a Shielded Metal Arc
+                    Weld out of the specified materials.
+                  </p>
+                  <p>
+                    4.2. Instruct the candidate to inspect the weld for defects.
+                  </p>
+                </div>
+
+                <p>
+                  5. Use the “Assessment Guide for Demonstration” as reference
+                  when rating the candidate’s performance in skills
+                  demonstration.
+                </p>
+
+                <p>
+                  6. Probe the candidate’s knowledge by oral questioning. A list
+                  of questions and answers are provided in this Guide.
+                </p>
+
+                <p>
+                  7. Assessment is based on the units of competency in the
+                  Training Regulations and EVIDENCE PLAN, and shall focus on the
+                  evidence-gathering methods with estimated maximum time limits
+                  below:
+                </p>
               </div>
-            ) : (
-              <div className="text-sm text-[#333]">
-                4 hours per candidate / 8 hours for 10 candidates
+
+              {/* Assessment Table */}
+              <table className="w-full border border-black mt-4 text-center text-xs">
+                <thead>
+                  <tr>
+                    <th className="border border-black p-2">
+                      Assessment Activities
+                    </th>
+                    <th className="border border-black p-2">Per Candidate</th>
+                    <th className="border border-black p-2">10 candidates</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="border border-black p-2 text-left">
+                      Orientation
+                    </td>
+                    <td className="border border-black p-2 ">
+                      10 minutes (simultaneous)
+                    </td>
+                    <td className="border border-black p-2" />
+                  </tr>
+                  <tr>
+                    <td className="border border-black p-2 text-left ">
+                      Written Test
+                    </td>
+                    <td className="border border-black p-2 ">
+                      30 minutes (simultaneous)
+                    </td>
+                    <td className="border border-black p-2" />
+                  </tr>
+                  <tr>
+                    <td className="border border-black p-2 text-left ">
+                      Demonstration
+                    </td>
+                    <td className="border border-black p-2 ">
+                      4 hours and 20 minutes (simultaneous)
+                    </td>
+                    <td className="border border-black p-2" />
+                  </tr>
+                  <tr>
+                    <td className="border border-black p-2 text-left ">
+                      Oral questioning
+                    </td>
+                    <td className="border border-black p-2 ">15 minutes</td>
+                    <td className="border border-black p-2 ">
+                      2 hours and 30 minutes
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border border-black p-2 text-left">
+                      Feedbacking
+                    </td>
+                    <td className="border border-black p-2 ">3 minutes</td>
+                    <td className="border border-black p-2 ">30 minutes</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-black p-2 font-bold w-1/2">
+                      TOTAL
+                    </td>
+                    <td className="border border-black p-2">
+                      5 hours and 18 minutes
+                    </td>
+                    <td className="border border-black p-2">8 hours</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
+
+  const renderSpecificInstructions2 = () => (
+    <div className="p-6 bg-white max-w-4xl mx-auto text-sm text-black">
+      {/* Footer Instructions */}
+      <table className="w-full border border-black mt-4">
+        <tbody>
+          <tr>
+            <td className="p-6" colSpan={2}>
+              <div className="mt-4 space-y-2">
+                <p>
+                  8. The final assessment shall be your responsibility as the
+                  Accredited Assessor.
+                </p>
+                <p>
+                  9. Record the assessment outcome using the prescribed Rating
+                  Sheet and provide the candidate feedback on the results of the
+                  assessment. The feedback shall indicate whether the candidate
+                  is COMPETENT or NOT YET COMPETENT.
+                </p>
               </div>
-            )}
-          </div>
-
-          <div>
-            <label
-              className="block text-sm font-semibold text-[#666] mb-2"
-              htmlFor="assessorInstructionsInput"
-            >
-              The Assessor MUST:
-            </label>
-            {editMode ? (
-              <textarea
-                className="w-full px-3 py-2 border border-[#E0E0E0] rounded text-sm min-h-[300px]"
-                defaultValue={`1. Provide the following tools, equipment and materials:
-   • SMAW Machine (AC/DC, 200A minimum)
-   • Welding electrodes (E6013, various sizes)
-   • Steel plates (A36, 6mm x 150mm x 200mm)
-   • PPE (welding helmet, gloves, apron, safety boots)
-   • Angle grinder
-   • Wire brush and chipping hammer
-
-2. Given the necessary tools, materials, instruments and equipment, instruct the candidate to perform the following tasks in accordance with the set performance criteria
-
-TASKS:
-• Identify and select appropriate electrodes according to WPS
-• Set up and adjust welding machine according to specifications
-• Prepare and clean base metals according to WPS requirements
-• Perform root pass according to WPS specifications
-• Complete fill and cover passes ensuring proper penetration
-• Conduct visual inspection and document results
-• Follow safety procedures throughout the assessment
-
-3. After the demonstration, you are required to:
-   • Conduct oral questioning session
-   • Administer the written test in a separate quiet area
-
-4. Assessment shall be based on the units of competency focusing on:
-   • Demonstration/Observation with Oral Questioning
-   • Written Test - 50 items (60 mins)
-
-5. The final Assessment shall be your responsibility as the Accredited Assessor.
-
-6. At the end of the assessment, provide feedback indicating whether the candidate is:
-   COMPETENT or NOT YET COMPETENT`}
-                id="assessorInstructionsInput"
-              />
-            ) : (
-              <div className="text-sm text-[#666] whitespace-pre-line bg-[#FAFAFA] p-4 rounded border border-[#E0E0E0]">
-                {`1. Provide the following tools, equipment and materials:
-   • SMAW Machine (AC/DC, 200A minimum)
-   • Welding electrodes (E6013, various sizes)
-   • Steel plates (A36, 6mm x 150mm x 200mm)
-   • PPE (welding helmet, gloves, apron, safety boots)
-   • Angle grinder
-   • Wire brush and chipping hammer
-
-2. Given the necessary tools, materials, instruments and equipment, instruct the candidate to perform the following tasks in accordance with the set performance criteria
-
-TASKS:
-• Identify and select appropriate electrodes according to WPS
-• Set up and adjust welding machine according to specifications
-• Prepare and clean base metals according to WPS requirements
-• Perform root pass according to WPS specifications
-• Complete fill and cover passes ensuring proper penetration
-• Conduct visual inspection and document results
-• Follow safety procedures throughout the assessment
-
-3. After the demonstration, you are required to:
-   • Conduct oral questioning session
-   • Administer the written test in a separate quiet area
-
-4. Assessment shall be based on the units of competency focusing on:
-   • Demonstration/Observation with Oral Questioning
-   • Written Test - 50 items (60 mins)
-
-5. The final Assessment shall be your responsibility as the Accredited Assessor.
-
-6. At the end of the assessment, provide feedback indicating whether the candidate is:
-   ☐ COMPETENT     ☐ NOT YET COMPETENT`}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 
   const renderDemonstrationGuide = () => (
     <div className="space-y-4">
       <div className="bg-[#E0E0E0] px-2 py-1 rounded text-xs text-[#666] inline-block">
-        <LockClosedIcon className="w-4 h-4 inline text-yellow-500 mr-1" />{" "}
         Auto-compiled from Demonstration Test - Phase 2
       </div>
 
@@ -535,7 +816,6 @@ TASKS:
   const renderQuestionsBasic = () => (
     <div className="space-y-4">
       <div className="bg-[#E0E0E0] px-2 py-1 rounded text-xs text-[#666] inline-block mb-4">
-        <LockClosedIcon className="w-4 h-4 inline text-yellow-500 mr-1" />{" "}
         Auto-compiled from Questioning Tool Pool - Phase 2
       </div>
 
@@ -590,7 +870,6 @@ TASKS:
   const renderQuestionsCore = () => (
     <div className="space-y-4">
       <div className="bg-[#E0E0E0] px-2 py-1 rounded text-xs text-[#666] inline-block mb-4">
-        <LockClosedIcon className="w-4 h-4 inline text-yellow-500 mr-1" />{" "}
         Auto-compiled from Questioning Tool Pool - Phase 2
       </div>
 
@@ -657,12 +936,11 @@ TASKS:
   const renderToolsEquipment = () => (
     <div className="space-y-6">
       <div className="bg-[#E0E0E0] px-2 py-1 rounded text-xs text-[#666] inline-block mb-4">
-        <LockClosedIcon className="w-4 h-4 inline text-yellow-500 mr-1" />{" "}
         Auto-compiled from Demonstration Test - Phase 2
       </div>
 
       <h2 className="text-base font-bold text-[#333] mb-4">
-        RECOMMENDED LIST OF TOOLS, EQUIPMENT AND MATERIALS FOR TEN (10)
+        RECOMMENDED LIST OF TOOLS, EQUIPMENT AND MATERIALS <br /> FOR TEN (10)
         CANDIDATES
       </h2>
 
@@ -839,7 +1117,6 @@ TASKS:
   const renderAnswerKey = () => (
     <div className="space-y-4">
       <div className="bg-[#E0E0E0] px-2 py-1 rounded text-xs text-[#666] inline-block mb-4">
-        <LockClosedIcon className="w-4 h-4 inline text-yellow-500 mr-1" />{" "}
         Auto-compiled from Written Test - Phase 2
       </div>
 
@@ -861,7 +1138,7 @@ TASKS:
           </tr>
         </thead>
         <tbody>
-          {Array.from({ length: 30 }, (_, i) => (
+          {Array.from({ length: 25 }, (_, i) => (
             <tr key={i}>
               <td className="border border-[#000] p-2 text-center">{i + 1}</td>
               <td className="border border-[#000] p-2 text-center" colSpan={2}>
@@ -878,21 +1155,6 @@ TASKS:
     </div>
   );
 
-  const renderCopyright = () => (
-    <div className="flex items-center justify-center min-h-[400px]">
-      <div className="text-center">
-        <div className="bg-gray-200 p-4 text-sm leading-relaxed text-black max-w-[800px] font-semibold">
-          “No part of this Competency Assessment Tools (CATs) may be produced,
-          distributed, or transmitted in any form or by any means, including
-          photocopying, recording, or other electronic or mechanical methods,
-          without prior written consent of TESDA. Any violation hereof shall be
-          subject to the penalties provided for by applicable laws, rules and
-          regulations.”
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="p-6 text-gray-800">
       <div className="text-sm text-[#666] mb-4">
@@ -900,19 +1162,19 @@ TASKS:
           items={[
             {
               label: "Sector Details",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/`,
             },
             {
               label: "Sector Projects",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
             },
             {
               label: "Assessor's Guide",
-              href: `/assessors-guide`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=assessors-guide`,
             },
           ]}
         />
@@ -1020,10 +1282,12 @@ TASKS:
           </select>
         </div>
 
-        {/* Document Content */}
-        <div className="p-8 max-h-[600px] overflow-y-auto">{renderPage()}</div>
+        <div className="p-6 bg-[#FAFAFA] text-sm text-[#666]">
+          <div className="w-[794px] h-[1123px] p-16 bg-white shadow-md mx-auto overflow-hidden">
+            {renderPage()}
+          </div>
+        </div>
       </div>
-
       {/* Footer Actions */}
       <div className="mt-6 flex justify-between">
         <button
@@ -1032,30 +1296,7 @@ TASKS:
         >
           ← Back to Package Navigator
         </button>
-        <div className="flex gap-2">
-          <button className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors">
-            Save Draft
-          </button>
-          <button
-            className="px-4 py-2 bg-white text-[#1976D2] border border-[#1976D2] rounded text-sm font-medium hover:bg-[#E3F2FD] transition-colors flex items-center gap-2"
-            onClick={() => setShowPreview(true)}
-          >
-            <EyeIcon className="w-5 h-5 inline" />
-            Preview
-          </button>
-          {status === "draft" && (
-            <button
-              className="px-4 py-2 bg-[#2E7D32] text-white rounded text-sm font-medium hover:bg-[#1B5E20] transition-colors"
-              onClick={() => setStatus("finalized")}
-            >
-              Finalize
-            </button>
-          )}
-        </div>
       </div>
-
-      {/* Preview Modal */}
-      {showPreview && <AGPreviewModal onClose={() => setShowPreview(false)} />}
     </div>
   );
 }

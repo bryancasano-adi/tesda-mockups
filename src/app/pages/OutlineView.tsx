@@ -1,20 +1,8 @@
-import { useState } from "react";
-import { EyeIcon } from "@heroicons/react/24/outline";
 import { InformationCircleIcon } from "@heroicons/react/24/solid";
 
-import {
-  DOCUMENT_ID,
-  SECTOR_PROJECT_ID,
-  usePageNavigation,
-} from "./pageUtils";
-
-import { OutlinePreviewModal } from "../components/OutlinePreviewModal";
-import { Breadcrumbs } from "./Dashboard";
+import { Breadcrumbs, DOCUMENT_ID, SECTOR_ID, PROJECT_ID } from "./pageUtils";
 
 export function OutlineView() {
-  const { navigateToPage } = usePageNavigation();
-  const [showPreview, setShowPreview] = useState(false);
-
   return (
     <div className="p-6">
       <div className="text-sm text-[#666] mb-4">
@@ -22,19 +10,19 @@ export function OutlineView() {
           items={[
             {
               label: "Sector Details",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/`,
             },
             {
               label: "Sector Projects",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
             },
             {
               label: "Outline",
-              href: `/outline`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=outline`,
             },
           ]}
         />
@@ -68,8 +56,8 @@ export function OutlineView() {
             </div>
             <div className="text-sm text-[#1565C0] leading-relaxed">
               This outline is automatically generated from the Evidence Plan and
-              serves as a reference for generating assessment tools. It is not
-              included in the final CATS package.
+              serves as a reference for generating assessment tools. This will
+              not be included in the final CATs package.
             </div>
           </div>
         </div>
@@ -274,27 +262,6 @@ export function OutlineView() {
           </div>
         </div>
       </div>
-
-      <div className="flex gap-3 justify-end">
-        <button
-          className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors"
-          onClick={() => navigateToPage("/")}
-        >
-          ← Back to Dashboard
-        </button>
-        <button
-          className="px-4 py-2 bg-white text-blue-700 border border-blue-500 rounded text-sm font-medium hover:bg-blue-100 transition-colors flex items-center gap-2"
-          onClick={() => setShowPreview(true)}
-        >
-          <EyeIcon className="w-5 h-5 inline" />
-          Preview
-        </button>
-      </div>
-
-      {/* Preview Modal */}
-      {showPreview && (
-        <OutlinePreviewModal onClose={() => setShowPreview(false)} />
-      )}
     </div>
   );
 }

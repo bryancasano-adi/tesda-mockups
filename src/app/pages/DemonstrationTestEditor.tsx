@@ -1,29 +1,25 @@
 "use client";
 
 import { useState } from "react";
+import { InformationCircleIcon } from "@heroicons/react/24/solid";
 import {
   CheckCircleIcon,
-  ExclamationTriangleIcon,
-  EyeIcon,
-  InformationCircleIcon,
-} from "@heroicons/react/24/solid";
-import {
-  CheckIcon,
   PencilSquareIcon,
   TrashIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 
-import {
+import Tooltip, {
+  Breadcrumbs,
   DOCUMENT_ID,
-  SECTOR_PROJECT_ID,
+  SECTOR_ID,
+  PROJECT_ID,
   usePageNavigation,
 } from "./pageUtils";
 
 import { DemoTestPreviewModal } from "../components/DemoTestPreviewModal";
 
 import { RichTextEditor } from "@/utils/rich-text-editor";
-import { Breadcrumbs } from "./Dashboard";
 
 interface RubricCriterion {
   id: string;
@@ -70,6 +66,11 @@ export function DemonstrationTestEditor() {
   const [showAddToolModal, setShowAddToolModal] = useState(false);
   const [showEditToolModal, setShowEditToolModal] = useState(false);
   const [showDeleteToolConfirm, setShowDeleteToolConfirm] = useState(false);
+  const [showUpdatePassingScoreModal, setShowUpdatePassingScoreModal] =
+    useState(false);
+
+  // Passing score state
+  const [passingThreshold, setPassingThreshold] = useState(75);
 
   const [editingCriterionId, setEditingCriterionId] = useState<string | null>(
     null,
@@ -97,6 +98,9 @@ export function DemonstrationTestEditor() {
   const [toolQty, setToolQty] = useState(1);
   const [toolUnit, setToolUnit] = useState("");
 
+  // Passing score form state
+  const [editingPassingScore, setEditingPassingScore] = useState(75);
+
   // Demo of 5 variations status
   const [setStatuses, setSetStatuses] = useState<{
     [key in "A" | "B" | "C" | "D" | "E"]: "complete" | "draft";
@@ -119,7 +123,7 @@ export function DemonstrationTestEditor() {
       id: "2",
       text: "Root pass execution according to WPS",
       points: 25,
-      critical: true,
+      critical: false,
     },
     {
       id: "3",
@@ -131,7 +135,7 @@ export function DemonstrationTestEditor() {
       id: "4",
       text: "Visual inspection and acceptance criteria",
       points: 20,
-      critical: true,
+      critical: false,
     },
     {
       id: "5",
@@ -484,19 +488,19 @@ export function DemonstrationTestEditor() {
           items={[
             {
               label: "Sector Details",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/`,
             },
             {
               label: "Sector Projects",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
             },
             {
               label: "Demonstration Test",
-              href: `/demonstration-test`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=demonstration-test`,
             },
           ]}
         />
@@ -525,9 +529,9 @@ export function DemonstrationTestEditor() {
           <div className="flex-1 text-sm text-[#1565C0]">
             <strong>5 Task Variations Required (Sets A-E)</strong>
             <div className="mt-1 text-xs">
-              All 5 variations assess the SAME Performance Criteria and use a
+              All 5 variations assess the same Performance Criteria and use a
               single 100-point rubric. Variations differ only in materials,
-              tools, methods, scenarios, or conditions - NOT in difficulty or
+              tools, methods, scenarios, or conditions - not in difficulty or
               PCs covered. Packaged as Sets A-E for different assessment
               centers.
             </div>
@@ -554,13 +558,11 @@ export function DemonstrationTestEditor() {
               <div className="font-bold text-lg">Set {set}</div>
               <div className="text-xs mt-1">
                 {setStatuses[set] === "complete" ? (
-                  <span className="text-[#2E7D32]">
-                    <CheckIcon className="w-5 h-5 inline text-green-500" />{" "}
+                  <span className="inline-block px-3 py-1 rounded text-xs font-semibold text-green-800">
                     Complete
                   </span>
                 ) : (
-                  <span className="text-[#F57C00]">
-                    <ExclamationTriangleIcon className="w-5 h-5 inline text-yellow-500" />{" "}
+                  <span className="inline-block px-3 py-1 rounded text-xs font-semibold text-orange-600">
                     Draft
                   </span>
                 )}
@@ -606,7 +608,22 @@ export function DemonstrationTestEditor() {
         </div>
 
         <div className="p-6">
-          {/* TAB: TASK INSTRUCTIONS */}
+          <div className="flex justify-end mb-4">
+            <button
+              className={`px-4 py-2 rounded text-sm font-medium transition-colors flex items-center gap-2 ${
+                setStatuses[selectedSet] === "complete"
+                  ? "bg-white text-[#666] border border-[#E0E0E0] hover:bg-[#F5F5F5]"
+                  : "bg-[#2E7D32] text-white hover:bg-[#1B5E20]"
+              }`}
+              onClick={() => toggleSetCompletion(selectedSet)}
+            >
+              <CheckCircleIcon className="w-5 h-5 inline" />
+              {setStatuses[selectedSet] === "complete"
+                ? `Reopen Set ${selectedSet}`
+                : `Mark Set ${selectedSet} as Complete`}
+            </button>
+          </div>
+
           {selectedTab === "tasks" && (
             <div className="space-y-6">
               <div className="border-2 border-[#1976D2] rounded-lg p-5 bg-[#F5FAFF]">
@@ -679,14 +696,11 @@ export function DemonstrationTestEditor() {
           {selectedTab === "rubric" && (
             <div className="space-y-6">
               <div className="p-4 bg-[#FFFDE7] border border-[#FFE082] rounded">
-                <div className="flex items-start gap-2">
-                  <span className="text-lg">
-                    <ExclamationTriangleIcon className="w-5 h-5 inline text-yellow-500" />
-                  </span>
+                <div className="flex items-start">
                   <div className="flex-1 text-sm text-[#F57C00]">
-                    <strong>Single Rubric for All 5 Variations</strong>
+                    <strong>Single Rubric for all variations</strong>
                     <div className="text-xs mt-1">
-                      This 100-point rubric is used for ALL Sets (A-E). The
+                      This 100-point rubric is used for all Sets (A-E). The
                       criteria map directly to Performance Criteria from the
                       Evidence Plan and remain consistent across all variations.
                     </div>
@@ -695,13 +709,23 @@ export function DemonstrationTestEditor() {
               </div>
 
               <div>
-                <div className="mb-4">
-                  <div className="text-sm font-medium text-[#333] mb-1">
-                    Performance Standards - {getTotalPoints()} Point Rubric
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <div className="text-sm font-medium text-[#333] mb-1">
+                      Performance Standards - {getTotalPoints()} Point Rubric
+                    </div>
+                    <div className="text-xs text-[#666]">
+                      Used for scoring all 5 task variations (Sets A, B, C, D,
+                      E)
+                    </div>
                   </div>
-                  <div className="text-xs text-[#666]">
-                    Used for scoring all 5 task variations (Sets A, B, C, D, E)
-                  </div>
+
+                  <button
+                    className="px-4 py-2 bg-white text-[#1976D2] border border-[#1976D2] rounded text-sm font-medium hover:bg-[#E3F2FD] transition-colors"
+                    onClick={() => setShowAddCriterionModal(true)}
+                  >
+                    + Add Criterion
+                  </button>
                 </div>
 
                 <div className="overflow-x-auto border border-[#E0E0E0] rounded">
@@ -764,28 +788,52 @@ export function DemonstrationTestEditor() {
                           </td>
                         </tr>
                       ))}
-                      <tr className="bg-[#E8F5E9]">
+                      <tr className="bg-gray-50">
                         <td
-                          className="px-4 py-3 text-sm font-bold text-right"
+                          className="px-4 py-3 text-xs font-bold text-right"
                           colSpan={2}
                         >
                           TOTAL POINTS
                         </td>
-                        <td className="px-4 py-3 text-sm font-bold text-center">
+                        <td className="px-4 py-3 text-xs font-bold text-center">
                           {getTotalPoints()}
                         </td>
                         <td />
                       </tr>
+                      <tr className="bg-gray-100">
+                        <td
+                          className="px-4 py-3 text-xs font-bold text-right"
+                          colSpan={2}
+                        >
+                          PASSING THRESHOLD
+                        </td>
+                        <td className="px-4 py-3 text-xs font-bold text-center">
+                          ≥{" "}
+                          {Math.ceil(
+                            getTotalPoints() * (passingThreshold / 100),
+                          )}
+                        </td>
+                        <td className="text-center border-b border-[#F0F0F0]">
+                          <Tooltip
+                            content="Update Passing Score"
+                            position="left"
+                          >
+                            <button
+                              className="text-white text-xs mx-1 bg-blue-500 border border-blue-500 px-2 py-1 rounded hover:bg-blue-700 hover:text-white transition-colors"
+                              onClick={() => {
+                                setEditingPassingScore(passingThreshold);
+                                setShowUpdatePassingScoreModal(true);
+                              }}
+                            >
+                              <PencilSquareIcon className="w-4 h-4 inline mt-[-2px]" />{" "}
+                              UPDATE
+                            </button>
+                          </Tooltip>
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
-
-                <button
-                  className="mt-4 px-4 py-2 bg-white text-[#1976D2] border border-[#1976D2] rounded text-sm font-medium hover:bg-[#E3F2FD] transition-colors"
-                  onClick={() => setShowAddCriterionModal(true)}
-                >
-                  + Add Criterion
-                </button>
 
                 <div className="mt-6 p-4 bg-[#E8F5E9] border border-[#A5D6A7] rounded">
                   <div className="font-semibold text-sm text-[#2E7D32] mb-2">
@@ -793,14 +841,14 @@ export function DemonstrationTestEditor() {
                   </div>
                   <ul className="text-sm text-[#1B5E20] space-y-1 ml-5 list-disc">
                     <li>
-                      <strong>Competent (C)</strong>: Total score ≥ 75/
-                      {getTotalPoints()} AND all critical PCs (*) demonstrated
-                      AND no unsafe practice observed
+                      <strong>Competent (C)</strong>: Total score ≥{" "}
+                      {passingThreshold}/{getTotalPoints()} AND all critical PCs{" "}
+                      (*) demonstrated AND no unsafe practice observed
                     </li>
                     <li>
-                      <strong>Not Yet Competent (NYC)</strong>: Score {"<"} 75
-                      OR failure to demonstrate a critical PC OR unsafe practice
-                      observed
+                      <strong>Not Yet Competent (NYC)</strong>: Score &lt;{" "}
+                      {passingThreshold} OR failure to demonstrate a critical PC{" "}
+                      OR unsafe practice observed
                     </li>
                   </ul>
                 </div>
@@ -1004,38 +1052,6 @@ export function DemonstrationTestEditor() {
         </div>
       </div>
 
-      <div className="flex gap-3 justify-end">
-        <button
-          className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors"
-          onClick={() => navigateToPage("/")}
-        >
-          ← Back to Dashboard
-        </button>
-        <button
-          className={`px-4 py-2 rounded text-sm font-medium transition-colors flex items-center gap-2 ${
-            setStatuses[selectedSet] === "complete"
-              ? "bg-white text-[#666] border border-[#E0E0E0] hover:bg-[#F5F5F5]"
-              : "bg-[#2E7D32] text-white hover:bg-[#1B5E20]"
-          }`}
-          onClick={() => toggleSetCompletion(selectedSet)}
-        >
-          <CheckCircleIcon className="w-5 h-5 inline" />
-          {setStatuses[selectedSet] === "complete"
-            ? `Unmark Set ${selectedSet}`
-            : `Mark Set ${selectedSet} as Complete`}
-        </button>
-        <button className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors">
-          Save Draft
-        </button>
-        <button
-          className="px-4 py-2 bg-white text-[#1976D2] border border-[#1976D2] rounded text-sm font-medium hover:bg-[#E3F2FD] transition-colors flex items-center gap-2"
-          onClick={() => setShowPreview(true)}
-        >
-          <EyeIcon className="w-5 h-5 inline" />
-          Preview
-        </button>
-      </div>
-
       {/* Edit Task Instructions Modal */}
       {showEditTaskModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -1231,26 +1247,6 @@ export function DemonstrationTestEditor() {
                     }
                   />
                 </div>
-                <div>
-                  <label
-                    className="block text-sm font-medium text-[#333] mb-2"
-                    htmlFor="critialAspectInput"
-                  >
-                    Critical Aspect?
-                  </label>
-                  <label className="flex items-center gap-2 mt-2">
-                    <input
-                      checked={criterionCritical}
-                      className="w-4 h-4"
-                      id="critialAspectInput"
-                      type="checkbox"
-                      onChange={(e) => setCriterionCritical(e.target.checked)}
-                    />
-                    <span className="text-sm text-[#666]">
-                      Mark as critical aspect (*)
-                    </span>
-                  </label>
-                </div>
               </div>
             </div>
             <div className="px-6 py-4 border-t border-[#E0E0E0] flex justify-end gap-2">
@@ -1319,26 +1315,6 @@ export function DemonstrationTestEditor() {
                       setCriterionPoints(parseInt(e.target.value))
                     }
                   />
-                </div>
-                <div>
-                  <label
-                    className="block text-sm font-medium text-[#333] mb-2"
-                    htmlFor="editCriticalAspect"
-                  >
-                    Critical Aspect?
-                  </label>
-                  <label className="flex items-center gap-2 mt-2">
-                    <input
-                      checked={criterionCritical}
-                      className="w-4 h-4"
-                      id="editCriticalAspect"
-                      type="checkbox"
-                      onChange={(e) => setCriterionCritical(e.target.checked)}
-                    />
-                    <span className="text-sm text-[#666]">
-                      Mark as critical aspect (*)
-                    </span>
-                  </label>
                 </div>
               </div>
             </div>
@@ -1876,6 +1852,82 @@ export function DemonstrationTestEditor() {
                 onClick={handleDeleteTool}
               >
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Update Passing Score Modal */}
+      {showUpdatePassingScoreModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div className="px-6 py-4 border-b border-[#E0E0E0] flex justify-between items-center">
+              <h3 className="font-semibold text-[#333]">
+                Update Passing Score
+              </h3>
+              <button
+                className="text-[#666] hover:text-[#333]"
+                onClick={() => setShowUpdatePassingScoreModal(false)}
+              >
+                <XMarkIcon className="w-5 h-5 inline" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label
+                  className="block text-sm font-medium text-[#333] mb-2"
+                  htmlFor="passingScoreInput"
+                >
+                  Passing Score (%)
+                </label>
+                <input
+                  className="w-full px-3 py-2 border border-[#E0E0E0] rounded text-sm"
+                  id="passingScoreInput"
+                  max={100}
+                  min={1}
+                  type="number"
+                  value={editingPassingScore}
+                  onChange={(e) =>
+                    setEditingPassingScore(
+                      Math.min(100, Math.max(1, parseInt(e.target.value) || 1)),
+                    )
+                  }
+                />
+                <p className="text-xs text-[#666] mt-2">
+                  Current total points: <strong>{getTotalPoints()}</strong>
+                </p>
+                <p className="text-xs text-[#666]">
+                  Required to pass:{" "}
+                  <strong>
+                    ≥{" "}
+                    {Math.ceil(getTotalPoints() * (editingPassingScore / 100))}
+                  </strong>{" "}
+                  points
+                </p>
+              </div>
+              <div className="p-3 bg-[#E3F2FD] border border-[#90CAF9] rounded text-sm text-[#1565C0]">
+                <InformationCircleIcon className="w-5 h-5 inline text-blue-500" />{" "}
+                The passing score determines the minimum percentage required to
+                achieve competency. This will update the Competency Decision
+                Rules in real-time.
+              </div>
+            </div>
+            <div className="px-6 py-4 border-t border-[#E0E0E0] flex justify-end gap-2">
+              <button
+                className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5]"
+                onClick={() => setShowUpdatePassingScoreModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-[#1976D2] text-white rounded text-sm font-medium hover:bg-[#1565C0]"
+                onClick={() => {
+                  setPassingThreshold(editingPassingScore);
+                  setShowUpdatePassingScoreModal(false);
+                }}
+              >
+                Save Changes
               </button>
             </div>
           </div>

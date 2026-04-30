@@ -2,11 +2,12 @@ import { InformationCircleIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
 
 import {
+  Breadcrumbs,
   DOCUMENT_ID,
-  SECTOR_PROJECT_ID,
+  SECTOR_ID,
+  PROJECT_ID,
   usePageNavigation,
 } from "./pageUtils";
-import { Breadcrumbs } from "./Dashboard";
 
 export function DistributionSettings() {
   const { navigateToPage } = usePageNavigation();
@@ -22,19 +23,19 @@ export function DistributionSettings() {
           items={[
             {
               label: "Sector Details",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/`,
             },
             {
               label: "Sector Projects",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
             },
             {
               label: "Distribution Settings",
-              href: `/distribution-settings`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=distribution-settings`,
             },
           ]}
         />
@@ -48,33 +49,8 @@ export function DistributionSettings() {
           Distribution Settings
         </h1>
         <p className="text-sm text-[#666]">
-          Configure how Phase 2 pools are distributed into 5 CATS packages
+          Configure how Phase 2 pools are distributed into 5 CATs packages
         </p>
-      </div>
-
-      {/* Prerequisites Panel */}
-      <div className="bg-[#E8F5E9] border border-[#A5D6A7] rounded p-5 mb-6">
-        <div className="font-semibold text-sm text-[#2E7D32] mb-3">
-          Prerequisites Met
-        </div>
-        <div className="grid grid-cols-3 gap-4 text-xs text-[#1B5E20]">
-          <div>
-            <div className="font-medium mb-1">Phase 1</div>
-            <div>- Evidence Plan finalized</div>
-            <div>- Outline generated</div>
-          </div>
-          <div>
-            <div className="font-medium mb-1">Phase 2 - Pools</div>
-            <div>- Demonstration Test (5 variations)</div>
-            <div>- Questioning Tool (25 questions)</div>
-            <div>- Written Test (50 MCQ items + TOS)</div>
-          </div>
-          <div>
-            <div className="font-medium mb-1">Ready for</div>
-            <div>→ 5 Assessors Guides (Sets A-E)</div>
-            <div>→ Distribution across packages</div>
-          </div>
-        </div>
       </div>
 
       {/* Distribution Settings */}
@@ -189,9 +165,9 @@ export function DistributionSettings() {
           </div>
 
           <div className="p-4 bg-[#E3F2FD] border border-[#90CAF9] rounded">
-            <div className="flex items-start gap-3">
+            <div className="flex items-start gap-2">
               <span className="text-sm">
-                <InformationCircleIcon className="w-8 h-8 inline text-blue-500" />
+                <InformationCircleIcon className="w-5 h-5 inline mt-[-2px] text-blue-500" />
               </span>
               <div className="flex-1 text-sm text-[#1565C0]">
                 <strong>Distribution Strategy:</strong> Questions from the
@@ -235,7 +211,7 @@ export function DistributionSettings() {
 
           {includeSafetyQs && (
             <div className="mt-4 p-3 bg-[#FFFDE7] border border-[#FFE082] rounded text-xs text-[#F57C00]">
-              ⚠️ <strong>Validation:</strong> The system will verify that enough
+              <strong>Validation:</strong> The system will verify that enough
               safety questions exist in the pool before distribution.
             </div>
           )}
@@ -340,16 +316,10 @@ export function DistributionSettings() {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-3 justify-between">
-        <button
-          className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors"
-          onClick={() => navigateToPage("/")}
-        >
-          ← Back to Dashboard
-        </button>
+      <div className="flex gap-3 justify-end">
         <div className="flex gap-3">
           <button
-            className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors"
+            className="px-4 py-2 bg-white text-blue-500 border border-blue-500 rounded text-sm font-medium hover:bg-blue-100 transition-colors"
             onClick={() => alert("Settings saved!")}
           >
             Save Settings

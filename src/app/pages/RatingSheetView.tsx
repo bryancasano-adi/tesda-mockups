@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { EyeIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
-import { ImageWithFallback } from "../components/figma/ImageWithFallback";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
 import {
+  Breadcrumbs,
   DOCUMENT_ID,
-  SECTOR_PROJECT_ID,
+  SECTOR_ID,
+  PROJECT_ID,
   usePageNavigation,
 } from "./pageUtils";
 
@@ -13,9 +14,7 @@ import {
   Table,
   Row,
   Footer,
-  RatingSheetPreviewModal,
 } from "../components/RatingSheetPreviewModal";
-import { Breadcrumbs } from "./Dashboard";
 
 export function RatingSheetView() {
   const { navigateToPage } = usePageNavigation();
@@ -54,7 +53,7 @@ export function RatingSheetView() {
                 mechanical methods, without prior written consent of TESDA.”
               </div>
 
-              <ImageWithFallback
+              <img
                 alt="logo"
                 className="mx-auto mb-2"
                 height={80}
@@ -243,19 +242,19 @@ export function RatingSheetView() {
           items={[
             {
               label: "Sector Details",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/`,
             },
             {
               label: "Sector Projects",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
             },
             {
               label: "Rating Sheet (Rubrics)",
-              href: `/rating-sheet`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=rating-sheet`,
             },
           ]}
         />
@@ -369,31 +368,6 @@ export function RatingSheetView() {
         >
           ← Back to Package Navigator
         </button>
-        <div className="flex gap-2">
-          <button className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors">
-            Save Draft
-          </button>
-          <button
-            className="px-4 py-2 bg-white text-[#1976D2] border border-[#1976D2] rounded text-sm font-medium hover:bg-[#E3F2FD] transition-colors flex items-center gap-2"
-            onClick={() => setShowPreview(true)}
-          >
-            <EyeIcon className="w-5 h-5 inline" />
-            Preview
-          </button>
-          {status === "draft" && (
-            <button
-              className="px-4 py-2 bg-[#2E7D32] text-white rounded text-sm font-medium hover:bg-[#1B5E20] transition-colors"
-              onClick={() => setStatus("finalized")}
-            >
-              Finalize
-            </button>
-          )}
-        </div>
-
-        {/* Preview Modal */}
-        {showPreview && (
-          <RatingSheetPreviewModal onClose={() => setShowPreview(false)} />
-        )}
       </div>
     </div>
   );

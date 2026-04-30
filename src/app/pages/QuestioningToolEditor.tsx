@@ -1,31 +1,20 @@
 import { useState } from "react";
 import {
-  CheckCircleIcon,
   DocumentCheckIcon,
-  EyeIcon,
   PencilSquareIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 
-import {
-  DOCUMENT_ID,
-  SECTOR_PROJECT_ID,
-  usePageNavigation,
-} from "./pageUtils";
+import { Breadcrumbs, DOCUMENT_ID, SECTOR_ID, PROJECT_ID } from "./pageUtils";
 
 import {
   initialQuestions,
   type Question,
 } from "../data/questioningToolQuestions";
-import { QuestioningToolPreviewModal } from "../components/QuestioningToolPreviewModal";
-import { Breadcrumbs } from "./Dashboard";
 
 export function QuestioningToolEditor() {
-  const { navigateToPage } = usePageNavigation();
   const [viewMode, setViewMode] = useState<"tabular" | "script">("tabular");
-  const [showPreview, setShowPreview] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [isFinalized, setIsFinalized] = useState(false);
 
   // Initial questions state - now using all 25 questions
   const [questions, setQuestions] = useState<Question[]>(initialQuestions);
@@ -76,19 +65,19 @@ export function QuestioningToolEditor() {
           items={[
             {
               label: "Sector Details",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/`,
             },
             {
               label: "Sector Projects",
-              href: `/`,
+              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/`,
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
             },
             {
-              label: "Questioning Tool",
-              href: `/questioning-tool`,
+              label: "Oral Questioning Tool",
+              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=questioning-tool`,
             },
           ]}
         />
@@ -100,7 +89,7 @@ export function QuestioningToolEditor() {
             <span className="inline-block px-2.5 py-0.5 rounded text-[11px] font-bold tracking-wide bg-[#E8F5E9] text-[#2E7D32] mr-2">
               PHASE 2
             </span>
-            Questioning Tool
+            Oral Questioning Tool
           </h1>
           <p className="text-sm text-[#666]">
             25 Questions ● Binary S/NS ● 4 Dimensions Coverage
@@ -208,6 +197,9 @@ export function QuestioningToolEditor() {
                     <th className="text-left px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0]">
                       Question
                     </th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0]">
+                      Performance Criteria
+                    </th>
                     <th className="text-center px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0] w-40">
                       Dimension of Competency
                     </th>
@@ -249,6 +241,9 @@ export function QuestioningToolEditor() {
                                 })
                               }
                             />
+                          </td>
+                          <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
+                            {q.performanceCriteria || "PC-1"}
                           </td>
                           <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
                             <select
@@ -306,6 +301,9 @@ export function QuestioningToolEditor() {
                             ) : null}{" "}
                             {q.question}
                           </td>
+                          <td className="px-4 py-3 text-sm border border-[#E0E0E0]">
+                            {q.performanceCriteria || "PC-1"}
+                          </td>
                           <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
                             {q.dimension}
                           </td>
@@ -346,7 +344,6 @@ export function QuestioningToolEditor() {
                         ) : (
                           <button
                             className="p-1.5 text-[#1976D2] hover:bg-[#E3F2FD] rounded transition-colors disabled:text-[#999] disabled:hover:bg-transparent disabled:cursor-not-allowed"
-                            disabled={isFinalized}
                             title="Edit"
                             onClick={() => handleEdit(q)}
                           >
@@ -358,40 +355,6 @@ export function QuestioningToolEditor() {
                   ))}
                 </tbody>
               </table>
-            </div>
-          </div>
-
-          {/* Finalize Button */}
-          <div className="bg-white border border-[#E0E0E0] rounded p-5">
-            <div className="flex items-start gap-4">
-              <div className="flex-1">
-                <div className="font-semibold text-sm text-[#333] mb-1">
-                  Finalize Question Pool
-                </div>
-                <div className="text-xs text-[#666]">
-                  Once finalized, this pool will be locked and ready for use in
-                  Phase 3 package assembly. All 25 questions will be used to
-                  generate the Interview Script.
-                </div>
-              </div>
-              <button
-                className={`px-5 py-2.5 rounded text-sm font-medium transition-colors flex items-center gap-2 whitespace-nowrap ${
-                  isFinalized
-                    ? "bg-white text-[#666] border border-[#E0E0E0] hover:bg-[#F5F5F5]"
-                    : "bg-[#2E7D32] text-white hover:bg-[#1B5E20]"
-                }`}
-                onClick={() => {
-                  setIsFinalized(!isFinalized);
-                  alert(
-                    isFinalized
-                      ? "Questioning tool unlocked for editing"
-                      : "Questioning tool finalized successfully!",
-                  );
-                }}
-              >
-                <CheckCircleIcon className="w-5 h-5 inline" />
-                {isFinalized ? "Unfinalize" : "Finalize"}
-              </button>
             </div>
           </div>
         </>
@@ -475,30 +438,6 @@ export function QuestioningToolEditor() {
             </div>
           </div>
         </div>
-      )}
-
-      <div className="flex gap-3 justify-end mt-5">
-        <button
-          className="px-4 py-2 bg-white text-[#666] border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#F5F5F5] transition-colors"
-          onClick={() => navigateToPage("/")}
-        >
-          ← Back to Dashboard
-        </button>
-        <button
-          className="px-4 py-2 bg-white text-[#1976D2] border border-[#1976D2] rounded text-sm font-medium hover:bg-[#E3F2FD] transition-colors flex items-center gap-2"
-          onClick={() => setShowPreview(true)}
-        >
-          <EyeIcon className="w-5 h-5 inline" />
-          Preview
-        </button>
-      </div>
-
-      {/* Preview Modal */}
-      {showPreview && (
-        <QuestioningToolPreviewModal
-          questions={questions}
-          onClose={() => setShowPreview(false)}
-        />
       )}
     </div>
   );
