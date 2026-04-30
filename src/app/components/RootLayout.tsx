@@ -20,9 +20,9 @@ export function RootLayout() {
         onToggleSidebar={toggleSidebar}
         variant={isNoVariantPage ? undefined : "cats"}
         onBack={() => (window.location.href = "/")}
-        onSaveDraft={() => console.log("save")}
-        onValidate={() => console.log("validate")}
-        onFinalize={() => console.log("finalize")}
+        onSaveDraft={() => alert("Changes have been saved as a draft.")}
+        onValidate={() => alert("Validation successful! No issues found.")}
+        onFinalize={() => alert("Document has been finalized.")}
       />
 
       <div className="flex flex-1 mt-10">

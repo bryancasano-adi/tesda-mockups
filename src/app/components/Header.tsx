@@ -10,8 +10,6 @@ interface HeaderProps {
   children?: React.ReactNode;
   sidebarOpen?: boolean;
   onToggleSidebar?: () => void;
-
-  // 👇 NEW
   variant?: "default" | "cats" | "lam" | "ig";
   onSaveDraft?: () => void;
   onValidate?: () => void;
@@ -33,6 +31,7 @@ export function Header({
   const [isSignoutOpen, setIsSignoutOpen] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isValidated, setIsValidated] = useState(false);
 
   const confirmSignout = async () => {
     if (isSigningOut) return;
@@ -44,6 +43,13 @@ export function Header({
       navigate("/");
       setIsSigningOut(false);
     }, 500);
+  };
+
+  const handleValidate = async () => {
+    if (onValidate) {
+      await onValidate();
+    }
+    setIsValidated(true);
   };
 
   const isWorkspace = ["cats", "lam", "ig"].includes(variant);
@@ -110,15 +116,22 @@ export function Header({
               </button>
 
               <button
-                onClick={onValidate}
-                className="px-3 py-1.5 text-sm border border-blue-500 text-blue-600 rounded-md hover:bg-blue-50"
+                onClick={handleValidate}
+                className={`px-3 py-1.5 text-sm border border-blue-500 text-blue-600 rounded-md hover:bg-blue-50 ${isValidated ? "cursor-not-allowed opacity-50" : ""}`}
+                disabled={isValidated}
               >
                 Validate
               </button>
 
               <button
                 onClick={onFinalize}
-                className="px-3 py-1.5 text-sm bg-gray-800 text-white rounded-md hover:bg-black"
+                disabled={!isValidated}
+                className={`px-3 py-1.5 text-sm rounded-md text-white
+                  ${
+                    isValidated
+                      ? "bg-gray-800 hover:bg-black"
+                      : "bg-gray-300 cursor-not-allowed"
+                  }`}
               >
                 Finalize
               </button>
