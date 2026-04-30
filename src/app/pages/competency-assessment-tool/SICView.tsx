@@ -6,7 +6,7 @@ import {
   SECTOR_ID,
   PROJECT_ID,
   usePageNavigation,
-} from "./pageUtils";
+} from "../pageUtils";
 
 export function SICView() {
   const { navigateToPage } = usePageNavigation();
@@ -21,19 +21,19 @@ export function SICView() {
           items={[
             {
               label: "Sector Details",
-              href: `/home/sector-projects/${SECTOR_ID}/`,
+              href: `#`,
             },
             {
               label: "Sector Projects",
-              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
+              href: `/`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
+              href: `/cats`,
             },
             {
               label: "Specific Instructions for Candidate (SIC)",
-              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=sic`,
+              href: `/cats/sic`,
             },
           ]}
         />

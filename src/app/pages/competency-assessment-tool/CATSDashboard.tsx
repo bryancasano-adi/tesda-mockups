@@ -14,8 +14,8 @@ import {
   MinusCircleIcon,
 } from "@heroicons/react/24/solid";
 
-import { WorkflowGuide } from "../components/WorkflowGuide";
-import { DocumentActions } from "../components/DocumentActions";
+import { WorkflowGuide } from "../../components/competency-assessment-tool/WorkflowGuide";
+import { DocumentActions } from "../../components/competency-assessment-tool/DocumentActions";
 
 type Crumb = {
   label: string;
@@ -45,7 +45,7 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
   );
 }
 
-export function Dashboard() {
+export function CATSDashboard() {
   const navigate = useNavigate();
 
   const [viewMode, setViewMode] = useState<"workflow" | "package">("workflow");
@@ -142,15 +142,15 @@ export function Dashboard() {
         items={[
           {
             label: "Sector Details",
-            href: `/home/sector-projects/${SECTOR_ID}/`,
+            href: `#`,
           },
           {
             label: "Sector Projects",
-            href: `/home/sector-projects/${SECTOR_ID}/${PROJECT_ID}`,
+            href: `/`,
           },
           {
             label: "Competency Assessment Tools (CATs)",
-            href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
+            href: `/cats`,
           },
         ]}
       />
@@ -195,7 +195,7 @@ export function Dashboard() {
             {totalCompleted === 30 && (
               <button
                 className="text-[#1976D2] hover:underline font-medium flex items-center gap-1"
-                onClick={() => navigate("/export")}
+                onClick={() => navigate("/cats/export")}
               >
                 Download CATS <ArrowRightIcon />
               </button>
@@ -369,7 +369,7 @@ export function Dashboard() {
                       <div className="flex items-center gap-2">
                         <button
                           className="font-semibold text-sm text-gray-700 hover:underline"
-                          onClick={() => navigate("/evidence-plan")}
+                          onClick={() => navigate("/cats/evidence-plan")}
                         >
                           Evidence Plan
                         </button>
@@ -391,7 +391,7 @@ export function Dashboard() {
                         status="finalized"
                         onDownload={() => alert("Download Evidence Plan")}
                         onRefresh={() => alert("Refresh Evidence Plan")}
-                        onView={() => navigate("/evidence-plan")}
+                        onView={() => navigate("/cats/evidence-plan")}
                       />
                     </td>
                   </tr>
@@ -400,7 +400,7 @@ export function Dashboard() {
                       <div className="flex items-center gap-2">
                         <button
                           className="font-semibold text-sm text-gray-700 hover:underline"
-                          onClick={() => navigate("/outline")}
+                          onClick={() => navigate("/cats/outline")}
                         >
                           Outline
                         </button>
@@ -423,7 +423,7 @@ export function Dashboard() {
                         status="finalized"
                         onDownload={() => alert("Download Outline")}
                         onRefresh={() => alert("Regenerate Outline")}
-                        onView={() => navigate("/outline")}
+                        onView={() => navigate("/cats/outline")}
                       />
                     </td>
                   </tr>
@@ -470,7 +470,7 @@ export function Dashboard() {
                       <div className="flex items-center gap-2">
                         <button
                           className="font-semibold text-sm text-gray-700 hover:underline"
-                          onClick={() => navigate("/demonstration-test")}
+                          onClick={() => navigate("/cats/demonstration-test")}
                         >
                           Demonstration Test
                         </button>
@@ -491,9 +491,9 @@ export function Dashboard() {
                         showLogs={true}
                         status="finalized"
                         onDownload={() => alert("Download Demonstration Test")}
-                        onEdit={() => navigate("/demonstration-test")}
+                        onEdit={() => navigate("/cats/demonstration-test")}
                         onRefresh={() => alert("Refresh Demonstration Test")}
-                        onView={() => navigate("/demonstration-test")}
+                        onView={() => navigate("/cats/demonstration-test")}
                       />
                     </td>
                   </tr>
@@ -502,7 +502,7 @@ export function Dashboard() {
                       <div className="flex items-center gap-2">
                         <button
                           className="font-semibold text-sm text-gray-700 hover:underline"
-                          onClick={() => navigate("/questioning-tool")}
+                          onClick={() => navigate("/cats/questioning-tool")}
                         >
                           Questioning Tool
                         </button>
@@ -524,9 +524,9 @@ export function Dashboard() {
                         showLogs={true}
                         status="finalized"
                         onDownload={() => alert("Download Oral Test")}
-                        onEdit={() => navigate("/questioning-tool")}
+                        onEdit={() => navigate("/cats/questioning-tool")}
                         onRefresh={() => alert("Refresh Questioning Tool")}
-                        onView={() => navigate("/questioning-tool")}
+                        onView={() => navigate("/cats/questioning-tool")}
                       />
                     </td>
                   </tr>
@@ -535,7 +535,7 @@ export function Dashboard() {
                       <div className="flex items-center gap-2">
                         <button
                           className="font-semibold text-sm text-gray-700 hover:underline"
-                          onClick={() => navigate("/mcq")}
+                          onClick={() => navigate("/cats/mcq")}
                         >
                           Written Test (MCQ)
                         </button>
@@ -555,9 +555,9 @@ export function Dashboard() {
                         showLogs={true}
                         status="finalized"
                         onDownload={() => alert("Download Written Test")}
-                        onEdit={() => navigate("/mcq")}
+                        onEdit={() => navigate("/cats/mcq")}
                         onRefresh={() => alert("Refresh Written Test")}
-                        onView={() => navigate("/mcq-config")}
+                        onView={() => navigate("/cats/mcq-config")}
                       />
                     </td>
                   </tr>
@@ -618,7 +618,7 @@ export function Dashboard() {
                     <td className="text-center py-3">
                       <button
                         className="px-3 py-1.5 text-xs font-medium text-white bg-[#1976D2] hover:bg-[#1565C0] rounded transition-colors"
-                        onClick={() => navigate("/distribution-settings")}
+                        onClick={() => navigate("/cats/distribution-settings")}
                       >
                         View
                       </button>
@@ -644,7 +644,7 @@ export function Dashboard() {
                     <td className="text-center py-3">
                       <button
                         className="px-3 py-1.5 text-xs font-medium text-white bg-[#1976D2] hover:bg-[#1565C0] rounded transition-colors"
-                        onClick={() => navigate("/ag-assembly")}
+                        onClick={() => navigate("/cats/ag-assembly")}
                       >
                         View
                       </button>
@@ -669,7 +669,7 @@ export function Dashboard() {
                     <td className="text-center py-3">
                       <button
                         className="px-3 py-1.5 text-xs font-medium bg-[#F57C00] text-white hover:bg-[#E65100] rounded transition-colors"
-                        onClick={() => navigate("/package-navigator")}
+                        onClick={() => navigate("/cats/package-navigator")}
                       >
                         Continue
                       </button>
@@ -929,7 +929,7 @@ export function Dashboard() {
               </div>
               <button
                 className="px-4 py-2 bg-[#1976D2] text-white rounded text-xs font-semibold hover:bg-[#1565C0] transition-colors"
-                onClick={() => navigate("/package-navigator")}
+                onClick={() => navigate("/cats/package-navigator")}
               >
                 Package Navigator
               </button>

@@ -15,9 +15,9 @@ import Tooltip, {
   SECTOR_ID,
   PROJECT_ID,
   usePageNavigation,
-} from "./pageUtils";
+} from "../pageUtils";
 
-import { DemoTestPreviewModal } from "../components/DemoTestPreviewModal";
+import { DemoTestPreviewModal } from "../../components/competency-assessment-tool/DemoTestPreviewModal";
 
 import { RichTextEditor } from "@/utils/rich-text-editor";
 
@@ -488,19 +488,19 @@ export function DemonstrationTestEditor() {
           items={[
             {
               label: "Sector Details",
-              href: `/home/sector-projects/${SECTOR_ID}/`,
+              href: `#`,
             },
             {
               label: "Sector Projects",
-              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
+              href: `/`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
+              href: `/cats`,
             },
             {
               label: "Demonstration Test",
-              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=demonstration-test`,
+              href: `/cats/demonstration-test`,
             },
           ]}
         />

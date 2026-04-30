@@ -7,14 +7,14 @@ import {
   SECTOR_ID,
   PROJECT_ID,
   usePageNavigation,
-} from "./pageUtils";
+} from "../pageUtils";
 
 import {
   Page,
   Table,
   Row,
   Footer,
-} from "../components/competency-assessment-tool/RatingSheetPreviewModal";
+} from "../../components/competency-assessment-tool/RatingSheetPreviewModal";
 
 export function RatingSheetView() {
   const { navigateToPage } = usePageNavigation();

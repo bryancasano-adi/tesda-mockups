@@ -5,12 +5,12 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 
-import { Breadcrumbs, DOCUMENT_ID, SECTOR_ID, PROJECT_ID } from "./pageUtils";
+import { Breadcrumbs, DOCUMENT_ID, SECTOR_ID, PROJECT_ID } from "../pageUtils";
 
 import {
   initialQuestions,
   type Question,
-} from "../data/questioningToolQuestions";
+} from "../../data/questioningToolQuestions";
 
 export function QuestioningToolEditor() {
   const [viewMode, setViewMode] = useState<"tabular" | "script">("tabular");
@@ -65,19 +65,19 @@ export function QuestioningToolEditor() {
           items={[
             {
               label: "Sector Details",
-              href: `/home/sector-projects/${SECTOR_ID}/`,
+              href: `#`,
             },
             {
               label: "Sector Projects",
-              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
+              href: `/`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
+              href: `/cats`,
             },
             {
               label: "Oral Questioning Tool",
-              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=questioning-tool`,
+              href: `/cats/questioning-tool`,
             },
           ]}
         />

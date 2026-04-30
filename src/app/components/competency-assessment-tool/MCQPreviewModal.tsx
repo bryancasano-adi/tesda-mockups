@@ -4,7 +4,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/solid";
 
-import { MCQItem } from "../data/mcqQuestions";
+import { MCQItem } from "../../data/mcqQuestions";
 
 interface MCQPreviewModalProps {
   items: MCQItem[];

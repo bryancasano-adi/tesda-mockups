@@ -18,9 +18,9 @@ import Tooltip, {
   PROJECT_ID,
   SECTOR_ID,
   usePageNavigation,
-} from "./pageUtils";
+} from "../pageUtils";
 
-import { EvidencePlanPreviewModal } from "../components/EvidencePlanPreviewModal";
+import { EvidencePlanPreviewModal } from "../../components/competency-assessment-tool/EvidencePlanPreviewModal";
 
 interface CustomColumn {
   id: string;
@@ -558,19 +558,19 @@ export function EvidencePlanEditor() {
         items={[
           {
             label: "Sector Details",
-            href: `/home/sector-projects/${SECTOR_ID}/`,
+            href: `#`,
           },
           {
             label: "Sector Projects",
-            href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
+            href: `/`,
           },
           {
             label: "Competency Assessment Tools (CATs)",
-            href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
+            href: `/cats`,
           },
           {
             label: "Evidence Plan",
-            href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=evidence-plan`,
+            href: `/cats/evidence-plan`,
           },
         ]}
       />

@@ -8,7 +8,7 @@ import {
   SECTOR_ID,
   PROJECT_ID,
   usePageNavigation,
-} from "./pageUtils";
+} from "../pageUtils";
 
 export function SAGView() {
   const { navigateToPage } = usePageNavigation();
@@ -22,19 +22,19 @@ export function SAGView() {
           items={[
             {
               label: "Sector Details",
-              href: `/home/sector-projects/${SECTOR_ID}/`,
+              href: `#`,
             },
             {
               label: "Sector Projects",
-              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
+              href: `/`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
+              href: `/cats`,
             },
             {
               label: "Self-Assessment Guide (SAG)",
-              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=sag`,
+              href: `/cats/sag`,
             },
           ]}
         />

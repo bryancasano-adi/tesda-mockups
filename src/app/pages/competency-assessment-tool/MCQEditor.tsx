@@ -13,13 +13,13 @@ import {
   SECTOR_ID,
   PROJECT_ID,
   usePageNavigation,
-} from "./pageUtils";
+} from "../pageUtils";
 
-import { initialMCQItems, MCQItem } from "../data/mcqQuestions";
-import { MCQEditorModal } from "../components/MCQEditorModal";
-import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
-import { MCQPreviewModal } from "../components/MCQPreviewModal";
-import { TOSPreviewModal } from "../components/TOSPreviewModal";
+import { initialMCQItems, MCQItem } from "../../data/mcqQuestions";
+import { MCQEditorModal } from "../../components/competency-assessment-tool/MCQEditorModal";
+import { DeleteConfirmDialog } from "../../components/competency-assessment-tool/DeleteConfirmDialog";
+import { MCQPreviewModal } from "../../components/competency-assessment-tool/MCQPreviewModal";
+import { TOSPreviewModal } from "../../components/competency-assessment-tool/TOSPreviewModal";
 
 export function MCQEditor() {
   const { navigateToPage } = usePageNavigation();
@@ -144,19 +144,19 @@ export function MCQEditor() {
           items={[
             {
               label: "Sector Details",
-              href: `/home/sector-projects/${SECTOR_ID}/`,
+              href: `#`,
             },
             {
               label: "Sector Projects",
-              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
+              href: `/`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
+              href: `/cats`,
             },
             {
               label: "Written Test + Table of Specifications",
-              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=mcq`,
+              href: `/cats/mcq`,
             },
           ]}
         />

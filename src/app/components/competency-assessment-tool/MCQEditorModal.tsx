@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
-import { MCQItem } from "../data/mcqQuestions";
+import { MCQItem } from "../../data/mcqQuestions";
 
 import { RichTextEditor } from "@/utils/rich-text-editor";
 

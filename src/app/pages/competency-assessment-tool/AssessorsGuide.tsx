@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { InformationCircleIcon } from "@heroicons/react/24/solid";
-import { ImageWithFallback } from "../components/figma/ImageWithFallback";
+import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import React from "react";
 
@@ -10,7 +10,7 @@ import {
   SECTOR_ID,
   PROJECT_ID,
   usePageNavigation,
-} from "./pageUtils";
+} from "../pageUtils";
 
 import { Unit } from "./EvidencePlanEditor";
 
@@ -1162,19 +1162,19 @@ export function AssessorsGuide() {
           items={[
             {
               label: "Sector Details",
-              href: `/home/sector-projects/${SECTOR_ID}/`,
+              href: `#`,
             },
             {
               label: "Sector Projects",
-              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
+              href: `/`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
+              href: `/cats`,
             },
             {
               label: "Assessor's Guide",
-              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=assessors-guide`,
+              href: `/cats/assessors-guide`,
             },
           ]}
         />

@@ -14,7 +14,7 @@ export function NotFound() {
           The page you're looking for doesn't exist or has been moved.
         </p>
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/cats/")}
           className="px-6 py-3 bg-[#1976D2] text-white rounded text-sm font-medium hover:bg-[#1565C0] transition-colors"
         >
           ← Back to Dashboard

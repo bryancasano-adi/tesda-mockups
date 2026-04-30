@@ -1,21 +1,21 @@
-import { EvidencePlanEditor } from "./pages/EvidencePlanEditor";
-import { OutlineView } from "./pages/OutlineView";
-import { DemonstrationTestEditor } from "./pages/DemonstrationTestEditor";
-import { QuestioningToolEditor } from "./pages/QuestioningToolEditor";
-import { MCQConfig } from "./pages/MCQConfig";
-import { MCQEditor } from "./pages/MCQEditor";
-import { MCQTOSSummary } from "./pages/MCQTOSSummary";
-import { MCQExternalAnalysis } from "./pages/MCQExternalAnalysis";
-import { DistributionSettings } from "./pages/DistributionSettings";
-import { AGAssemblyStatus } from "./pages/AGAssemblyStatus";
-import { PackageNavigator } from "./pages/PackageNavigator";
-import { AssessorsGuide } from "./pages/AssessorsGuide";
-import { SICView } from "./pages/SICView";
-import { WrittenTestView } from "./pages/WrittenTestView";
-import { RatingSheetView } from "./pages/RatingSheetView";
-import { SAGView } from "./pages/SAGView";
-import { CARSView } from "./pages/CARSView";
-import { FinalExport } from "./pages/FinalExport";
+import { EvidencePlanEditor } from "./pages/competency-assessment-tool/EvidencePlanEditor";
+import { OutlineView } from "./pages/competency-assessment-tool/OutlineView";
+import { DemonstrationTestEditor } from "./pages/competency-assessment-tool/DemonstrationTestEditor";
+import { QuestioningToolEditor } from "./pages/competency-assessment-tool/QuestioningToolEditor";
+import { MCQConfig } from "./pages/competency-assessment-tool/MCQConfig";
+import { MCQEditor } from "./pages/competency-assessment-tool/MCQEditor";
+import { MCQTOSSummary } from "./pages/competency-assessment-tool/MCQTOSSummary";
+import { MCQExternalAnalysis } from "./pages/competency-assessment-tool/MCQExternalAnalysis";
+import { DistributionSettings } from "./pages/competency-assessment-tool/DistributionSettings";
+import { AGAssemblyStatus } from "./pages/competency-assessment-tool/AGAssemblyStatus";
+import { PackageNavigator } from "./pages/competency-assessment-tool/PackageNavigator";
+import { AssessorsGuide } from "./pages/competency-assessment-tool/AssessorsGuide";
+import { SICView } from "./pages/competency-assessment-tool/SICView";
+import { WrittenTestView } from "./pages/competency-assessment-tool/WrittenTestView";
+import { RatingSheetView } from "./pages/competency-assessment-tool/RatingSheetView";
+import { SAGView } from "./pages/competency-assessment-tool/SAGView";
+import { CARSView } from "./pages/competency-assessment-tool/CARSView";
+import { FinalExport } from "./pages/competency-assessment-tool/FinalExport";
 
 export const pageConfig = {
   "evidence-plan": {

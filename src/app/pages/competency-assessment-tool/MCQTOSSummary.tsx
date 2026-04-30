@@ -7,9 +7,9 @@ import {
   SECTOR_ID,
   PROJECT_ID,
   usePageNavigation,
-} from "./pageUtils";
+} from "../pageUtils";
 
-import { MCQTOSPreviewModal } from "../components/MCQTOSPreviewModal";
+import { MCQTOSPreviewModal } from "../../components/competency-assessment-tool/MCQTOSPreviewModal";
 
 export function MCQTOSSummary() {
   const { navigateToPage } = usePageNavigation();
@@ -54,19 +54,19 @@ export function MCQTOSSummary() {
           items={[
             {
               label: "Sector Details",
-              href: `/home/sector-projects/${SECTOR_ID}/`,
+              href: `#`,
             },
             {
               label: "Sector Projects",
-              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
+              href: `/`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
+              href: `/cats`,
             },
             {
               label: "Written Test Table of Specifications (TOS) Summary",
-              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=mcq-tos`,
+              href: `/cats/mcq-tos`,
             },
           ]}
         />

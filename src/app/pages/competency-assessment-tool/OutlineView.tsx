@@ -1,6 +1,6 @@
 import { InformationCircleIcon } from "@heroicons/react/24/solid";
 
-import { Breadcrumbs, DOCUMENT_ID, SECTOR_ID, PROJECT_ID } from "./pageUtils";
+import { Breadcrumbs, DOCUMENT_ID, SECTOR_ID, PROJECT_ID } from "../pageUtils";
 
 export function OutlineView() {
   return (
@@ -10,19 +10,19 @@ export function OutlineView() {
           items={[
             {
               label: "Sector Details",
-              href: `/home/sector-projects/${SECTOR_ID}/`,
+              href: `#`,
             },
             {
               label: "Sector Projects",
-              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
+              href: `/`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
+              href: `/cats`,
             },
             {
               label: "Outline",
-              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=outline`,
+              href: `/cats/outline`,
             },
           ]}
         />

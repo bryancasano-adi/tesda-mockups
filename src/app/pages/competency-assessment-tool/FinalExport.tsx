@@ -13,7 +13,7 @@ import {
   SECTOR_ID,
   PROJECT_ID,
   usePageNavigation,
-} from "./pageUtils";
+} from "../pageUtils";
 
 export function FinalExport() {
   const { navigateToPage } = usePageNavigation();
@@ -41,19 +41,19 @@ export function FinalExport() {
           items={[
             {
               label: "Sector Details",
-              href: `/home/sector-projects/${SECTOR_ID}/`,
+              href: `#`,
             },
             {
               label: "Sector Projects",
-              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
+              href: `/`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
+              href: `/cats`,
             },
             {
               label: "Final Export",
-              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=exoort`,
+              href: `/cats/exoort`,
             },
           ]}
         />
@@ -523,7 +523,7 @@ export function FinalExport() {
         </button>
         <button
           className="px-4 py-2 bg-blue-500 text-white border border-[#E0E0E0] rounded text-sm font-medium hover:bg-[#1976D2] transition-colors"
-          onClick={() => navigateToPage("")}
+          onClick={() => navigateToPage("/")}
         >
           Return to Dashboard
         </button>

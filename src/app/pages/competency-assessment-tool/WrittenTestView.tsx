@@ -7,10 +7,10 @@ import {
   SECTOR_ID,
   PROJECT_ID,
   usePageNavigation,
-} from "./pageUtils";
+} from "../pageUtils";
 
-import { initialMCQItems, MCQItem } from "../data/mcqQuestions";
-import { WrittenTestPreviewModal } from "../components/WrittenTestPreviewModal";
+import { initialMCQItems, MCQItem } from "../../data/mcqQuestions";
+import { WrittenTestPreviewModal } from "../../components/competency-assessment-tool/WrittenTestPreviewModal";
 
 // Shuffle helper
 function shuffleArray<T>(array: T[]): T[] {
@@ -65,19 +65,19 @@ export function WrittenTestView() {
           items={[
             {
               label: "Sector Details",
-              href: `/home/sector-projects/${SECTOR_ID}/`,
+              href: `#`,
             },
             {
               label: "Sector Projects",
-              href: `/home/sector-projects/${SECTOR_ID}/${DOCUMENT_ID}`,
+              href: `/`,
             },
             {
               label: "Competency Assessment Tools (CATs)",
-              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool`,
+              href: `/cats`,
             },
             {
               label: "Written Test Preview",
-              href: `/home/documents/${PROJECT_ID}?documentId=${DOCUMENT_ID}&documentType=competency-assessment-tool&page=written-test`,
+              href: `/cats/written-test`,
             },
           ]}
         />
