@@ -154,9 +154,7 @@ export function LAMTableView({
           </div>
           <div>
             <span className="text-gray-600">PQF Level</span>
-            <span className="ml-2 font-semibold text-gray-900">
-              {toRomanPQF(pqfLevel)}
-            </span>
+            <span className="ml-2 font-semibold text-gray-900">{pqfLevel}</span>
           </div>
         </div>
       </div>
