@@ -5,7 +5,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 
-import { Breadcrumbs, DOCUMENT_ID, SECTOR_ID, PROJECT_ID } from "../pageUtils";
+import { Breadcrumbs } from "../pageUtils";
 
 import {
   initialQuestions,
@@ -56,6 +56,14 @@ export function QuestioningToolEditor() {
   const handleCancel = () => {
     setEditingId(null);
     setEditForm(null);
+  };
+
+  const getCompetencyCode = (q: Question) => {
+    const uc = q.unitCompetency || "UC1";
+    const element = q.element || "E1";
+    const pc = q.performanceCriteria || "PC1";
+
+    return `${uc}, ${element}, ${pc}`;
   };
 
   return (
@@ -194,21 +202,27 @@ export function QuestioningToolEditor() {
                     <th className="text-center px-3 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0] w-12">
                       #
                     </th>
+
                     <th className="text-left px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0]">
                       Question
                     </th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0]">
-                      Performance Criteria
+
+                    <th className="text-center px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0] w-40">
+                      UC / Element / PC
                     </th>
+
                     <th className="text-center px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0] w-40">
                       Dimension of Competency
                     </th>
+
                     <th className="text-center px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0] w-32">
                       Test Type
                     </th>
+
                     <th className="text-left px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0] w-64">
                       Model Answer
                     </th>
+
                     <th className="text-center px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0] w-24">
                       Actions
                     </th>
@@ -243,7 +257,43 @@ export function QuestioningToolEditor() {
                             />
                           </td>
                           <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
-                            {q.performanceCriteria || "PC-1"}
+                            <div className="flex flex-col gap-1">
+                              <input
+                                className="w-full px-2 py-1 border border-[#E0E0E0] rounded text-sm"
+                                value={editForm.unitCompetency || ""}
+                                placeholder="UC1"
+                                onChange={(e) =>
+                                  setEditForm({
+                                    ...editForm,
+                                    unitCompetency: e.target.value,
+                                  })
+                                }
+                              />
+
+                              <input
+                                className="w-full px-2 py-1 border border-[#E0E0E0] rounded text-sm"
+                                value={editForm.element || ""}
+                                placeholder="E1"
+                                onChange={(e) =>
+                                  setEditForm({
+                                    ...editForm,
+                                    element: e.target.value,
+                                  })
+                                }
+                              />
+
+                              <input
+                                className="w-full px-2 py-1 border border-[#E0E0E0] rounded text-sm"
+                                value={editForm.performanceCriteria || ""}
+                                placeholder="PC1"
+                                onChange={(e) =>
+                                  setEditForm({
+                                    ...editForm,
+                                    performanceCriteria: e.target.value,
+                                  })
+                                }
+                              />
+                            </div>
                           </td>
                           <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
                             <select
@@ -301,8 +351,8 @@ export function QuestioningToolEditor() {
                             ) : null}{" "}
                             {q.question}
                           </td>
-                          <td className="px-4 py-3 text-sm border border-[#E0E0E0]">
-                            {q.performanceCriteria || "PC-1"}
+                          <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0] font-mono text-[#333]">
+                            {getCompetencyCode(q)}
                           </td>
                           <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
                             {q.dimension}

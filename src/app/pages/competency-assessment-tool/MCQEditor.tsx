@@ -7,13 +7,7 @@ import {
   TrashIcon,
 } from "@heroicons/react/24/outline";
 
-import {
-  Breadcrumbs,
-  DOCUMENT_ID,
-  SECTOR_ID,
-  PROJECT_ID,
-  usePageNavigation,
-} from "../pageUtils";
+import { Breadcrumbs, usePageNavigation } from "../pageUtils";
 
 import { initialMCQItems, MCQItem } from "../../data/mcqQuestions";
 import { MCQEditorModal } from "../../components/competency-assessment-tool/MCQEditorModal";
@@ -30,7 +24,7 @@ export function MCQEditor() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [showTOSPreview, setShowTOSPreview] = useState(false);
-  const [isFinalized, setIsFinalized] = useState(false);
+  const [isFinalized, _setIsFinalized] = useState(false);
 
   const handleSaveItem = (item: MCQItem) => {
     if (item.id === 0) {
@@ -67,37 +61,37 @@ export function MCQEditor() {
     const tosData = [
       {
         article: "1. Occupational Safety and Health",
-        pc: "PC-1",
+        pc: "Perform occupational safety and health procedures in the workplace",
         target: 4,
         percentage: 10,
       },
       {
         article: "2. Equipment Operation",
-        pc: "PC-2",
+        pc: "Operate welding equipment according to manufacturer specifications and workplace procedures",
         target: 12,
         percentage: 30,
       },
       {
         article: "3. Preventive Maintenance Servicing/Inspection",
-        pc: "PC-3",
+        pc: "Perform preventive maintenance and inspection of welding equipment",
         target: 6,
         percentage: 15,
       },
       {
         article: "4. Job or Role in the Workplace",
-        pc: "PC-4",
+        pc: "Perform assigned job or role in the workplace",
         target: 2,
         percentage: 5,
       },
       {
         article: "5. Equipment/Supply Identification and Usage",
-        pc: "PC-5",
+        pc: "Identify and use appropriate equipment and supplies",
         target: 15,
         percentage: 37.5,
       },
       {
         article: "6. Mathematics/Computation",
-        pc: "PC-6",
+        pc: "Apply mathematical computations relevant to the task",
         target: 1,
         percentage: 2.5,
       },
@@ -422,13 +416,13 @@ export function MCQEditor() {
                     className="text-left px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0] align-middle"
                     rowSpan={2}
                   >
-                    ARTICLE NUMBER
+                    PERFORMANCE CRITERIA
                   </th>
                   <th
-                    className="text-center px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0] align-middle"
+                    className="text-left px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0] align-middle"
                     rowSpan={2}
                   >
-                    PERFORMANCE CRITERIA
+                    ARTICLE NUMBER
                   </th>
                   <th
                     className="text-center px-4 py-2 text-xs font-semibold text-[#666] border border-[#E0E0E0]"
@@ -472,10 +466,10 @@ export function MCQEditor() {
                 {tosData.map((row, idx) => (
                   <tr key={idx} className="hover:bg-[#FAFAFA]">
                     <td className="px-4 py-3 text-sm border border-[#E0E0E0]">
-                      {row.article}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
                       {row.pc}
+                    </td>
+                    <td className="px-4 py-3 text-sm border border-[#E0E0E0]">
+                      {row.article}
                     </td>
                     <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
                       {row.factual}
@@ -524,13 +518,13 @@ export function MCQEditor() {
           {/* Summary Table */}
           <div className="p-5 border-t border-[#E0E0E0]">
             <div className="text-xs font-semibold text-[#666] uppercase mb-3">
-              Summary by Article
+              Summary by Performance Criteria
             </div>
             <table className="w-full border border-[#E0E0E0]">
               <thead>
                 <tr className="bg-[#FAFAFA]">
                   <th className="text-left px-4 py-2 text-xs font-semibold text-[#666] border border-[#E0E0E0]">
-                    ARTICLE/DESCRIPTION
+                    PERFORMANCE CRITERIA
                   </th>
                   <th className="text-center px-4 py-2 text-xs font-semibold text-[#666] border border-[#E0E0E0]">
                     NO. OF ITEMS
@@ -544,7 +538,7 @@ export function MCQEditor() {
                 {tosData.map((row, idx) => (
                   <tr key={idx} className="hover:bg-[#FAFAFA]">
                     <td className="px-4 py-2 text-sm border border-[#E0E0E0]">
-                      {row.article}
+                      {row.pc}
                     </td>
                     <td className="px-4 py-2 text-sm text-center border border-[#E0E0E0]">
                       {row.total}

@@ -1,10 +1,12 @@
 export interface Question {
   id: number;
   question: string;
-  performanceCriteria?: string;
+  modelAnswer: string;
   dimension: string;
   testType: "Knowledge" | "Scenario";
-  modelAnswer: string;
+  unitCompetency?: string;
+  element?: string;
+  performanceCriteria?: string;
 }
 
 export const initialQuestions: Question[] = [
@@ -12,7 +14,9 @@ export const initialQuestions: Question[] = [
     id: 1,
     question:
       "What type of electrode would you use for welding low carbon steel in a flat position?",
-    performanceCriteria: "PC-1",
+    unitCompetency: "UC1",
+    element: "E1",
+    performanceCriteria: "PC1",
     dimension: "Task Skills",
     testType: "Knowledge",
     modelAnswer: "E6013 or E6011 electrodes, following WPS specifications",
@@ -21,7 +25,9 @@ export const initialQuestions: Question[] = [
     id: 2,
     question:
       "Scenario: You notice that the electrode is sticking frequently during welding. What would you do to address this problem?",
-    performanceCriteria: "PC-2",
+    unitCompetency: "UC1",
+    element: "E1",
+    performanceCriteria: "PC2",
     dimension: "Contingency Management",
     testType: "Scenario",
     modelAnswer:
@@ -30,7 +36,9 @@ export const initialQuestions: Question[] = [
   {
     id: 3,
     question: "Why is it important to clean the base metal before welding?",
-    performanceCriteria: "PC-3",
+    unitCompetency: "UC1",
+    element: "E1",
+    performanceCriteria: "PC3",
     dimension: "Task Skills",
     testType: "Knowledge",
     modelAnswer:
@@ -40,7 +48,9 @@ export const initialQuestions: Question[] = [
     id: 4,
     question:
       "Scenario: While welding, you smell smoke and see small sparks near the welding cables. What should you do immediately?",
-    performanceCriteria: "PC-4",
+    unitCompetency: "UC1",
+    element: "E2",
+    performanceCriteria: "PC1",
     dimension: "Contingency Management",
     testType: "Scenario",
     modelAnswer:
@@ -50,7 +60,9 @@ export const initialQuestions: Question[] = [
     id: 5,
     question:
       "How would you prioritize your tasks when preparing for a welding job?",
-    performanceCriteria: "PC-5",
+    unitCompetency: "UC1",
+    element: "E2",
+    performanceCriteria: "PC2",
     dimension: "Task Management",
     testType: "Knowledge",
     modelAnswer:
@@ -60,7 +72,9 @@ export const initialQuestions: Question[] = [
     id: 6,
     question:
       "What is the purpose of preheating before welding thick sections?",
-    performanceCriteria: "PC-6",
+    unitCompetency: "UC1",
+    element: "E2",
+    performanceCriteria: "PC3",
     dimension: "Task Skills",
     testType: "Knowledge",
     modelAnswer:
@@ -70,7 +84,9 @@ export const initialQuestions: Question[] = [
     id: 7,
     question:
       "Scenario: The weld shows visible porosity after completion. What could be the possible causes and how would you prevent it?",
-    performanceCriteria: "PC-7",
+    unitCompetency: "UC2",
+    element: "E1",
+    performanceCriteria: "PC1",
     dimension: "Contingency Management",
     testType: "Scenario",
     modelAnswer:
@@ -80,7 +96,9 @@ export const initialQuestions: Question[] = [
     id: 8,
     question:
       "Describe the proper procedure for changing electrodes during welding.",
-    performanceCriteria: "PC-8",
+    unitCompetency: "UC2",
+    element: "E1",
+    performanceCriteria: "PC2",
     dimension: "Task Skills",
     testType: "Knowledge",
     modelAnswer:
@@ -90,7 +108,9 @@ export const initialQuestions: Question[] = [
     id: 9,
     question:
       "What safety equipment must be worn when performing SMAW operations?",
-    performanceCriteria: "PC-9",
+    unitCompetency: "UC2",
+    element: "E1",
+    performanceCriteria: "PC3",
     dimension: "Job/Role Environment",
     testType: "Knowledge",
     modelAnswer:
@@ -100,7 +120,9 @@ export const initialQuestions: Question[] = [
     id: 10,
     question:
       "Scenario: You are assigned to weld in a confined space. What additional safety measures would you implement?",
-    performanceCriteria: "PC-10",
+    unitCompetency: "UC2",
+    element: "E2",
+    performanceCriteria: "PC1",
     dimension: "Job/Role Environment",
     testType: "Scenario",
     modelAnswer:
@@ -109,7 +131,9 @@ export const initialQuestions: Question[] = [
   {
     id: 11,
     question: "What is the difference between AC and DC welding current?",
-    performanceCriteria: "PC-11",
+    unitCompetency: "UC2",
+    element: "E2",
+    performanceCriteria: "PC2",
     dimension: "Task Skills",
     testType: "Knowledge",
     modelAnswer:
@@ -119,7 +143,9 @@ export const initialQuestions: Question[] = [
     id: 12,
     question:
       "How do you ensure the quality of your welds during the welding process?",
-    performanceCriteria: "PC-12",
+    unitCompetency: "UC2",
+    element: "E2",
+    performanceCriteria: "PC3",
     dimension: "Task Management",
     testType: "Knowledge",
     modelAnswer:
@@ -129,7 +155,9 @@ export const initialQuestions: Question[] = [
     id: 13,
     question:
       "Scenario: The arc becomes unstable and wanders during welding. What adjustments would you make?",
-    performanceCriteria: "PC-13",
+    unitCompetency: "UC3",
+    element: "E1",
+    performanceCriteria: "PC1",
     dimension: "Contingency Management",
     testType: "Scenario",
     modelAnswer:
@@ -139,7 +167,9 @@ export const initialQuestions: Question[] = [
     id: 14,
     question:
       "What information must be included in a Welding Procedure Specification (WPS)?",
-    performanceCriteria: "PC-14",
+    unitCompetency: "UC3",
+    element: "E1",
+    performanceCriteria: "PC2",
     dimension: "Task Skills",
     testType: "Knowledge",
     modelAnswer:
@@ -149,7 +179,9 @@ export const initialQuestions: Question[] = [
     id: 15,
     question:
       "How would you organize your welding consumables and tools at the start of a shift?",
-    performanceCriteria: "PC-15",
+    unitCompetency: "UC3",
+    element: "E1",
+    performanceCriteria: "PC3",
     dimension: "Task Management",
     testType: "Knowledge",
     modelAnswer:
@@ -159,7 +191,9 @@ export const initialQuestions: Question[] = [
     id: 16,
     question:
       "What are the common welding defects and how can you identify them visually?",
-    performanceCriteria: "PC-16",
+    unitCompetency: "UC3",
+    element: "E2",
+    performanceCriteria: "PC1",
     dimension: "Task Skills",
     testType: "Knowledge",
     modelAnswer:
@@ -169,7 +203,9 @@ export const initialQuestions: Question[] = [
     id: 17,
     question:
       "Scenario: Your supervisor asks you to complete a rush job, but you notice the WPS calls for preheat that would delay completion. What do you do?",
-    performanceCriteria: "PC-17",
+    unitCompetency: "UC3",
+    element: "E2",
+    performanceCriteria: "PC2",
     dimension: "Job/Role Environment",
     testType: "Scenario",
     modelAnswer:
@@ -178,7 +214,9 @@ export const initialQuestions: Question[] = [
   {
     id: 18,
     question: "Explain the purpose of post-weld heat treatment.",
-    performanceCriteria: "PC-18",
+    unitCompetency: "UC3",
+    element: "E2",
+    performanceCriteria: "PC3",
     dimension: "Task Skills",
     testType: "Knowledge",
     modelAnswer:
@@ -188,7 +226,9 @@ export const initialQuestions: Question[] = [
     id: 19,
     question:
       "What steps would you take to coordinate with other trades working in the same area?",
-    performanceCriteria: "PC-19",
+    unitCompetency: "UC4",
+    element: "E1",
+    performanceCriteria: "PC1",
     dimension: "Task Management",
     testType: "Knowledge",
     modelAnswer:
@@ -198,7 +238,9 @@ export const initialQuestions: Question[] = [
     id: 20,
     question:
       "Scenario: During overhead welding, molten metal drops on your glove. What is your immediate response?",
-    performanceCriteria: "PC-20",
+    unitCompetency: "UC4",
+    element: "E1",
+    performanceCriteria: "PC2",
     dimension: "Contingency Management",
     testType: "Scenario",
     modelAnswer:
@@ -208,7 +250,9 @@ export const initialQuestions: Question[] = [
     id: 21,
     question:
       "How do you read and interpret welding symbols on engineering drawings?",
-    performanceCriteria: "PC-21",
+    unitCompetency: "UC4",
+    element: "E1",
+    performanceCriteria: "PC3",
     dimension: "Task Skills",
     testType: "Knowledge",
     modelAnswer:
@@ -218,7 +262,9 @@ export const initialQuestions: Question[] = [
     id: 22,
     question:
       "What environmental conditions would make welding unsafe or unacceptable?",
-    performanceCriteria: "PC-22",
+    unitCompetency: "UC4",
+    element: "E2",
+    performanceCriteria: "PC1",
     dimension: "Job/Role Environment",
     testType: "Knowledge",
     modelAnswer:
@@ -228,7 +274,9 @@ export const initialQuestions: Question[] = [
     id: 23,
     question:
       "Scenario: You run out of specified electrodes mid-job. What should you do?",
-    performanceCriteria: "PC-23",
+    unitCompetency: "UC4",
+    element: "E2",
+    performanceCriteria: "PC2",
     dimension: "Contingency Management",
     testType: "Scenario",
     modelAnswer:
@@ -238,7 +286,9 @@ export const initialQuestions: Question[] = [
     id: 24,
     question:
       "Describe the procedure for inspecting welding equipment before starting work.",
-    performanceCriteria: "PC-24",
+    unitCompetency: "UC4",
+    element: "E2",
+    performanceCriteria: "PC3",
     dimension: "Task Management",
     testType: "Knowledge",
     modelAnswer:
@@ -248,7 +298,9 @@ export const initialQuestions: Question[] = [
     id: 25,
     question:
       "What factors determine the appropriate welding position for a joint?",
-    performanceCriteria: "PC-25",
+    unitCompetency: "UC5",
+    element: "E1",
+    performanceCriteria: "PC1",
     dimension: "Task Skills",
     testType: "Knowledge",
     modelAnswer:
