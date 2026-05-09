@@ -2,7 +2,7 @@ import { FlagIcon, SparklesIcon } from "@heroicons/react/24/outline";
 import { ReactNode, useState, useRef } from "react";
 import { SheetKind } from "../../pages/competency-based-learning-materials/Dashboard";
 import { loData } from "@/app/data/cblmData";
-import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
+import { ArrowRightIcon, Link } from "lucide-react";
 
 function FieldLabel({
   label,
@@ -2666,15 +2666,13 @@ function LearningExperiencesTableContent() {
         <div className="text-[11px] text-gray-400 italic">
           Module 5: Providing Effective Customer Service
         </div>
-        <button
-          onClick={() => {
-            window.location.href = "/cblm/front-matter";
-          }}
+        <a
+          href={`/cblm/front-matter`}
           className="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-50 hover:text-blue-600"
         >
           <ArrowRightIcon className="h-3.5 w-3.5" />
           Proceed to Front Matter
-        </button>
+        </a>
       </div>
 
       <EditabilityLegend />
