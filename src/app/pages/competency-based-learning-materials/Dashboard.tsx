@@ -867,7 +867,7 @@ type SourcePanelProps = {
 
 export function SourcePanel({ isFrontMatter = false }: SourcePanelProps) {
   return (
-    <aside className="w-72 flex-shrink-0 overflow-y-auto border-l border-gray-200 bg-white">
+    <aside className="w-65 min-w-65 flex-shrink-0 overflow-y-auto border-l border-gray-200 bg-white">
       {isFrontMatter ? (
         <>
           {/* FRONT MATTER VERSION */}
