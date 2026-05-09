@@ -4,6 +4,7 @@ import {
   DocumentTextIcon,
   TableCellsIcon,
   BookOpenIcon,
+  AcademicCapIcon,
 } from "@heroicons/react/24/outline";
 import { Button } from "../components/ui/button";
 
@@ -32,6 +33,14 @@ const featureCards = [
     icon: DocumentTextIcon,
     accent: "from-sky-500 to-indigo-500",
   },
+  {
+    title: "Competency-Based Learning Materials",
+    description:
+      "Generate CBLM modules, review learning sheets, manage front matter and export TESDA-ready documents.",
+    href: "/cblm",
+    icon: AcademicCapIcon,
+    accent: "from-amber-500 to-orange-600",
+  },
 ];
 
 export function LandingPage() {
@@ -51,7 +60,7 @@ export function LandingPage() {
         </header>
 
         {/* Cards */}
-        <section className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <section className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
           {featureCards.map((card) => {
             const Icon = card.icon;
 

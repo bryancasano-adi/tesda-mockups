@@ -10,7 +10,7 @@ interface HeaderProps {
   children?: React.ReactNode;
   sidebarOpen?: boolean;
   onToggleSidebar?: () => void;
-  variant?: "default" | "cats" | "lam" | "ig";
+  variant?: "default" | "cats" | "lam" | "ig" | "cblm";
   onSaveDraft?: () => void;
   onValidate?: () => void;
   onFinalize?: () => void;
@@ -52,7 +52,7 @@ export function Header({
     setIsValidated(true);
   };
 
-  const isWorkspace = ["cats", "lam", "ig"].includes(variant);
+  const isWorkspace = ["cats", "lam", "ig", "cblm"].includes(variant);
 
   return (
     <div className="fixed top-0 left-0 z-20 w-full bg-white border-b border-gray-200">

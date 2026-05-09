@@ -13,12 +13,13 @@ export function RootLayout() {
 
   const isNoVariantPage =
     location.pathname === "/" || location.pathname === "/cats";
+  const variant = location.pathname.startsWith("/cblm") ? "cblm" : "cats";
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header
         onToggleSidebar={toggleSidebar}
-        variant={isNoVariantPage ? undefined : "cats"}
+        variant={isNoVariantPage ? undefined : variant}
         onBack={() => (window.location.href = "/")}
         onSaveDraft={() => alert("Changes have been saved as a draft.")}
         onValidate={() => alert("Validation successful! No issues found.")}

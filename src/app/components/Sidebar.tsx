@@ -31,6 +31,11 @@ const mockTrainingProjects = [
     sub_sector_id: "d",
     project_name: "Agile Methodology Bootcamp",
   },
+  {
+    project_id: "5",
+    sub_sector_id: "e",
+    project_name: "Food and Beverage Services NC II",
+  },
 ];
 
 const navigation = [
@@ -77,7 +82,7 @@ export function Sidebar({ onClose, isOpen = true }: SidebarProps) {
 
   const handleProjectClick = (subSectorId?: string, projectId?: string) => {
     if (subSectorId && projectId) {
-      navigate(`/`);
+      navigate(projectId === "5" ? `/cblm` : `/`);
     }
   };
 
@@ -155,7 +160,12 @@ export function Sidebar({ onClose, isOpen = true }: SidebarProps) {
                 {/* Project List */}
                 <div className="flex-1 overflow-y-auto custom-scrollbar space-y-1">
                   {filteredProjects.length > 0 ? (
-                    filteredProjects.map((project, index) => (
+                    filteredProjects.map((project, index) => {
+                      const isCBLMProject =
+                        project.project_name ===
+                        "Food and Beverage Services NC II";
+
+                      return (
                       <div
                         key={`training-${project.project_id || index}`}
                         role="button"
@@ -173,11 +183,16 @@ export function Sidebar({ onClose, isOpen = true }: SidebarProps) {
                             project.project_id,
                           )
                         }
-                        className="text-sm text-black hover:bg-blue-50 hover:text-blue-800 cursor-pointer py-1 px-2 rounded truncate"
+                        className={`text-sm hover:bg-blue-50 hover:text-blue-800 cursor-pointer py-1 px-2 rounded truncate ${
+                          isCBLMProject
+                            ? "bg-blue-50 text-blue-800 font-medium"
+                            : "text-black"
+                        }`}
                       >
                         {project.project_name}
                       </div>
-                    ))
+                      );
+                    })
                   ) : (
                     <div className="text-sm text-gray-400 py-2 pl-2">
                       No projects found
