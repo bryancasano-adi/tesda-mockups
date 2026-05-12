@@ -526,7 +526,7 @@ export function CATSDashboard() {
                         onDownload={() => alert("Download Oral Test")}
                         onEdit={() => navigate("/cats/questioning-tool")}
                         onRefresh={() => alert("Refresh Questioning Tool")}
-                        onView={() => navigate("/cats/questioning-tool")}
+                        onView={() => navigate("/cats/questioning-tool-config")}
                       />
                     </td>
                   </tr>

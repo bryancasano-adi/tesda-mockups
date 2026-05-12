@@ -12,13 +12,7 @@ import {
   StarIcon,
 } from "@heroicons/react/24/solid";
 
-import Tooltip, {
-  Breadcrumbs,
-  DOCUMENT_ID,
-  PROJECT_ID,
-  SECTOR_ID,
-  usePageNavigation,
-} from "../pageUtils";
+import Tooltip, { Breadcrumbs, usePageNavigation } from "../pageUtils";
 
 import { EvidencePlanPreviewModal } from "../../components/competency-assessment-tool/EvidencePlanPreviewModal";
 
@@ -526,11 +520,6 @@ export function EvidencePlanEditor() {
     );
   };
 
-  const runValidation = () => {
-    setValidationRun(true);
-    setShowValidation(true);
-  };
-
   const getMethodCounts = () => {
     let mcqCount = 0;
     let demoCount = 0;
@@ -550,6 +539,48 @@ export function EvidencePlanEditor() {
   };
 
   const { mcqCount, demoCount, qtCount } = getMethodCounts();
+
+  const hasCheckedInUnit = (unit: Unit) => {
+    return unit.elements.some((element) =>
+      element.pcs.some(
+        (pc) =>
+          pc.mcq ||
+          pc.demo ||
+          pc.qt ||
+          customColumns.some((col) => pc[col.id] === true),
+      ),
+    );
+  };
+
+  const clearAllChecksInUnit = (unitId: string) => {
+    setUnits((prevUnits) =>
+      prevUnits.map((unit) => {
+        if (unit.id !== unitId) return unit;
+
+        return {
+          ...unit,
+          elements: unit.elements.map((element) => ({
+            ...element,
+            pcs: element.pcs.map((pc) => {
+              const clearedPC: PerformanceCriteria = {
+                ...pc,
+                mcq: false,
+                demo: false,
+                qt: false,
+                critical: false,
+              };
+
+              customColumns.forEach((col) => {
+                clearedPC[col.id] = false;
+              });
+
+              return clearedPC;
+            }),
+          })),
+        };
+      }),
+    );
+  };
 
   return (
     <div className="p-6 max-w-[1400px] mx-auto text-gray-800">
@@ -684,13 +715,27 @@ export function EvidencePlanEditor() {
                       colSpan={5 + customColumns.length}
                       onClick={() => toggleUnit(unit.id)}
                     >
-                      <div className="flex items-center gap-2">
-                        {expandedUnits[unit.id] ? (
-                          <ChevronDownIcon className="w-5 h-5 inline" />
-                        ) : (
-                          <ChevronRightIcon className="w-5 h-5 inline" />
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          {expandedUnits[unit.id] ? (
+                            <ChevronDownIcon className="w-5 h-5 inline" />
+                          ) : (
+                            <ChevronRightIcon className="w-5 h-5 inline" />
+                          )}
+                          <span>{unit.name}</span>
+                        </div>
+
+                        {hasCheckedInUnit(unit) && (
+                          <button
+                            className="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded border border-white/20 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              clearAllChecksInUnit(unit.id);
+                            }}
+                          >
+                            Clear All Selections
+                          </button>
                         )}
-                        <span className="flex-1">{unit.name}</span>
                       </div>
                     </td>
                   </tr>

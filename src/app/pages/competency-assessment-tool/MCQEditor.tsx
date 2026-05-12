@@ -12,8 +12,6 @@ import { Breadcrumbs, usePageNavigation } from "../pageUtils";
 import { initialMCQItems, MCQItem } from "../../data/mcqQuestions";
 import { MCQEditorModal } from "../../components/competency-assessment-tool/MCQEditorModal";
 import { DeleteConfirmDialog } from "../../components/competency-assessment-tool/DeleteConfirmDialog";
-import { MCQPreviewModal } from "../../components/competency-assessment-tool/MCQPreviewModal";
-import { TOSPreviewModal } from "../../components/competency-assessment-tool/TOSPreviewModal";
 
 export function MCQEditor() {
   const { navigateToPage } = usePageNavigation();
@@ -22,8 +20,6 @@ export function MCQEditor() {
   const [editingItem, setEditingItem] = useState<MCQItem | null>(null);
   const [deletingItemId, setDeletingItemId] = useState<number | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
-  const [showTOSPreview, setShowTOSPreview] = useState(false);
   const [isFinalized, _setIsFinalized] = useState(false);
 
   const handleSaveItem = (item: MCQItem) => {
@@ -60,64 +56,72 @@ export function MCQEditor() {
   const calculateTOS = () => {
     const tosData = [
       {
-        article: "1. Occupational Safety and Health",
+        uc: "UC1",
+        element: "E1",
         pc: "Perform occupational safety and health procedures in the workplace",
         target: 4,
         percentage: 10,
       },
       {
-        article: "2. Equipment Operation",
-        pc: "Operate welding equipment according to manufacturer specifications and workplace procedures",
+        uc: "UC1",
+        element: "E2",
+        pc: "Operate welding equipment according to manufacturer specifications",
         target: 12,
         percentage: 30,
       },
       {
-        article: "3. Preventive Maintenance Servicing/Inspection",
+        uc: "UC2",
+        element: "E3",
         pc: "Perform preventive maintenance and inspection of welding equipment",
         target: 6,
         percentage: 15,
       },
       {
-        article: "4. Job or Role in the Workplace",
+        uc: "UC2",
+        element: "E4",
         pc: "Perform assigned job or role in the workplace",
         target: 2,
         percentage: 5,
       },
       {
-        article: "5. Equipment/Supply Identification and Usage",
+        uc: "UC3",
+        element: "E5",
         pc: "Identify and use appropriate equipment and supplies",
         target: 15,
         percentage: 37.5,
       },
       {
-        article: "6. Mathematics/Computation",
+        uc: "UC3",
+        element: "E6",
         pc: "Apply mathematical computations relevant to the task",
         target: 1,
         percentage: 2.5,
       },
     ];
 
-    return tosData.map((article, idx) => {
-      const articleNum = idx + 1;
-      const articleItems = mcqItems.filter(
-        (item) => item.articleNumber === articleNum,
-      );
+    return tosData.map((row) => {
+      const articleItems = mcqItems.filter((_item) => {
+        // MOCK mapping fallback (since MCQItem has no UC/Element yet)
+        return true;
+      });
 
       const factual = articleItems
         .filter((item) => item.type === "Factual")
         .map((item) => item.id);
+
       const comprehension = articleItems
         .filter((item) => item.type === "Scenario")
         .map((item) => item.id);
+
       const application = articleItems
         .filter((item) => item.type === "Application")
         .map((item) => item.id);
 
       return {
-        ...article,
-        factual: factual.length > 0 ? factual.join(",") : "–",
-        comprehension: comprehension.length > 0 ? comprehension.join(",") : "–",
-        application: application.length > 0 ? application.join(",") : "–",
+        ...row,
+        factual: factual.length ? factual.join(",") : "–",
+        comprehension: comprehension.length ? comprehension.join(",") : "–",
+        application: application.length ? application.join(",") : "–",
         total: articleItems.length,
       };
     });
@@ -419,10 +423,16 @@ export function MCQEditor() {
                     PERFORMANCE CRITERIA
                   </th>
                   <th
-                    className="text-left px-4 py-3 text-xs font-semibold text-[#666] border border-[#E0E0E0] align-middle"
+                    className="text-center px-4 py-2 text-xs font-semibold text-[#666] border border-[#E0E0E0]"
                     rowSpan={2}
                   >
-                    ARTICLE NUMBER
+                    UNIT OF COMPETENCY
+                  </th>
+                  <th
+                    className="text-center px-4 py-2 text-xs font-semibold text-[#666] border border-[#E0E0E0]"
+                    rowSpan={2}
+                  >
+                    ELEMENT
                   </th>
                   <th
                     className="text-center px-4 py-2 text-xs font-semibold text-[#666] border border-[#E0E0E0]"
@@ -468,8 +478,11 @@ export function MCQEditor() {
                     <td className="px-4 py-3 text-sm border border-[#E0E0E0]">
                       {row.pc}
                     </td>
-                    <td className="px-4 py-3 text-sm border border-[#E0E0E0]">
-                      {row.article}
+                    <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
+                      {row.uc}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
+                      {row.element}
                     </td>
                     <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0]">
                       {row.factual}
@@ -493,7 +506,10 @@ export function MCQEditor() {
                     TOTAL
                   </td>
                   <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0] font-semibold">
-                    0
+                    -
+                  </td>
+                  <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0] font-semibold">
+                    -
                   </td>
                   <td className="px-4 py-3 text-sm text-center border border-[#E0E0E0] font-semibold">
                     {factualCount}
@@ -571,23 +587,6 @@ export function MCQEditor() {
           itemNumber={deletingItemId}
           onCancel={() => setDeletingItemId(null)}
           onConfirm={() => handleDeleteItem(deletingItemId)}
-        />
-      )}
-
-      {showPreview && (
-        <MCQPreviewModal
-          items={mcqItems}
-          onClose={() => setShowPreview(false)}
-        />
-      )}
-      {showTOSPreview && (
-        <TOSPreviewModal
-          applicationCount={applicationCount}
-          factualCount={factualCount}
-          scenarioCount={scenarioCount}
-          tosData={tosData}
-          totalItems={totalItems}
-          onClose={() => setShowTOSPreview(false)}
         />
       )}
     </div>

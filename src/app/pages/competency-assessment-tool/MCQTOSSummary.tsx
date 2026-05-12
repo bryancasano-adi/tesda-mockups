@@ -1,13 +1,7 @@
 import { CheckIcon, InformationCircleIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
 
-import {
-  Breadcrumbs,
-  DOCUMENT_ID,
-  SECTOR_ID,
-  PROJECT_ID,
-  usePageNavigation,
-} from "../pageUtils";
+import { Breadcrumbs, usePageNavigation } from "../pageUtils";
 
 import { MCQTOSPreviewModal } from "../../components/competency-assessment-tool/MCQTOSPreviewModal";
 

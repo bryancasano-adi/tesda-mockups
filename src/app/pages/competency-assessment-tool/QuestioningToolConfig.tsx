@@ -1,12 +1,6 @@
 import { useState } from "react";
 
-import {
-  Breadcrumbs,
-  DOCUMENT_ID,
-  SECTOR_ID,
-  PROJECT_ID,
-  usePageNavigation,
-} from "../pageUtils";
+import { Breadcrumbs, usePageNavigation } from "../pageUtils";
 
 export function QuestioningToolConfig() {
   const { navigateToPage } = usePageNavigation();

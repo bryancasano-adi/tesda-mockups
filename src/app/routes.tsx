@@ -6,6 +6,7 @@ import { EvidencePlanEditor } from "./pages/competency-assessment-tool/EvidenceP
 import { OutlineView } from "./pages/competency-assessment-tool/OutlineView";
 import { DemonstrationTestEditor } from "./pages/competency-assessment-tool/DemonstrationTestEditor";
 import { QuestioningToolEditor } from "./pages/competency-assessment-tool/QuestioningToolEditor";
+import { QuestioningToolConfig } from "./pages/competency-assessment-tool/QuestioningToolConfig";
 import { MCQConfig } from "./pages/competency-assessment-tool/MCQConfig";
 import { MCQEditor } from "./pages/competency-assessment-tool/MCQEditor";
 import { MCQTOSSummary } from "./pages/competency-assessment-tool/MCQTOSSummary";
@@ -48,6 +49,10 @@ export const router = createBrowserRouter([
       { path: "/cats/outline", Component: OutlineView },
       { path: "/cats/demonstration-test", Component: DemonstrationTestEditor },
       { path: "/cats/questioning-tool", Component: QuestioningToolEditor },
+      {
+        path: "/cats/questioning-tool-config",
+        Component: QuestioningToolConfig,
+      },
       { path: "/cats/mcq-config", Component: MCQConfig },
       { path: "/cats/mcq", Component: MCQEditor },
       { path: "/cats/mcq-tos", Component: MCQTOSSummary },
