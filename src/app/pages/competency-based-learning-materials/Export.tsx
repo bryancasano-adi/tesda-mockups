@@ -1,197 +1,179 @@
+import { Link } from "react-router-dom";
+import { CblmPageLayout } from "@/app/components/competency-based-learning-materials/CblmEditorLayout";
+import { CblmModal } from "@/app/components/competency-based-learning-materials/CblmPrimitives";
 import {
-  ArrowDownTrayIcon,
-  DocumentTextIcon,
-} from "@heroicons/react/24/outline";
-import { ArrowLeftIcon, EyeIcon } from "lucide-react";
-import { ButtonLink, SectionCard, Status, StatusBadge } from "./Dashboard";
-import { Breadcrumbs } from "../pageUtils";
+  CblmToast,
+  useCblmToast,
+  useModal,
+} from "@/app/components/competency-based-learning-materials/cblmMockupHooks";
+import { ucMeta } from "@/app/data/cblmData";
+import { cblm, cblmBtn } from "@/app/components/competency-based-learning-materials/cblmClasses";
+
+const readinessRows = [
+  { section: "Front Matter", dot: "#1B3A5C", sheets: "6 / 6", pct: 100, status: "✓ Included", color: "#2E7D32" },
+  { section: "LO 1 — Prepare", dot: "#1565C0", sheets: "6 / 11", pct: 55, status: "✓ Included", color: "#2E7D32", warn: true },
+  { section: "LO 2 — Inspect", dot: "#1565C0", sheets: "0 / 11", pct: 0, status: "No validated sheets", color: "#BDBDBD", warn: true },
+  { section: "LO 3 — Document", dot: "#1565C0", sheets: "0 / 3", pct: 0, status: "No validated sheets", color: "#BDBDBD", warn: true },
+  { section: "Step 3 — Consolidation", dot: "#2E7D32", sheets: "0 / 3", pct: 0, status: "No validated sheets", color: "#BDBDBD", warn: true },
+  { section: "Video Scripts", dot: "#7C3AED", sheets: "1 / 4", pct: 25, status: "✓ Included (draft)", color: "#2E7D32", warn: true },
+];
 
 export function CBLMExport() {
-  const sections = [
-    ["Front Cover", "1 page", "validated"],
-    ["How to Use This Module", "1 page", "validated"],
-    ["List of Competencies (All 14 modules)", "2 pages", "validated"],
-    ["Module Content Summary — Module 5", "1 page", "validated"],
-    ["LO 1 — IS, SC, AK, TS, PCC", "8 sheets", "validated"],
-    ["LO 2 — IS 5.2.1, SC 5.2.1, AK, TS, PCC", "8 sheets", "review"],
-    ["LO 3 — IS, SC, AK, TS, PCC, OS", "6 sheets", "validated"],
-    ["LO 4 — IS, SC, AK", "6 sheets", "validated"],
-    ["Job Sheet (JS 5)", "1 sheet", "validated"],
-    ["Learning Experiences Table", "4 LO tables", "validated"],
-    ["References — Consolidated", "1 page", "validated"],
-  ];
+  const { toast, showToast } = useCblmToast();
+  const modal = useModal();
 
   return (
-    <div className="mx-auto max-w-8xl p-6 text-gray-800">
-      <Breadcrumbs
-        items={[
-          {
-            label: "Sector Details",
-            href: `#`,
-          },
-          {
-            label: "Sector Projects",
-            href: `/`,
-          },
-          {
-            label: "Competency Based Learning Materials (CBLM)",
-            href: `/cblm`,
-          },
-          {
-            label: "Module",
-            href: `/cblm/module`,
-          },
-          {
-            label: `Export`,
-            href: `/cblm/export`,
-          },
-        ]}
-      />
+    <CblmPageLayout>
+      <div className={cblm.breadcrumb}>
+        <Link to="/">CBC</Link>
+        {" › "}
+        <Link to="/cblm">
+          {ucMeta.code} CBLM
+        </Link>
+        {" › "}
+        <strong>Export .docx</strong>
+      </div>
 
-      <div className="mb-5 flex items-start justify-between gap-4">
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20 }}>
         <div>
-          <h1 className="text-[22px] font-bold text-gray-900">Export CBLM</h1>
-          <p className="text-sm text-gray-600">
-            Module 5 — Provide Effective Customer Service · Food and Beverage
-            Services NC II
+          <h1 style={{ fontSize: 20, fontWeight: 600, marginBottom: 4 }}>
+            Export CBLM — {ucMeta.code}
+          </h1>
+          <p style={{ fontSize: 14, color: "#666" }}>{ucMeta.titleLower}</p>
+          <p style={{ fontSize: 12, color: "#999", marginTop: 4 }}>
+            {ucMeta.project} · {ucMeta.module} · Document No: {ucMeta.documentNo} · Revision No:{" "}
+            {ucMeta.revision}
           </p>
         </div>
-        <div className="flex gap-2">
-          <ButtonLink to="/cblm/module" variant="outline">
-            <ArrowLeftIcon className="h-4 w-4" />
-            Back to Module
-          </ButtonLink>
-          <button className="inline-flex items-center gap-2 rounded bg-[#1B3A5C] px-4 py-2 text-xs font-semibold text-white">
-            <ArrowDownTrayIcon className="h-4 w-4" />
-            Export as .docx
+        <div style={{ display: "flex", gap: 8 }}>
+          <Link to="/cblm" className={cblmBtn("secondary")}>
+            ← Back to Module
+          </Link>
+          <button type="button" className={cblmBtn("primary")} onClick={() => modal.open("exportModal")}>
+            ⬇ Export as .docx
           </button>
         </div>
       </div>
 
-      <SectionCard className="mb-5 overflow-hidden">
-        <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
-          <span className="text-sm font-semibold">Export Readiness</span>
-          <span className="text-xs font-semibold text-orange-700">
-            2 sheets not yet validated — marked [DRAFT] in export
-          </span>
+      <div
+        style={{
+          background: "#FFF3E0",
+          border: "1px solid #FFB74D",
+          borderRadius: 4,
+          padding: "12px 16px",
+          marginBottom: 20,
+        }}
+      >
+        <div style={{ fontWeight: 600, color: "#E65100", marginBottom: 4 }}>
+          21 of 34 content sheets are not yet validated
         </div>
-        <div className="p-5">
-          <div className="mb-2 flex justify-between text-sm">
-            <span className="text-gray-600">
-              Overall validation:{" "}
-              <strong className="text-gray-900">
-                27 of 29 sheets validated
-              </strong>
-            </span>
-            <span className="font-semibold text-orange-700">93%</span>
-          </div>
-          <div className="mb-4 h-2 overflow-hidden rounded bg-gray-200">
-            <div
-              className="h-full rounded bg-orange-500"
-              style={{ width: "93%" }}
-            />
-          </div>
-          <table className="w-full text-sm">
-            <tbody>
-              {["LO 1", "LO 2", "LO 3", "LO 4", "Job Sheet", "LET"].map(
-                (section, index) => (
-                  <tr className="border-t border-gray-100" key={section}>
-                    <td className="px-3 py-2 font-medium">{section}</td>
-                    <td className="px-3 py-2">
-                      <StatusBadge
-                        status={index === 1 ? "review" : "validated"}
-                      />
-                    </td>
-                    <td className="px-3 py-2 text-gray-600">
-                      {index === 1 ? "5/7 sheets" : "Complete"}
-                    </td>
-                  </tr>
-                ),
-              )}
-            </tbody>
-          </table>
+        <div style={{ fontSize: 12, color: "#795548" }}>
+          Unvalidated sheets will be included but marked <strong>[DRAFT]</strong>. Finalize all sheets
+          before distributing externally.
         </div>
-      </SectionCard>
+      </div>
 
-      <SectionCard className="mb-5 overflow-hidden">
-        <div className="flex items-center gap-3 border-b border-gray-200 px-5 py-4">
-          <span className="text-sm font-semibold">Section Toggles</span>
-          <span className="text-xs text-gray-500">
-            Uncheck to exclude sections from export
-          </span>
+      <div className={cblm.card}>
+        <div className={cblm.cardHdr}>
+          <span className={cblm.cardTitle}>Document Control — Export Metadata</span>
+          <Link to="/cblm/front-matter" style={{ fontSize: 12, color: "#1565C0" }}>
+            Edit in Front Matter →
+          </Link>
         </div>
-        {sections.map(([label, count, status]) => (
-          <label
-            className="flex items-center gap-3 border-b border-gray-100 px-5 py-3 last:border-b-0"
-            key={label}
-          >
-            <input
-              className="h-4 w-4 accent-blue-600"
-              defaultChecked
-              type="checkbox"
-            />
-            <span className="flex-1 text-sm">{label}</span>
-            <span className="text-xs text-gray-500">{count}</span>
-            <StatusBadge status={status as Status} />
-          </label>
-        ))}
-      </SectionCard>
-
-      <SectionCard className="mb-5 overflow-hidden">
-        <div className="border-b border-gray-200 px-5 py-4">
-          <div className="text-sm font-semibold">
-            TESDA Footer Configuration
-          </div>
-          <p className="mt-1 text-xs text-gray-500">
-            These values appear in the standard TESDA footer on every exported
-            page.
-          </p>
-        </div>
-        <div className="grid gap-4 p-5 sm:grid-cols-2">
+        <div className={cblm.cardBody} style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 0, padding: 0 }}>
           {[
-            ["Qualification Title", "Food and Beverage Services NC II"],
-            ["Module Title", "Provide Effective Customer Service"],
-            ["Date Developed", "2026-01-15"],
-            ["Document No.", "FBS-CBLM-M5-001"],
-            ["Issued by", "TESDA"],
-            ["Developed by", "[Institution Name]"],
-          ].map(([label, value]) => (
-            <label
-              className="text-xs font-semibold uppercase tracking-wide text-gray-500"
-              key={label}
-            >
-              {label}
-              <input
-                className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm font-normal normal-case text-gray-800"
-                defaultValue={value}
-              />
-            </label>
+            ["Document No.", ucMeta.documentNo],
+            ["Revision No.", ucMeta.revision],
+            ["Qualification", ucMeta.project],
+            ["Module", "Module 1 of 3"],
+          ].map(([l, v]) => (
+            <div key={l} style={{ padding: "14px 20px", borderRight: "1px solid #F0F0F0", borderBottom: "1px solid #F0F0F0" }}>
+              <div style={{ fontSize: 10, fontWeight: 600, color: "#999", textTransform: "uppercase", marginBottom: 4 }}>{l}</div>
+              <div style={{ fontSize: 13, fontWeight: 500, fontFamily: "monospace" }}>{v}</div>
+            </div>
           ))}
         </div>
-      </SectionCard>
+      </div>
 
-      <SectionCard className="p-5">
-        <div className="mb-4 text-sm font-semibold">Export Actions</div>
-        <div className="flex flex-wrap items-center gap-3">
-          <button className="inline-flex items-center gap-2 rounded bg-[#1B3A5C] px-5 py-3 text-sm font-semibold text-white">
-            <ArrowDownTrayIcon className="h-5 w-5" />
-            Export as .docx
-          </button>
-          <button className="inline-flex items-center gap-2 rounded border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-700">
-            <EyeIcon className="h-5 w-5" />
-            Preview in Browser
-          </button>
-          <button className="inline-flex items-center gap-2 rounded border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-700">
-            <DocumentTextIcon className="h-5 w-5" />
-            Copy Export Log
-          </button>
-          <span className="text-xs text-gray-400">Last export: Never</span>
+      <div className={cblm.card}>
+        <div className={cblm.cardHdr}>
+          <span className={cblm.cardTitle}>Sheet Readiness by Section</span>
+          <span style={{ fontSize: 12, color: "#666" }}>7 of 38 total sheets validated</span>
         </div>
-        <div className="mt-4 rounded border border-orange-200 bg-orange-50 p-3 text-xs text-orange-900">
-          2 sheets will be marked [DRAFT] in the export: IS 5.2.1 and SC 5.2.1
-          are awaiting trainer validation.
-        </div>
-      </SectionCard>
-    </div>
+        <table className={cblm.tbl}>
+          <thead>
+            <tr>
+              <th className={cblm.tblTh}>Section</th>
+              <th className={`${cblm.tblTh} w-[120px] text-center`}>Sheets</th>
+              <th className={`${cblm.tblTh} w-60`}>Readiness</th>
+              <th className={`${cblm.tblTh} w-[120px] text-center`}>Export Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {readinessRows.map((r) => (
+              <tr key={r.section} className={cblm.tblRow}>
+                <td className={cblm.tblTd}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: "50%", background: r.dot }} />
+                    <span style={{ fontSize: 13, fontWeight: 500 }}>{r.section}</span>
+                    {r.warn && (
+                      <span style={{ fontSize: 10, color: "#F57C00" }}>⚠ Unvalidated marked [DRAFT]</span>
+                    )}
+                  </div>
+                </td>
+                <td className={`${cblm.tblTd} text-center`}>{r.sheets}</td>
+                <td className={cblm.tblTd}>
+                  <div className="flex items-center gap-2">
+                    <div className={`${cblm.progBar} flex-1`}>
+                      <div
+                        className={cblm.progFill}
+                        style={{
+                          width: `${r.pct}%`,
+                          background: r.pct > 0 ? "#1565C0" : "#BDBDBD",
+                        }}
+                      />
+                    </div>
+                    <span style={{ fontSize: 12, color: "#666", width: 32 }}>{r.pct}%</span>
+                  </div>
+                </td>
+                <td className={`${cblm.tblTd} text-center text-xs`} style={{ color: r.color }}>{r.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <CblmModal
+        id="exportModal"
+        open={modal.isOpen("exportModal")}
+        onClose={modal.close}
+        title="Export CBLM as .docx"
+        darkHeader
+        footer={
+          <>
+            <button type="button" className={cblmBtn("secondary")} onClick={modal.close}>
+              Cancel
+            </button>
+            <button
+              type="button"
+              className={cblmBtn("primary")}
+              onClick={() => {
+                modal.close();
+                showToast("Export started — AUT-BEV-001.docx", "#1565C0");
+              }}
+            >
+              Download
+            </button>
+          </>
+        }
+      >
+        <p style={{ fontSize: 13, color: "#666" }}>
+          Generates a Word document following the TESDA CBLM template: front matter, module content,
+          sheets, job sheet, learning experiences table, and references.
+        </p>
+      </CblmModal>
+
+      <CblmToast toast={toast} />
+    </CblmPageLayout>
   );
 }

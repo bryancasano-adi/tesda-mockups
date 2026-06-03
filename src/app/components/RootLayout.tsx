@@ -12,9 +12,7 @@ export function RootLayout() {
   };
 
   const isNoVariantPage =
-    location.pathname === "/" ||
-    location.pathname === "/cats" ||
-    location.pathname === "/cblm";
+    location.pathname === "/" || location.pathname === "/cats";
   const variant = location.pathname.startsWith("/cblm") ? "cblm" : "cats";
 
   return (

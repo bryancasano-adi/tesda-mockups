@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import { RootLayout } from "./components/RootLayout";
 
 import { CATSDashboard } from "./pages/competency-assessment-tool/CATSDashboard";
@@ -25,11 +25,12 @@ import { NotFound } from "./pages/competency-assessment-tool/NotFound";
 import { LevelAlignmentMatrix } from "./pages/level-alignment-matrix/level-alignment-matrix";
 import { ImplementingGuidelines } from "./pages/implementing-guidelines/implementing-guidelines";
 import { LandingPage } from "./pages/LandingPage";
-import { CBLMDashboard } from "./pages/competency-based-learning-materials/Dashboard";
 import { CBLMModule } from "./pages/competency-based-learning-materials/Module";
 import { CBLMEditor } from "./pages/competency-based-learning-materials/Editor";
 import { CBLMFrontMatter } from "./pages/competency-based-learning-materials/FrontMatter";
 import { CBLMExport } from "./pages/competency-based-learning-materials/Export";
+import { VideoScriptsDashboard } from "./pages/competency-based-learning-materials/VideoScriptsDashboard";
+import { VideoScriptEditor } from "./pages/competency-based-learning-materials/VideoScriptEditor";
 
 export const router = createBrowserRouter([
   {
@@ -39,11 +40,12 @@ export const router = createBrowserRouter([
       { index: true, Component: LandingPage },
       { path: "/lam", Component: LevelAlignmentMatrix },
       { path: "/ig", Component: ImplementingGuidelines },
-      { path: "/cblm", Component: CBLMDashboard },
-      { path: "/cblm/module", Component: CBLMModule },
+      { path: "/cblm", Component: CBLMModule },
       { path: "/cblm/editor", Component: CBLMEditor },
       { path: "/cblm/front-matter", Component: CBLMFrontMatter },
       { path: "/cblm/export", Component: CBLMExport },
+      { path: "/cblm/video-scripts", Component: VideoScriptsDashboard },
+      { path: "/cblm/video-scripts/edit", Component: VideoScriptEditor },
       { path: "/cats", Component: CATSDashboard },
       { path: "/cats/evidence-plan", Component: EvidencePlanEditor },
       { path: "/cats/outline", Component: OutlineView },
