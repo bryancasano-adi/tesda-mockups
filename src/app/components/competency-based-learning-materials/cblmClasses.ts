@@ -176,6 +176,22 @@ export const cblm = {
   toggleRow:
     "flex items-center gap-2.5 border-b border-[#F0F0F0] px-5 py-2.5 last:border-b-0",
 
+  ddWrap: "relative inline-block",
+  ddWrapOpen: "z-50",
+  btnDots:
+    "flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded border border-[#E0E0E0] bg-white text-[#666] transition-colors hover:border-[#1565C0] hover:text-[#1565C0]",
+  btnDotsActive: "border-[#1565C0] bg-[#F5F8FF] text-[#1565C0]",
+  ddMenu:
+    "absolute right-0 top-[calc(100%+6px)] z-50 hidden min-w-[220px] rounded-[10px] border border-[#E0E0E0] bg-white py-1.5 shadow-[0_8px_28px_rgba(0,0,0,0.14)]",
+  ddMenuOpen: "block",
+  ddHdr:
+    "px-4 pb-0.5 pt-1 text-[10px] font-bold uppercase tracking-[0.07em] text-[#999]",
+  ddSep: "my-1 h-px bg-[#F0F0F0]",
+  ddItem:
+    "flex cursor-pointer items-center gap-2.5 whitespace-nowrap px-4 py-2 text-[13px] text-[#333] transition-colors hover:bg-[#F5F8FF] hover:text-[#1565C0]",
+  ddItemDisabled: "pointer-events-none cursor-not-allowed text-[#BDBDBD] hover:bg-transparent hover:text-[#BDBDBD]",
+  ddItemDanger: "text-[#C62828] hover:bg-[#FFF5F5] hover:text-[#C62828]",
+
   modalOverlay:
     "fixed inset-0 z-[100] hidden items-center justify-center bg-black/40 p-4",
   modalOverlayOpen: "flex",
@@ -250,4 +266,15 @@ export function cblmFieldRo(sourceClass?: string, className?: string) {
 
 export function cblmSourceTag(tagClass: string, className?: string) {
   return cn(cblm.spBt, CBLM_SOURCE_TAG_VARIANTS[tagClass], className);
+}
+
+export function cblmDdItem(
+  opts?: { disabled?: boolean; danger?: boolean; className?: string },
+) {
+  return cn(
+    cblm.ddItem,
+    opts?.disabled && cblm.ddItemDisabled,
+    opts?.danger && !opts?.disabled && cblm.ddItemDanger,
+    opts?.className,
+  );
 }

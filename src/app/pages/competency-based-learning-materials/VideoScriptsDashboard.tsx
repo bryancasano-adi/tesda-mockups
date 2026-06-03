@@ -1,15 +1,145 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { CblmPageLayout } from "@/app/components/competency-based-learning-materials/CblmEditorLayout";
-import { CblmModal } from "@/app/components/competency-based-learning-materials/CblmPrimitives";
+import { CblmDotsMenu, CblmModal } from "@/app/components/competency-based-learning-materials/CblmPrimitives";
 import {
   CblmToast,
   useCblmToast,
   useDropdown,
   useModal,
 } from "@/app/components/competency-based-learning-materials/cblmMockupHooks";
-import { ucMeta, videoScriptRows } from "@/app/data/cblmData";
-import { cblm, cblmBadge, cblmBtn } from "@/app/components/competency-based-learning-materials/cblmClasses";
+import { ucMeta, videoScriptRows, type VideoScriptRow } from "@/app/data/cblmData";
+import {
+  cblm,
+  cblmBadge,
+  cblmBtn,
+  cblmDdItem,
+} from "@/app/components/competency-based-learning-materials/cblmClasses";
+import { cn } from "@/app/components/ui/utils";
+
+function VsMenuItem({
+  disabled,
+  danger,
+  onClick,
+  to,
+  children,
+}: {
+  disabled?: boolean;
+  danger?: boolean;
+  onClick?: () => void;
+  to?: string;
+  children: ReactNode;
+}) {
+  const className = cblmDdItem({ disabled, danger, className: "w-full" });
+  if (to && !disabled) {
+    return (
+      <Link to={to} role="menuitem" className={className}>
+        {children}
+      </Link>
+    );
+  }
+  return (
+    <button
+      type="button"
+      role="menuitem"
+      disabled={disabled}
+      className={className}
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  );
+}
+
+function sheetEditorHref(code: string) {
+  return `/cblm/video-scripts/edit?sheet=${encodeURIComponent(code)}`;
+}
+
+function RowActions({
+  row,
+  dd,
+  showToast,
+}: {
+  row: VideoScriptRow;
+  dd: ReturnType<typeof useDropdown>;
+  showToast: (msg: string, color?: string) => void;
+}) {
+  const menuId = `vs-row-${row.id}`;
+  const editorHref = sheetEditorHref(row.code);
+  const hasScript = row.scriptBadge === "b-draft";
+  const notGenerated = row.scriptBadge === "b-pending";
+  const locked = !row.eligible || row.scriptBadge === "b-locked";
+
+  return (
+    <div className="flex items-center justify-end gap-2">
+      {hasScript && (
+        <Link to={editorHref} className={cblmBtn("secondary", "text-[11px] px-2.5 py-1")}>
+          View / Edit
+        </Link>
+      )}
+      {notGenerated && row.eligible && (
+        <button
+          type="button"
+          className={cblmBtn("primary", "text-[11px] px-2.5 py-1")}
+          onClick={() => showToast(`Generating ${row.code} script…`, "#1565C0")}
+        >
+          Generate
+        </button>
+      )}
+      {locked && (
+        <span className="text-xs text-[#BDBDBD]">🔒 Finalize CBLM first</span>
+      )}
+
+      <CblmDotsMenu
+        menuId={menuId}
+        header={`${row.code} — Video Script`}
+        open={dd.isOpen(menuId)}
+        onToggle={(e) => dd.toggle(menuId, e)}
+      >
+        <VsMenuItem disabled={!hasScript} to={hasScript ? editorHref : undefined}>
+          View Script
+        </VsMenuItem>
+        <VsMenuItem disabled={!hasScript} to={hasScript ? editorHref : undefined}>
+          Edit Script
+        </VsMenuItem>
+        <div className={cblm.ddSep} />
+        {hasScript && (
+          <VsMenuItem
+            disabled
+            onClick={() => showToast(`Regenerating ${row.code}…`, "#1565C0")}
+          >
+            Regenerate Script
+          </VsMenuItem>
+        )}
+        {notGenerated && row.eligible && (
+          <VsMenuItem onClick={() => showToast(`Generating ${row.code} script…`, "#1565C0")}>
+            Generate Script
+          </VsMenuItem>
+        )}
+        <VsMenuItem
+          disabled={!hasScript}
+          onClick={() => showToast(`Exporting ${row.code}…`, "#1565C0")}
+        >
+          Export Script (.docx)
+        </VsMenuItem>
+        {locked && (
+          <>
+            <div className={cblm.ddSep} />
+            <VsMenuItem disabled>🔒 Finalize CBLM first</VsMenuItem>
+          </>
+        )}
+        <div className={cblm.ddSep} />
+        <VsMenuItem
+          danger
+          disabled={!hasScript}
+          onClick={() => showToast(`Delete ${row.code} script`, "#C62828")}
+        >
+          Delete Script
+        </VsMenuItem>
+      </CblmDotsMenu>
+    </div>
+  );
+}
 
 export function VideoScriptsDashboard() {
   const { toast, showToast } = useCblmToast();
@@ -39,7 +169,7 @@ export function VideoScriptsDashboard() {
             One script per Task Sheet or Job Sheet · Two-column AUDIO | VIDEO format · 3–5 min target
           </p>
         </div>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <div className={cn("relative flex items-center gap-2", dd.isOpen("vs-all") && "z-50")}>
           <button
             type="button"
             className={cblmBtn("primary")}
@@ -47,6 +177,23 @@ export function VideoScriptsDashboard() {
           >
             Generate Selected
           </button>
+          <CblmDotsMenu
+            menuId="vs-all-menu"
+            header="All Video Scripts"
+            open={dd.isOpen("vs-all")}
+            onToggle={(e) => dd.toggle("vs-all", e)}
+          >
+            <VsMenuItem onClick={() => showToast("Exporting all scripts…", "#1565C0")}>
+              Export all scripts (.docx)
+            </VsMenuItem>
+            <VsMenuItem onClick={() => showToast("Preparing download…", "#1565C0")}>
+              Download all scripts (.zip)
+            </VsMenuItem>
+            <div className={cblm.ddSep} />
+            <VsMenuItem onClick={() => showToast("Regenerating eligible scripts…", "#1565C0")}>
+              Regenerate all eligible scripts
+            </VsMenuItem>
+          </CblmDotsMenu>
         </div>
       </div>
 
@@ -89,7 +236,17 @@ export function VideoScriptsDashboard() {
             <div style={{ fontSize: 12, fontWeight: 600, color: "#555", marginBottom: 6 }}>
               Generation Mode
             </div>
-            <select className={cblm.fieldInput} style={{ width: 160 }} defaultValue="selected">
+            <select
+              className={cn(
+                cblm.fieldInput,
+                "cursor-pointer appearance-none bg-[length:12px] bg-[right_10px_center] bg-no-repeat pr-9",
+              )}
+              style={{
+                width: 160,
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 26' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+              }}
+              defaultValue="selected"
+            >
               <option value="selected">Selected only</option>
               <option value="all">All eligible sheets</option>
             </select>
@@ -97,7 +254,7 @@ export function VideoScriptsDashboard() {
         </div>
       </div>
 
-      <div className={cblm.card}>
+      <div className={cn(cblm.card, "overflow-visible")}>
         <div className={cblm.cardHdr}>
           <span className={cblm.cardTitle}>Task & Job Sheets — Script Status</span>
           <span style={{ fontSize: 12, color: "#666" }}>3 of 4 sheets eligible · 1 script in draft</span>
@@ -115,7 +272,10 @@ export function VideoScriptsDashboard() {
           </thead>
           <tbody>
             {rows.map((row) => (
-              <tr key={row.id} className={cblm.tblRow}>
+              <tr
+                key={row.id}
+                className={cn(cblm.tblRow, dd.isOpen(`vs-row-${row.id}`) && "relative z-50")}
+              >
                 <td className={cblm.tblTd}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <input
@@ -154,25 +314,46 @@ export function VideoScriptsDashboard() {
                 </td>
                 <td className={`${cblm.tblTd} text-center text-xs text-[#666]`}>{row.duration}</td>
                 <td className={cblm.tblTd}>
-                  <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
-                    {row.eligible ? (
-                      <Link
-                        to={`/cblm/video-scripts/edit?sheet=${encodeURIComponent(row.code)}`}
-                        className={cblmBtn("secondary", "text-[11px] px-2.5 py-1")}
-                      >
-                        View / Edit
-                      </Link>
-                    ) : (
-                      <button type="button" className={cblmBtn("lock", "text-[11px]")}>
-                        Locked
-                      </button>
-                    )}
-                  </div>
+                  <RowActions row={row} dd={dd} showToast={showToast} />
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className={cblm.card}>
+        <div className={cblm.cardHdr}>
+          <span className={cblm.cardTitle}>Video Script Format</span>
+        </div>
+        <div className={cn(cblm.cardBody, "grid grid-cols-2 gap-5")}>
+          <div>
+            <div className="mb-2 text-xs font-semibold text-[#555]">Document Structure</div>
+            <div className="flex flex-col gap-1 text-xs text-[#666]">
+              <div className="rounded-sm border border-[#E0E0E0] bg-[#FAFAFA] px-2.5 py-1.5 font-mono text-[#999] italic">
+                OBB — Opening Billboard (read-only)
+              </div>
+              <div className="rounded-sm border border-[#BBDEFB] bg-[#E3F2FD] px-2.5 py-1.5">
+                Generated rows — one per procedure step
+              </div>
+              <div className="rounded-sm border border-[#E0E0E0] bg-[#FAFAFA] px-2.5 py-1.5 font-mono text-[#999] italic">
+                CBB — Closing Billboard (read-only)
+              </div>
+            </div>
+          </div>
+          <div>
+            <div className="mb-2 text-xs font-semibold text-[#555]">Generation Rules</div>
+            <div className="text-xs leading-8 text-[#666]">
+              <ul className="list-disc ml-5 *:-mb-2">
+                <li>Second-person &ldquo;You&rdquo; point of view</li>
+                <li>Short sentences — conversational but formal</li>
+                <li>PCC quality standards integrated into steps</li>
+                <li>Source: Finalized Task Sheet + paired PCC</li>
+              </ul>
+         
+            </div>
+          </div>
+        </div>
       </div>
 
       <CblmModal

@@ -217,4 +217,55 @@ export function CblmModal({
   );
 }
 
+function DotsIcon() {
+  return (
+    <svg width={16} height={16} fill="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <circle cx={12} cy={5} r={1.5} />
+      <circle cx={12} cy={12} r={1.5} />
+      <circle cx={12} cy={19} r={1.5} />
+    </svg>
+  );
+}
+
+export function CblmDotsMenu({
+  menuId,
+  header,
+  open,
+  onToggle,
+  children,
+}: {
+  menuId: string;
+  header?: string;
+  open: boolean;
+  onToggle: (e: React.MouseEvent) => void;
+  children: ReactNode;
+}) {
+  return (
+    <div
+      className={cn(cblm.ddWrap, open && cblm.ddWrapOpen)}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <button
+        type="button"
+        className={cn(cblm.btnDots, open && cblm.btnDotsActive)}
+        onClick={onToggle}
+        title="More actions"
+        aria-expanded={open}
+        aria-haspopup="menu"
+        aria-controls={menuId}
+      >
+        <DotsIcon />
+      </button>
+      <div
+        id={menuId}
+        role="menu"
+        className={cn(cblm.ddMenu, open && cblm.ddMenuOpen)}
+      >
+        {header && <div className={cblm.ddHdr}>{header}</div>}
+        {children}
+      </div>
+    </div>
+  );
+}
+
 export { CBLM_SOURCE_VARIANTS };
