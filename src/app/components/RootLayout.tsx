@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
+import { isCblmRoute } from "@/app/utils/cblmRoutes";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
 
@@ -12,10 +13,8 @@ export function RootLayout() {
   };
 
   const isNoVariantPage =
-    location.pathname === "/" ||
-    location.pathname === "/cats" ||
-    location.pathname === "/cblm";
-  const variant = location.pathname.startsWith("/cblm") ? "cblm" : "cats";
+    location.pathname === "/" || location.pathname === "/cats";
+  const variant = isCblmRoute(location.pathname) ? "cblm" : "cats";
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">

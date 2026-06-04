@@ -1,383 +1,205 @@
-import { Status } from "../pages/competency-based-learning-materials/Dashboard";
+import type { Status } from "../pages/competency-based-learning-materials/Dashboard";
 
+export const CBLM_PROJECT_NAME = "BEV Servicing Level II";
+
+export const ucMeta = {
+  code: "UC-001",
+  title: "Carry Out Inspection of Electric Vehicle for Fleet Operations",
+  titleLower: "Carry out inspection of electric vehicle for fleet operations",
+  project: CBLM_PROJECT_NAME,
+  module: "Module 1",
+  unitCode: "AUTBEV311201",
+  sector: "Automotive",
+  ncLevel: "Level II",
+  qualificationName: "Battery Electric Vehicle (BEV) Servicing Level II",
+  qualificationShort: "BEV Servicing LII",
+  qualificationCode: "TRS322201",
+  documentNo: "AUT-BEV-001",
+  revision: "00",
+};
+
+export type SheetNavItem = {
+  id: string;
+  label: string;
+  badge: string;
+  badgeClass: string;
+  dotColor: string;
+  sub?: boolean;
+  href?: string;
+  section?: string;
+};
+
+export const moduleSheetNavItems: SheetNavItem[] = [
+  { id: "lo1-h", label: "LO 1 — Prepare for inspection — None", badge: "--", badgeClass: "snb-pend", dotColor: "#BDBDBD" },
+  { id: "is-1-1-1", label: "IS 1.1.1 — Safety Protocols for EV Inspection", badge: "✓ Finalized", badgeClass: "snb-done", dotColor: "#2E7D32", href: "/cblm/editor?page=information-sheet" },
+  { id: "sc-1-1-1", label: "SC 1.1.1 — Self-Check — Safety", badge: "✓ Finalized", badgeClass: "snb-done", dotColor: "#2E7D32", sub: true },
+  { id: "ak-1-1-1", label: "AK 1.1.1 — Answer Key — Safety", badge: "✓ Finalized", badgeClass: "snb-done", dotColor: "#2E7D32", sub: true },
+  { id: "is-1-1-2", label: "IS 1.1.2 — PPE Requirements", badge: "✓ Finalized", badgeClass: "snb-done", dotColor: "#2E7D32" },
+  { id: "is-1-1-3", label: "IS 1.1.3 — Inspection Tools", badge: "Draft", badgeClass: "snb-active", dotColor: "#1565C0", href: "/cblm/editor?page=information-sheet" },
+  { id: "ts-1-1-1", label: "TS 1.1.1 — Prepare EV Safety Check", badge: "🔒 Locked", badgeClass: "snb-lock", dotColor: "#E0E0E0", href: "/cblm/editor?page=task-sheet" },
+  { id: "lo2-h", label: "LO 2 — Visual inspection — None", badge: "--", badgeClass: "snb-pend", dotColor: "#BDBDBD" },
+  { id: "lo3-h", label: "LO 3 — Documentation — None", badge: "--", badgeClass: "snb-pend", dotColor: "#BDBDBD" },
+  { id: "js-1", label: "JS 1 — Job Sheet", badge: "🔒 Locked", badgeClass: "snb-lock", dotColor: "#E0E0E0", href: "/cblm/editor?page=job-sheet" },
+  { id: "let-1", label: "LET — Learning Exp. Table", badge: "🔒 Locked", badgeClass: "snb-lock", dotColor: "#E0E0E0", href: "/cblm/editor?page=learning-experiences-table" },
+];
+
+export type FrontMatterKind =
+  | "cover"
+  | "rev-history"
+  | "howto"
+  | "list"
+  | "module-content"
+  | "prerequisites";
+
+export const frontMatterNavItems: SheetNavItem[] = [
+  { id: "cover", label: "Cover", badge: "Front Cover", badgeClass: "snb-active", dotColor: "#1565C0", href: "/cblm/front-matter?page=cover" },
+  { id: "rev-history", label: "Rev History", badge: "Revision History", badgeClass: "snb-pend", dotColor: "#BDBDBD", href: "/cblm/front-matter?page=rev-history" },
+  { id: "howto", label: "How to Use", badge: "How to Use Module", badgeClass: "snb-pend", dotColor: "#BDBDBD", href: "/cblm/front-matter?page=howto" },
+  { id: "list", label: "List of Comp.", badge: "List of Competencies", badgeClass: "snb-pend", dotColor: "#BDBDBD", href: "/cblm/front-matter?page=list" },
+  { id: "module-content", label: "Module Content", badge: "Module Content Summary", badgeClass: "snb-pend", dotColor: "#BDBDBD", href: "/cblm/front-matter?page=module-content" },
+  { id: "prerequisites", label: "Prerequisites", badge: "Prerequisites", badgeClass: "snb-pend", dotColor: "#BDBDBD", href: "/cblm/front-matter?page=prerequisites" },
+  { id: "goto-sheets", label: "Go to Sheet Editors", badge: "LO 1 →", badgeClass: "snb-active", dotColor: "#1565C0", href: "/cblm/editor?page=information-sheet" },
+];
+
+export const frontMatterMeta: Record<
+  FrontMatterKind,
+  { label: string; title: string }
+> = {
+  cover: { label: "Front Cover", title: "Front Cover" },
+  "rev-history": { label: "Revision History", title: "Revision History" },
+  howto: { label: "How to Use Module", title: "How to Use This Module" },
+  list: { label: "List of Competencies", title: "List of Competencies" },
+  "module-content": { label: "Module Content", title: "Module Content Summary" },
+  prerequisites: { label: "Prerequisites", title: "Prerequisites" },
+};
+
+export type ModuleSheetRow = {
+  type: string;
+  typeColor: string;
+  typeBg: string;
+  code: string;
+  title: string;
+  status: string;
+  badgeClass: string;
+  locked?: boolean;
+  editorHref?: string;
+};
+
+export type ModuleLo = {
+  no: number;
+  title: string;
+  badge: string;
+  badgeClass: string;
+  defaultOpen?: boolean;
+  sheets: ModuleSheetRow[];
+};
+
+export const moduleLearningOutcomes: ModuleLo[] = [
+  {
+    no: 1,
+    title: "Prepare for EV inspection — Safety, PPE, Tools",
+    badge: "Partially Finalized",
+    badgeClass: "b-draft",
+    defaultOpen: true,
+    sheets: [
+      { type: "IS", typeColor: "#1565C0", typeBg: "#1565C022", code: "IS 1.1.1", title: "Safety Protocols for EV Inspection", status: "Finalized", badgeClass: "snb-done", editorHref: "/cblm/editor?page=information-sheet" },
+      { type: "SC", typeColor: "#7C3AED", typeBg: "#7C3AED22", code: "SC 1.1.1", title: "Self-Check — Safety Protocols", status: "Finalized", badgeClass: "snb-done" },
+      { type: "AK", typeColor: "#2E7D32", typeBg: "#2E7D3222", code: "AK 1.1.1", title: "Answer Key — Safety Protocols", status: "Finalized", badgeClass: "snb-done" },
+      { type: "IS", typeColor: "#1565C0", typeBg: "#1565C022", code: "IS 1.1.2", title: "PPE Requirements for HV Work", status: "Finalized", badgeClass: "snb-done" },
+      { type: "IS", typeColor: "#1565C0", typeBg: "#1565C022", code: "IS 1.1.3", title: "Inspection Tools and Equipment", status: "Draft", badgeClass: "b-draft", editorHref: "/cblm/editor?page=information-sheet" },
+      { type: "TS", typeColor: "#F57C00", typeBg: "#F57C0022", code: "TS 1.1.1", title: "Perform Pre-Inspection EV Safety Preparation", status: "Locked", badgeClass: "b-locked", locked: true, editorHref: "/cblm/editor?page=task-sheet" },
+    ],
+  },
+  {
+    no: 2,
+    title: "Conduct visual inspection of EV exterior and systems",
+    badge: "Not Started",
+    badgeClass: "b-pending",
+    sheets: [
+      { type: "IS", typeColor: "#1565C0", typeBg: "#1565C022", code: "IS 1.2.1", title: "Exterior Inspection Procedures", status: "Not Started", badgeClass: "b-pending" },
+    ],
+  },
+  {
+    no: 3,
+    title: "Document inspection findings and report standards",
+    badge: "Not Started",
+    badgeClass: "b-pending",
+    sheets: [
+      { type: "IS", typeColor: "#1565C0", typeBg: "#1565C022", code: "IS 1.3.1", title: "Report Standards and Documentation", status: "Not Started", badgeClass: "b-pending" },
+    ],
+  },
+];
+
+export const moduleReferences = [
+  { name: "AUTBEV-CS-2025-v2.pdf", type: "CS", usedIn: "IS 1.1.1, IS 1.1.2, TS 1.1.1", flagged: false },
+  { name: "AUTBEV-CBC-2025-v1.pdf", type: "CBC", usedIn: "IS 1.1.1, LO 1.1", flagged: false },
+  { name: "CLM-UC001-2025.pdf", type: "CLM", usedIn: "IS 1.1.1", flagged: true },
+];
+
+export type VideoScriptRow = {
+  id: string;
+  type: "TS" | "JS";
+  code: string;
+  title: string;
+  cblmStatus: string;
+  cblmBadge: string;
+  scriptStatus: string;
+  scriptBadge: string;
+  duration: string;
+  eligible: boolean;
+  checked?: boolean;
+};
+
+export const videoScriptRows: VideoScriptRow[] = [
+  { id: "ts-1-1-1", type: "TS", code: "TS 1.1.1", title: "Perform Pre-Inspection EV Safety Preparation", cblmStatus: "Finalized", cblmBadge: "b-finalized", scriptStatus: "Draft", scriptBadge: "b-draft", duration: "45 min", eligible: true, checked: true },
+  { id: "ts-1-2-1", type: "TS", code: "TS 1.2.1", title: "Conduct Exterior Visual Inspection", cblmStatus: "Finalized", cblmBadge: "b-finalized", scriptStatus: "Not Generated", scriptBadge: "b-pending", duration: "—", eligible: true },
+  { id: "ts-1-2-2", type: "TS", code: "TS 1.2.2", title: "Inspect HV System Warning Indicators", cblmStatus: "Finalized", cblmBadge: "b-finalized", scriptStatus: "Not Generated", scriptBadge: "b-pending", duration: "—", eligible: true },
+  { id: "js-1", type: "JS", code: "JS 1", title: "Integrated EV Fleet Inspection Job Sheet", cblmStatus: "Draft", cblmBadge: "b-draft", scriptStatus: "Locked", scriptBadge: "b-locked", duration: "—", eligible: false },
+];
+
+/** Dashboard module list — keep structure for /cblm */
 export const modules = [
-  {
-    group: "Basic Competencies",
-    color: "bg-slate-600",
-    items: [
-      {
-        no: "Mod 1",
-        title: "Participate in Workplace Communication",
-        code: "500311105",
-        duration: "8 hrs",
-        status: "fetched",
-        los: "Auto-fetched",
-      },
-      {
-        no: "Mod 2",
-        title: "Work in a Team Environment",
-        code: "500311106",
-        duration: "4 hrs",
-        status: "fetched",
-        los: "Auto-fetched",
-      },
-      {
-        no: "Mod 3",
-        title: "Practice Career Professionalism",
-        code: "500311107",
-        duration: "4 hrs",
-        status: "fetched",
-        los: "Auto-fetched",
-      },
-    ],
-  },
-  {
-    group: "Common Competencies",
-    color: "bg-blue-600",
-    items: [
-      {
-        no: "Mod 4",
-        title:
-          "Implement and Monitor Infection Control Policies and Procedures",
-        code: "TRS141201",
-        duration: "8 hrs",
-        status: "validated",
-        los: "3 LOs · 12 sheets",
-      },
-      {
-        no: "Mod 5",
-        title: "Provide Effective Customer Service",
-        code: "TRS141202",
-        duration: "16 hrs",
-        status: "review",
-        los: "4 LOs · 18 sheets",
-        current: true,
-      },
-      {
-        no: "Mod 6",
-        title: "Maintain an Effective Relationship with Clients/Customers",
-        code: "TRS141203",
-        duration: "8 hrs",
-        status: "generating",
-        los: "3 LOs · ~13 sheets",
-      },
-      {
-        no: "Mod 7",
-        title: "Manage Own Performance",
-        code: "TRS141204",
-        duration: "4 hrs",
-        status: "not-started",
-        los: "2 LOs · ~8 sheets",
-      },
-      {
-        no: "Mod 8",
-        title: "Develop and Update Industry Knowledge",
-        code: "TRS141205",
-        duration: "8 hrs",
-        status: "not-started",
-        los: "2 LOs · ~9 sheets",
-      },
-    ],
-  },
   {
     group: "Core Competencies",
     color: "bg-green-700",
     items: [
       {
-        no: "Mod 9",
-        title: "Prepare the Bar/Counter Area",
-        code: "TRS322201",
-        duration: "12 hrs",
-        status: "not-started",
-        los: "3 LOs · ~15 sheets",
-      },
-      {
-        no: "Mod 10",
-        title: "Perform Bar/Counter Service",
-        code: "TRS322202",
+        no: "Mod 1",
+        title: "Carry out inspection of electric vehicle for fleet operations",
+        code: "AUTBEV311201",
         duration: "24 hrs",
-        status: "not-started",
-        los: "5 LOs · ~25 sheets",
-      },
-      {
-        no: "Mod 11",
-        title: "Prepare Alcoholic and Non-Alcoholic Beverages",
-        code: "TRS322203",
-        duration: "32 hrs",
-        status: "not-started",
-        los: "6 LOs · ~30 sheets",
-      },
-      {
-        no: "Mod 12",
-        title: "Prepare Cocktails",
-        code: "TRS322204",
-        duration: "16 hrs",
-        status: "not-started",
-        los: "3 LOs · ~15 sheets",
-      },
-      {
-        no: "Mod 13",
-        title: "Provide Room Service",
-        code: "TRS322205",
-        duration: "16 hrs",
-        status: "not-started",
-        los: "4 LOs · ~18 sheets",
-      },
-      {
-        no: "Mod 14",
-        title: "Process Payment/Transactions",
-        code: "TRS322206",
-        duration: "12 hrs",
-        status: "not-started",
-        los: "3 LOs · ~13 sheets",
+        status: "review" as Status,
+        los: "3 LOs · 21 sheets",
+        current: true,
       },
     ],
   },
 ];
 
-export const learningOutcomes = [
-  {
-    no: 1,
-    title: "Maintain a professional appearance and positive attitude",
-    meta: "4 content items · 4 hr · 3 assessment criteria",
-    status: "validated" as Status,
-    sheets: [
-      [
-        "information-sheet",
-        "IS 5.1.1",
-        "Personal Hygiene and Grooming Standards",
-        "validated",
-      ],
-      ["self-check", "SC 5.1.1", "Multiple Choice · 5 items", "validated"],
-      ["answer-key", "AK 5.1.1", "Answers for SC 5.1.1", "validated"],
-      [
-        "information-sheet",
-        "IS 5.1.2",
-        "Communication Skills in Customer Interaction",
-        "validated",
-      ],
-      [
-        "self-check",
-        "SC 5.1.2 · AK 5.1.2",
-        "Matching Type · 5 items",
-        "validated",
-      ],
-      [
-        "task-sheet",
-        "TS 5.1.1",
-        "Demonstrate Professional Greeting and Service Approach",
-        "validated",
-      ],
-      [
-        "performance-criterion",
-        "PCC 5.1.1",
-        "Did you... YES/NO checklist + trainer signature",
-        "validated",
-      ],
-    ],
-  },
-
-  {
-    no: 2,
-    title: "Handle customer inquiries and complaints effectively",
-    meta: "3 content items · 6 hr · 4 assessment criteria",
-    status: "review" as Status,
-    sheets: [
-      [
-        "information-sheet",
-        "IS 5.2.1",
-        "Customer Complaint Handling Procedures",
-        "review",
-      ],
-      ["self-check", "SC 5.2.1", "Multiple Choice · 5 items", "review"],
-      [
-        "answer-key",
-        "AK 5.2.1",
-        "Answers and rationales for SC 5.2.1",
-        "generated",
-      ],
-      [
-        "information-sheet",
-        "IS 5.2.2",
-        "Service Recovery Techniques",
-        "generated",
-      ],
-      ["self-check", "SC 5.2.2 · AK 5.2.2", "Essay · 2 items", "generated"],
-      [
-        "task-sheet",
-        "TS 5.2.1",
-        "Conduct a Complaint Resolution Role-Play",
-        "generated",
-      ],
-      [
-        "performance-criterion",
-        "PCC 5.2.1",
-        "Did you... YES/NO checklist + Trainer signature",
-        "generated",
-      ],
-    ],
-  },
-
-  // ✅ LO 3 — MATCHES HTML MOCKUP EXACTLY
-  {
-    no: 3,
-    title: "Process and follow up customer requests efficiently",
-    meta: "2 content items · 4 hr",
-    status: "validated" as Status,
-
-    // this summary text is what appears in collapsed body
-    summary:
-      "IS 5.3.1 · SC 5.3.1 · AK 5.3.1 · IS 5.3.2 · SC 5.3.2 · AK 5.3.2 · TS 5.3.1 · PCC 5.3.1 — all validated",
-
-    // special OS preview card
-    observationSheet: {
-      code: "OS 5.3.1",
-      title: "Operating the Commercial Espresso Machine",
-      description:
-        "LLM generated this because LO 3 conditions list a commercial espresso machine (powered equipment). Simple hand tools do not trigger OS generation.",
-      status: "validated" as Status,
-    },
-
-    sheets: [
-      [
-        "information-sheet",
-        "IS 5.3.1",
-        "Request Processing Procedures",
-        "validated",
-      ],
-
-      ["self-check", "SC 5.3.1", "Short Answer · 5 items", "validated"],
-
-      ["answer-key", "AK 5.3.1", "Answers for SC 5.3.1", "validated"],
-
-      [
-        "information-sheet",
-        "IS 5.3.2",
-        "Customer Follow-Up and Coordination",
-        "validated",
-      ],
-
-      ["self-check", "SC 5.3.2", "Identification Type · 5 items", "validated"],
-
-      [
-        "task-sheet",
-        "TS 5.3.1",
-        "Process Customer Requests and Follow-Up Actions",
-        "validated",
-      ],
-
-      [
-        "performance-criterion",
-        "PCC 5.3.1",
-        "Customer request processing performance checklist",
-        "validated",
-      ],
-    ],
-  },
-
-  // ✅ LO 4 — MATCHES HTML MOCKUP EXACTLY
-  {
-    no: 4,
-    title: "Maintain customer satisfaction records and reporting",
-    meta: "3 content items · 2 hr",
-    status: "validated" as Status,
-
-    summary:
-      "IS 5.4.1–5.4.3 · SC/AK 5.4.1–5.4.3 — all validated · No TS/OS for this LO (knowledge-only assessment criteria)",
-
-    sheets: [
-      [
-        "information-sheet",
-        "IS 5.4.1",
-        "Documentation and Recording Procedures",
-        "validated",
-      ],
-
-      ["self-check", "SC 5.4.1", "True or False · 5 items", "validated"],
-
-      ["answer-key", "AK 5.4.1", "Answers for SC 5.4.1", "validated"],
-
-      [
-        "information-sheet",
-        "IS 5.4.2",
-        "Service Improvement Records",
-        "validated",
-      ],
-
-      [
-        "self-check",
-        "SC 5.4.2 · AK 5.4.2",
-        "Matching Type · 5 items",
-        "validated",
-      ],
-
-      [
-        "information-sheet",
-        "IS 5.4.3",
-        "Customer Satisfaction Reporting",
-        "validated",
-      ],
-
-      [
-        "self-check",
-        "SC 5.4.3 · AK 5.4.3",
-        "Enumeration · 5 items",
-        "validated",
-      ],
-    ],
-  },
-];
+export const learningOutcomes = moduleLearningOutcomes.map((lo) => ({
+  no: lo.no,
+  title: lo.title,
+  meta: `${lo.sheets.length} sheets`,
+  status: (lo.badgeClass === "b-draft" ? "review" : lo.badgeClass === "b-pending" ? "not-started" : "finalized") as Status,
+  sheets: lo.sheets.map((s) => [
+    s.type.toLowerCase() === "is" ? "information-sheet" : s.type.toLowerCase() === "ts" ? "task-sheet" : "information-sheet",
+    s.code,
+    s.title,
+    s.badgeClass === "b-validated" ? "finalized" : s.locked ? "locked" : "generated",
+  ] as [string, string, string, string]),
+}));
 
 export const loData = [
   {
     num: 1,
-    title: "Maintain a professional appearance and positive attitude",
+    title: "Prepare for EV inspection — Safety, PPE, Tools",
     activities: [
-      "● Read Information Sheet 5.1.1 on Personal Hygiene and Grooming Standards",
-      "● Answer Self-Check 5.1.1",
-      "● Compare your answers with Answer Key 5.1.1",
-      "● Read Information Sheet 5.1.2 on Communication Skills in Customer Interaction",
-      "● Answer Self-Check 5.1.2 and compare with Answer Key 5.1.2",
-      "● Perform Task Sheet 5.1.1 — Demonstrate Professional Greeting and Service Approach",
+      "● Read Information Sheet 1.1.1 on Safety Protocols",
+      "● Answer Self-Check 1.1.1 and compare with Answer Key 1.1.1",
+      "● Read IS 1.1.2 on PPE Requirements",
+      "● Perform Task Sheet 1.1.1 when unlocked",
     ],
     instructions:
-      "Be honest with your learning. Answer Self-Checks without looking back at the Information Sheets. If you score below 80%, re-read the IS and retake the Self-Check. Ask your facilitator if you have questions.",
-  },
-  {
-    num: 2,
-    title: "Handle customer inquiries and complaints effectively",
-    activities: [
-      "● Read Information Sheet 5.2.1 on Customer Complaint Handling Procedures",
-      "● Answer Self-Check 5.2.1 and compare with Answer Key 5.2.1",
-      "● Read Information Sheet 5.2.2 on Service Recovery Techniques",
-      "● Answer Self-Check 5.2.2 and compare with Answer Key 5.2.2",
-      "● Perform Task Sheet 5.2.1 — Conduct a Complaint Resolution Role-Play",
-    ],
-    instructions:
-      "Apply the L.A.S.T. framework when you encounter scenarios involving complaints. Re-read IS 5.2.1 if you score below 80% on SC 5.2.1.",
-  },
-  {
-    num: 3,
-    title: "Process and follow up customer requests efficiently",
-    activities: [
-      "● Read Information Sheet 5.3.1 on Request Processing and Follow-up Procedures",
-      "● Answer Self-Check 5.3.1 and compare with Answer Key 5.3.1",
-      "● Read Operation Sheet 5.3.1 on the Commercial Espresso Machine before the task",
-      "● Perform Task Sheet 5.3.1 — Operating the Commercial Espresso Machine",
-    ],
-    instructions:
-      "The Operation Sheet must be read and understood BEFORE performing TS 5.3.1. Safety precautions are mandatory. Equipment operation without trainer supervision is not permitted.",
-  },
-  {
-    num: 4,
-    title: "Maintain customer satisfaction records and reporting",
-    activities: [
-      "● Read Information Sheet 5.4.1 on Recordkeeping and Reporting Standards",
-      "● Read Information Sheet 5.4.2 on Digital and Manual Log Systems",
-      "● Read Information Sheet 5.4.3 on Customer Feedback Management",
-      "● Answer Self-Check 5.4.1, 5.4.2, 5.4.3 and compare with Answer Keys",
-    ],
-    instructions:
-      "LO 4 is knowledge-based. No Task Sheet is required. Ensure you can explain all documentation formats before proceeding to the Job Sheet.",
+      "Complete all safety protocols before any hands-on inspection. HV certification is mandatory for TS 1.1.1.",
   },
 ];

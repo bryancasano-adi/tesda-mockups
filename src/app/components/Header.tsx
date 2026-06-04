@@ -120,21 +120,23 @@ export function Header({
                 className={`px-3 py-1.5 text-sm border border-blue-500 text-blue-600 rounded-md hover:bg-blue-50 ${isValidated ? "cursor-not-allowed opacity-50" : ""}`}
                 disabled={isValidated}
               >
-                Validate
+                {variant === "cblm" ? "Finalize" : "Validate"}
               </button>
 
-              <button
-                onClick={onFinalize}
-                disabled={!isValidated}
-                className={`px-3 py-1.5 text-sm rounded-md text-white
-                  ${
-                    isValidated
-                      ? "bg-gray-800 hover:bg-black"
-                      : "bg-gray-300 cursor-not-allowed"
-                  }`}
-              >
-                Finalize
-              </button>
+              {variant !== "cblm" && (
+                <button
+                  onClick={onFinalize}
+                  disabled={!isValidated}
+                  className={`px-3 py-1.5 text-sm rounded-md text-white
+                    ${
+                      isValidated
+                        ? "bg-gray-800 hover:bg-black"
+                        : "bg-gray-300 cursor-not-allowed"
+                    }`}
+                >
+                  Finalize
+                </button>
+              )}
             </>
           ) : (
             <>

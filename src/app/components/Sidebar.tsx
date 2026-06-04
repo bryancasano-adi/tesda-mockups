@@ -162,8 +162,9 @@ export function Sidebar({ onClose, isOpen = true }: SidebarProps) {
                   {filteredProjects.length > 0 ? (
                     filteredProjects.map((project, index) => {
                       const isCBLMProject =
+                        project.project_name === "BEV Servicing Level II" ||
                         project.project_name ===
-                        "Food and Beverage Services NC II";
+                          "Food and Beverage Services NC II";
 
                       return (
                       <div
