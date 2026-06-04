@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
 import { CblmPageLayout } from "@/app/components/competency-based-learning-materials/CblmEditorLayout";
 import { LoAccordion, CblmModal } from "@/app/components/competency-based-learning-materials/CblmPrimitives";
 import {
@@ -119,7 +118,7 @@ export function CBLMModule() {
         <div style={{ padding: "16px 20px" }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 14 }}>
             {[
-              ["6", "Sheets Validated", "#E8F5E9", "#2E7D32"],
+              ["6", "Sheets Finalized", "#E8F5E9", "#2E7D32"],
               ["1", "In Draft", "#FFF3E0", "#F57C00"],
               ["3", "Not Started", "#F5F5F5", "#9E9E9E"],
               ["11", "Locked", "#FAFAFA", "#BDBDBD"],
@@ -147,8 +146,48 @@ export function CBLMModule() {
             <span className={cblmBadge("b-finalized")}>✓ Complete</span>
           </div>
         </div>
-        <div style={{ padding: "14px 20px" }}>
-          <Link to="/cblm/front-matter" style={{ color: "#1565C0", fontSize: 12 }}>
+        <div
+          style={{
+            padding: "14px 20px",
+            display: "flex",
+            gap: 16,
+            flexWrap: "wrap",
+          }}
+        >
+          {[
+            "Front Cover",
+            "How to Use Module",
+            "List of Competencies",
+            "Module Content",
+            "Prerequisites",
+            "LO Summary Table",
+          ].map((label) => (
+            <span
+              key={label}
+              style={{
+                fontSize: 12,
+                background: "#E8F5E9",
+                color: "#2E7D32",
+                borderRadius: 3,
+                padding: "3px 10px",
+              }}
+            >
+              ✓ {label}
+            </span>
+          ))}
+        </div>
+        <div
+          style={{
+            padding: "8px 20px",
+            borderTop: "1px solid #E0E0E0",
+            fontSize: 12,
+            color: "#666",
+            background: "#FAFAFA",
+          }}
+        >
+          All Step 1 sections are auto-populated from the Finalized CLM ({ucMeta.code}) and CBC. Read-only — no AI
+          generation.{" "}
+          <Link to="/cblm/front-matter" style={{ color: "#1565C0", marginLeft: 8 }}>
             View Front Cover →
           </Link>
         </div>

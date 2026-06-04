@@ -177,23 +177,6 @@ export function VideoScriptsDashboard() {
           >
             Generate Selected
           </button>
-          <CblmDotsMenu
-            menuId="vs-all-menu"
-            header="All Video Scripts"
-            open={dd.isOpen("vs-all")}
-            onToggle={(e) => dd.toggle("vs-all", e)}
-          >
-            <VsMenuItem onClick={() => showToast("Exporting all scripts…", "#1565C0")}>
-              Export all scripts (.docx)
-            </VsMenuItem>
-            <VsMenuItem onClick={() => showToast("Preparing download…", "#1565C0")}>
-              Download all scripts (.zip)
-            </VsMenuItem>
-            <div className={cblm.ddSep} />
-            <VsMenuItem onClick={() => showToast("Regenerating eligible scripts…", "#1565C0")}>
-              Regenerate all eligible scripts
-            </VsMenuItem>
-          </CblmDotsMenu>
         </div>
       </div>
 

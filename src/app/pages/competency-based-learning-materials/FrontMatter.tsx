@@ -396,7 +396,7 @@ const validKinds = Object.keys(frontMatterMeta) as FrontMatterKind[];
 export function CBLMFrontMatter() {
   const [searchParams] = useSearchParams();
   const { toast, showToast } = useCblmToast();
-  const { saved, saveSheet } = useSaveValidate(showToast);
+  const { saved, saveSheet, validateSheet } = useSaveValidate(showToast);
 
   const page = searchParams.get("page") as FrontMatterKind | null;
   const kind: FrontMatterKind =
@@ -452,7 +452,7 @@ export function CBLMFrontMatter() {
             nextLabel={nextNav?.label}
             onSave={saveSheet}
             saved={saved}
-            showValidate={false}
+            onValidate={validateSheet}
           />
         }
         notice={

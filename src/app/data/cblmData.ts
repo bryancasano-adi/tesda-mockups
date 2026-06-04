@@ -31,10 +31,10 @@ export type SheetNavItem = {
 
 export const moduleSheetNavItems: SheetNavItem[] = [
   { id: "lo1-h", label: "LO 1 — Prepare for inspection — None", badge: "--", badgeClass: "snb-pend", dotColor: "#BDBDBD" },
-  { id: "is-1-1-1", label: "IS 1.1.1 — Safety Protocols for EV Inspection", badge: "✓ Validated", badgeClass: "snb-done", dotColor: "#2E7D32", href: "/cblm/editor?page=information-sheet" },
-  { id: "sc-1-1-1", label: "SC 1.1.1 — Self-Check — Safety", badge: "✓ Validated", badgeClass: "snb-done", dotColor: "#2E7D32", sub: true },
-  { id: "ak-1-1-1", label: "AK 1.1.1 — Answer Key — Safety", badge: "✓ Validated", badgeClass: "snb-done", dotColor: "#2E7D32", sub: true },
-  { id: "is-1-1-2", label: "IS 1.1.2 — PPE Requirements", badge: "✓ Validated", badgeClass: "snb-done", dotColor: "#2E7D32" },
+  { id: "is-1-1-1", label: "IS 1.1.1 — Safety Protocols for EV Inspection", badge: "✓ Finalized", badgeClass: "snb-done", dotColor: "#2E7D32", href: "/cblm/editor?page=information-sheet" },
+  { id: "sc-1-1-1", label: "SC 1.1.1 — Self-Check — Safety", badge: "✓ Finalized", badgeClass: "snb-done", dotColor: "#2E7D32", sub: true },
+  { id: "ak-1-1-1", label: "AK 1.1.1 — Answer Key — Safety", badge: "✓ Finalized", badgeClass: "snb-done", dotColor: "#2E7D32", sub: true },
+  { id: "is-1-1-2", label: "IS 1.1.2 — PPE Requirements", badge: "✓ Finalized", badgeClass: "snb-done", dotColor: "#2E7D32" },
   { id: "is-1-1-3", label: "IS 1.1.3 — Inspection Tools", badge: "Draft", badgeClass: "snb-active", dotColor: "#1565C0", href: "/cblm/editor?page=information-sheet" },
   { id: "ts-1-1-1", label: "TS 1.1.1 — Prepare EV Safety Check", badge: "🔒 Locked", badgeClass: "snb-lock", dotColor: "#E0E0E0", href: "/cblm/editor?page=task-sheet" },
   { id: "lo2-h", label: "LO 2 — Visual inspection — None", badge: "--", badgeClass: "snb-pend", dotColor: "#BDBDBD" },
@@ -98,14 +98,14 @@ export const moduleLearningOutcomes: ModuleLo[] = [
   {
     no: 1,
     title: "Prepare for EV inspection — Safety, PPE, Tools",
-    badge: "Partially Validated",
+    badge: "Partially Finalized",
     badgeClass: "b-draft",
     defaultOpen: true,
     sheets: [
-      { type: "IS", typeColor: "#1565C0", typeBg: "#1565C022", code: "IS 1.1.1", title: "Safety Protocols for EV Inspection", status: "Validated", badgeClass: "b-validated", editorHref: "/cblm/editor?page=information-sheet" },
-      { type: "SC", typeColor: "#7C3AED", typeBg: "#7C3AED22", code: "SC 1.1.1", title: "Self-Check — Safety Protocols", status: "Validated", badgeClass: "b-validated" },
-      { type: "AK", typeColor: "#2E7D32", typeBg: "#2E7D3222", code: "AK 1.1.1", title: "Answer Key — Safety Protocols", status: "Validated", badgeClass: "b-validated" },
-      { type: "IS", typeColor: "#1565C0", typeBg: "#1565C022", code: "IS 1.1.2", title: "PPE Requirements for HV Work", status: "Validated", badgeClass: "b-validated" },
+      { type: "IS", typeColor: "#1565C0", typeBg: "#1565C022", code: "IS 1.1.1", title: "Safety Protocols for EV Inspection", status: "Finalized", badgeClass: "snb-done", editorHref: "/cblm/editor?page=information-sheet" },
+      { type: "SC", typeColor: "#7C3AED", typeBg: "#7C3AED22", code: "SC 1.1.1", title: "Self-Check — Safety Protocols", status: "Finalized", badgeClass: "snb-done" },
+      { type: "AK", typeColor: "#2E7D32", typeBg: "#2E7D3222", code: "AK 1.1.1", title: "Answer Key — Safety Protocols", status: "Finalized", badgeClass: "snb-done" },
+      { type: "IS", typeColor: "#1565C0", typeBg: "#1565C022", code: "IS 1.1.2", title: "PPE Requirements for HV Work", status: "Finalized", badgeClass: "snb-done" },
       { type: "IS", typeColor: "#1565C0", typeBg: "#1565C022", code: "IS 1.1.3", title: "Inspection Tools and Equipment", status: "Draft", badgeClass: "b-draft", editorHref: "/cblm/editor?page=information-sheet" },
       { type: "TS", typeColor: "#F57C00", typeBg: "#F57C0022", code: "TS 1.1.1", title: "Perform Pre-Inspection EV Safety Preparation", status: "Locked", badgeClass: "b-locked", locked: true, editorHref: "/cblm/editor?page=task-sheet" },
     ],
@@ -180,12 +180,12 @@ export const learningOutcomes = moduleLearningOutcomes.map((lo) => ({
   no: lo.no,
   title: lo.title,
   meta: `${lo.sheets.length} sheets`,
-  status: (lo.badgeClass === "b-draft" ? "review" : lo.badgeClass === "b-pending" ? "not-started" : "validated") as Status,
+  status: (lo.badgeClass === "b-draft" ? "review" : lo.badgeClass === "b-pending" ? "not-started" : "finalized") as Status,
   sheets: lo.sheets.map((s) => [
     s.type.toLowerCase() === "is" ? "information-sheet" : s.type.toLowerCase() === "ts" ? "task-sheet" : "information-sheet",
     s.code,
     s.title,
-    s.badgeClass === "b-validated" ? "validated" : s.locked ? "locked" : "generated",
+    s.badgeClass === "b-validated" ? "finalized" : s.locked ? "locked" : "generated",
   ] as [string, string, string, string]),
 }));
 

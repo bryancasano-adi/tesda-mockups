@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import { RootLayout } from "./components/RootLayout";
 
 import { CATSDashboard } from "./pages/competency-assessment-tool/CATSDashboard";
@@ -40,12 +40,17 @@ export const router = createBrowserRouter([
       { index: true, Component: LandingPage },
       { path: "/lam", Component: LevelAlignmentMatrix },
       { path: "/ig", Component: ImplementingGuidelines },
-      { path: "/cblm", Component: CBLMModule },
-      { path: "/cblm/editor", Component: CBLMEditor },
-      { path: "/cblm/front-matter", Component: CBLMFrontMatter },
-      { path: "/cblm/export", Component: CBLMExport },
-      { path: "/cblm/video-scripts", Component: VideoScriptsDashboard },
-      { path: "/cblm/video-scripts/edit", Component: VideoScriptEditor },
+      {
+        path: "/cblm",
+        children: [
+          { index: true, Component: CBLMModule },
+          { path: "editor", Component: CBLMEditor },
+          { path: "front-matter", Component: CBLMFrontMatter },
+          { path: "export", Component: CBLMExport },
+          { path: "video-scripts", Component: VideoScriptsDashboard },
+          { path: "video-scripts/edit", Component: VideoScriptEditor },
+        ],
+      },
       { path: "/cats", Component: CATSDashboard },
       { path: "/cats/evidence-plan", Component: EvidencePlanEditor },
       { path: "/cats/outline", Component: OutlineView },

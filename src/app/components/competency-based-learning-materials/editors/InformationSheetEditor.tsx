@@ -47,7 +47,7 @@ export function InformationSheetEditor({
           { label: "Type", value: "Information Sheet" },
           { label: "LO", value: "1.1 — Prepare for EV inspection" },
           { label: "Content Item", value: "1 — Safety Protocols" },
-          { label: "Status", value: <CblmBadge variant="b-validated">✓ Validated</CblmBadge> },
+          { label: "Status", value: <CblmBadge variant="snb-done">✓ Finalized</CblmBadge> },
           { label: "Phase", value: <span className="text-[#1565C0]">Phase 1 (LLM + CS/CBC/CLM)</span> },
         ]}
       />

@@ -60,7 +60,7 @@ export function EditorToolbar({
             className={cblmBtn("primary", "text-xs")}
             onClick={onValidate}
           >
-            ✓ Validate
+            ✓ Finalize
           </button>
         )}
       </div>
