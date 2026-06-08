@@ -223,6 +223,54 @@ export function CBLMModule() {
         </div>
       </div>
 
+      <div className={cblm.card} style={{ opacity: 0.6 }}>
+        <div className={cblm.cardHdr} style={{ background: "#FAFAFA" }}>
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#BDBDBD] text-[13px] font-bold text-white">
+              3
+            </div>
+            <span className={cblm.cardTitle} style={{ color: "#999" }}>
+              Step 3 — Consolidation
+            </span>
+            <span className={cblmBadge("b-locked")}>🔒 Locked — complete Step 2 first</span>
+          </div>
+        </div>
+        <div style={{ padding: "14px 20px", display: "flex", gap: 10 }}>
+          {[
+            { label: "JS 1 →", to: "/cblm/editor?page=job-sheet" },
+            { label: "LET →", to: "/cblm/editor?page=learning-experiences-table" },
+            { label: "Export →", to: "/cblm/export" },
+          ].map(({ label, to }) => (
+            <Link
+              key={label}
+              to={to}
+              style={{
+                fontSize: 12,
+                background: "#FAFAFA",
+                color: "#1565C0",
+                border: "1px solid #1565C0",
+                borderRadius: 3,
+                padding: "3px 10px",
+                textDecoration: "none",
+              }}
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
+        <div
+          style={{
+            padding: "8px 20px",
+            borderTop: "1px solid #E0E0E0",
+            fontSize: 12,
+            color: "#999",
+            background: "#FAFAFA",
+          }}
+        >
+          Job Sheet and LET are generated automatically after all Step 2 sheets are validated for all 3 LOs.
+        </div>
+      </div>
+
       <div className={cblm.card}>
         <div className={cblm.cardHdr}>
           <span className={`${cblm.cardTitle} text-[#2E7D32]`}>
