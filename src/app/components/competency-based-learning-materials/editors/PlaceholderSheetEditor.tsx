@@ -18,7 +18,7 @@ export function PlaceholderSheetEditor({
       <p style={{ fontSize: 12, marginBottom: 16 }}>
         Translated editors: IS, TS, JS, LET, and Video Scripts.
       </p>
-      <Link to="/cblm/editor?page=information-sheet" className={cblmBtn("primary", "text-xs")}>
+      <Link to="/cbc/editor?page=information-sheet" className={cblmBtn("primary", "text-xs")}>
         Open IS 1.1.1 Editor
       </Link>
     </div>

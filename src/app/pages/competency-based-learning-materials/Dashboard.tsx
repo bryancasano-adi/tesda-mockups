@@ -49,35 +49,35 @@ export const sheetMeta: Record<
 > = {
   "information-sheet": {
     label: "Information Sheet",
-    code: "IS 5.2.1",
+    code: "IS 1.1.1",
     title: "Customer Complaint Handling Procedures",
     color: "text-blue-700",
     bg: "bg-blue-600",
   },
   "self-check": {
     label: "Self-Check",
-    code: "SC 5.2.1",
+    code: "SC 1.1.1",
     title: "Multiple Choice · Customer Complaints",
     color: "text-violet-700",
     bg: "bg-violet-600",
   },
   "answer-key": {
     label: "Answer Key",
-    code: "AK 5.2.1",
+    code: "AK 1.1.1",
     title: "Answers and Rationales",
     color: "text-green-700",
     bg: "bg-green-700",
   },
   "task-sheet": {
     label: "Task Sheet",
-    code: "TS 5.2.1",
+    code: "TS 1.1.1",
     title: "Complaint Resolution Role-Play",
     color: "text-orange-700",
     bg: "bg-orange-500",
   },
   "performance-criterion": {
     label: "Performance Criteria Checklist",
-    code: "PCC 5.2.1",
+    code: "PCC 1.1.1",
     title: "Complaint Handling Performance Criteria",
     color: "text-red-700",
     bg: "bg-red-600",
@@ -572,7 +572,7 @@ export function CBLMDashboard() {
             },
             {
               label: "Competency Based Learning Materials (CBLM)",
-              href: "/cblm",
+              href: "/cbc",
             },
           ]}
         />
@@ -777,11 +777,11 @@ export function CBLMDashboard() {
                         <td className="px-4 py-4">
                           <div className="flex items-center justify-center gap-2">
                             {item.current || item.status === "validated" ? (
-                              <ButtonLink to="/cblm/module" variant="outline">
+                              <ButtonLink to="/cbc/module" variant="outline">
                                 Open
                               </ButtonLink>
                             ) : item.status === "review" ? (
-                              <ButtonLink to="/cblm/module" variant="orange">
+                              <ButtonLink to="/cbc/module" variant="orange">
                                 Review
                               </ButtonLink>
                             ) : item.status === "generating" ? (

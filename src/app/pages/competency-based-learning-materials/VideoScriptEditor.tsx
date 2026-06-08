@@ -22,7 +22,7 @@ const vsNavItems = videoScriptRows
     badge: r.scriptStatus,
     badgeClass: r.scriptBadge,
     dotColor: r.scriptStatus === "Draft" ? "#F57C00" : "#2E7D32",
-    href: `/cblm/video-scripts/edit?sheet=${encodeURIComponent(r.code)}`,
+    href: `/cbc/video-scripts/edit?sheet=${encodeURIComponent(r.code)}`,
   }));
 
 const scriptRows = [
@@ -51,11 +51,11 @@ export function VideoScriptEditor() {
             title="Video Scripts"
             subtitle={`${ucMeta.code} — Module 1`}
             items={[
-              { id: "vs-dash", label: "← All Scripts", badge: "Dashboard", badgeClass: "snb-active", dotColor: "#1565C0", href: "/cblm/video-scripts" },
+              { id: "vs-dash", label: "← All Scripts", badge: "Dashboard", badgeClass: "snb-active", dotColor: "#1565C0", href: "/cbc/video-scripts" },
               ...vsNavItems,
             ]}
             activeId={row.id}
-            backHref="/cblm/video-scripts"
+            backHref="/cbc/video-scripts"
             backLabel="Video Scripts"
           />
         }
@@ -63,11 +63,11 @@ export function VideoScriptEditor() {
           <EditorToolbar
             crumbs={[
               { label: "CBC", href: "/" },
-              { label: `${ucMeta.code} CBLM`, href: "/cblm" },
-              { label: "Video Scripts", href: "/cblm/video-scripts" },
+              { label: `${ucMeta.code} CBLM`, href: "/cbc/module" },
+              { label: "Video Scripts", href: "/cbc/video-scripts" },
               { label: row.code },
             ]}
-            backHref="/cblm/video-scripts"
+            backHref="/cbc/video-scripts"
             backLabel="Scripts"
             onSave={saveSheet}
             onValidate={validateSheet}
@@ -141,7 +141,7 @@ export function VideoScriptEditor() {
           </tbody>
         </table>
         <div className="mt-3">
-          <Link to="/cblm" className={cblmBtn("secondary", "text-xs")}>
+          <Link to="/cbc/module" className={cblmBtn("secondary", "text-xs")}>
             ← Module 1
           </Link>
         </div>

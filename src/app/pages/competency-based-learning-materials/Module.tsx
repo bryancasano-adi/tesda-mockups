@@ -76,11 +76,11 @@ export function CBLMModule() {
   return (
     <CblmPageLayout>
       <div className={cblm.breadcrumb}>
-        <Link to="/">
-          CBC Generation
-        </Link>
+        <Link to="/cbc">CBC Generation</Link>
         {" › "}
-        <span style={{ color: "#1565C0" }}>{ucMeta.code} CLM</span>
+        <Link to="/cbc/clm" style={{ color: "#1565C0" }}>
+          {ucMeta.code} CLM
+        </Link>
         {" › "}
         <strong>CBLM</strong>
       </div>
@@ -95,13 +95,13 @@ export function CBLMModule() {
           </p>
         </div>
         <div className="flex gap-2 flex-shrink-0">
-          <Link to="/cblm/front-matter" className={cblmBtn("secondary")}>
+          <Link to="/cbc/front-matter" className={cblmBtn("secondary")}>
             📄 Front Matter
           </Link>
-          <Link to="/cblm/video-scripts" className={cblmBtn("secondary")}>
+          <Link to="/cbc/video-scripts" className={cblmBtn("secondary")}>
             🎬 Video Scripts
           </Link>
-          <Link to="/cblm/export" className={cblmBtn("secondary")}>
+          <Link to="/cbc/export" className={cblmBtn("secondary")}>
             ⬇ Export .docx
           </Link>
           <button type="button" className={cblmBtn("success")} onClick={() => modal.open("finalizeModal")}>
@@ -187,7 +187,7 @@ export function CBLMModule() {
         >
           All Step 1 sections are auto-populated from the Finalized CLM ({ucMeta.code}) and CBC. Read-only — no AI
           generation.{" "}
-          <Link to="/cblm/front-matter" style={{ color: "#1565C0", marginLeft: 8 }}>
+          <Link to="/cbc/front-matter" style={{ color: "#1565C0", marginLeft: 8 }}>
             View Front Cover →
           </Link>
         </div>
@@ -223,12 +223,60 @@ export function CBLMModule() {
         </div>
       </div>
 
+      <div className={cblm.card} style={{ opacity: 0.6 }}>
+        <div className={cblm.cardHdr} style={{ background: "#FAFAFA" }}>
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#BDBDBD] text-[13px] font-bold text-white">
+              3
+            </div>
+            <span className={cblm.cardTitle} style={{ color: "#999" }}>
+              Step 3 — Consolidation
+            </span>
+            <span className={cblmBadge("b-locked")}>🔒 Locked — complete Step 2 first</span>
+          </div>
+        </div>
+        <div style={{ padding: "14px 20px", display: "flex", gap: 10 }}>
+          {[
+            { label: "JS 1 →", to: "/cbc/editor?page=job-sheet" },
+            { label: "LET →", to: "/cbc/editor?page=learning-experiences-table" },
+            { label: "Export →", to: "/cbc/export" },
+          ].map(({ label, to }) => (
+            <Link
+              key={label}
+              to={to}
+              style={{
+                fontSize: 12,
+                background: "#FAFAFA",
+                color: "#1565C0",
+                border: "1px solid #1565C0",
+                borderRadius: 3,
+                padding: "3px 10px",
+                textDecoration: "none",
+              }}
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
+        <div
+          style={{
+            padding: "8px 20px",
+            borderTop: "1px solid #E0E0E0",
+            fontSize: 12,
+            color: "#999",
+            background: "#FAFAFA",
+          }}
+        >
+          Job Sheet and LET are generated automatically after all Step 2 sheets are validated for all 3 LOs.
+        </div>
+      </div>
+
       <div className={cblm.card}>
         <div className={cblm.cardHdr}>
           <span className={`${cblm.cardTitle} text-[#2E7D32]`}>
             🎬 Video Scripts (Media Scripts)
           </span>
-          <Link to="/cblm/video-scripts" className={cblmBtn("secondary", "text-xs")}>
+          <Link to="/cbc/video-scripts" className={cblmBtn("secondary", "text-xs")}>
             Open Video Scripts Dashboard
           </Link>
         </div>

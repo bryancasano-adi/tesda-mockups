@@ -27,7 +27,7 @@ export function CBLMExport() {
       <div className={cblm.breadcrumb}>
         <Link to="/">CBC</Link>
         {" › "}
-        <Link to="/cblm">
+        <Link to="/cbc/module">
           {ucMeta.code} CBLM
         </Link>
         {" › "}
@@ -46,7 +46,7 @@ export function CBLMExport() {
           </p>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <Link to="/cblm" className={cblmBtn("secondary")}>
+          <Link to="/cbc/module" className={cblmBtn("secondary")}>
             ← Back to Module
           </Link>
           <button type="button" className={cblmBtn("primary")} onClick={() => modal.open("exportModal")}>
@@ -76,7 +76,7 @@ export function CBLMExport() {
       <div className={cblm.card}>
         <div className={cblm.cardHdr}>
           <span className={cblm.cardTitle}>Document Control — Export Metadata</span>
-          <Link to="/cblm/front-matter" style={{ fontSize: 12, color: "#1565C0" }}>
+          <Link to="/cbc/front-matter" style={{ fontSize: 12, color: "#1565C0" }}>
             Edit in Front Matter →
           </Link>
         </div>
