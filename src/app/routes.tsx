@@ -25,6 +25,8 @@ import { NotFound } from "./pages/competency-assessment-tool/NotFound";
 import { LevelAlignmentMatrix } from "./pages/level-alignment-matrix/level-alignment-matrix";
 import { ImplementingGuidelines } from "./pages/implementing-guidelines/implementing-guidelines";
 import { LandingPage } from "./pages/LandingPage";
+import { CbcMainDashboard } from "./pages/competency-based-learning-materials/CbcMainDashboard";
+import { ClmUcView } from "./pages/competency-based-learning-materials/ClmUcView";
 import { CBLMModule } from "./pages/competency-based-learning-materials/Module";
 import { CBLMEditor } from "./pages/competency-based-learning-materials/Editor";
 import { CBLMFrontMatter } from "./pages/competency-based-learning-materials/FrontMatter";
@@ -41,9 +43,12 @@ export const router = createBrowserRouter([
       { path: "/lam", Component: LevelAlignmentMatrix },
       { path: "/ig", Component: ImplementingGuidelines },
       {
-        path: "/cblm",
+        // competency-based-learning-materials route proper, CBC and CLM components are for context only 
+        path: "/cbc", 
         children: [
-          { index: true, Component: CBLMModule },
+          { index: true, Component: CbcMainDashboard },
+          { path: "clm", Component: ClmUcView },
+          { path: "cblm", Component: CBLMModule },
           { path: "editor", Component: CBLMEditor },
           { path: "front-matter", Component: CBLMFrontMatter },
           { path: "export", Component: CBLMExport },

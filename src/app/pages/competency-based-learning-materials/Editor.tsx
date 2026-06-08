@@ -94,7 +94,7 @@ export function CBLMEditor() {
             subtitle={`${ucMeta.code} — EV Inspection`}
             items={moduleSheetNavItems}
             activeId={activeNavId}
-            backHref="/cblm"
+            backHref="/cbc/cblm"
             backLabel="Back to Module 1"
           />
         }
@@ -102,13 +102,13 @@ export function CBLMEditor() {
           <EditorToolbar
             crumbs={[
               { label: "CBC", href: "/" },
-              { label: `${ucMeta.code} CBLM`, href: "/cblm" },
+              { label: `${ucMeta.code} CBLM`, href: "/cbc/cblm" },
               { label: meta.code },
             ]}
-            backHref="/cblm"
+            backHref="/cbc/cblm"
             backLabel="Module"
             nextHref={
-              kind === "information-sheet" ? "/cblm/editor?page=task-sheet" : undefined
+              kind === "information-sheet" ? "/cbc/editor?page=task-sheet" : undefined
             }
             nextLabel={kind === "information-sheet" ? "TS 1.1.1" : undefined}
             onSave={saveSheet}

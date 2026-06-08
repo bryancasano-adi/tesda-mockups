@@ -416,7 +416,7 @@ export function CBLMFrontMatter() {
     if (idx < 0 || idx >= order.length - 1) return undefined;
     const next = order[idx + 1];
     return {
-      href: `/cblm/front-matter?page=${next}`,
+      href: `/cbc/front-matter?page=${next}`,
       label: frontMatterMeta[next].label,
     };
   }, [kind]);
@@ -437,7 +437,7 @@ export function CBLMFrontMatter() {
             subtitle={`${ucMeta.code} — Module 1`}
             items={frontMatterNavItems}
             activeId={kind}
-            backHref="/cblm"
+            backHref="/cbc/cblm"
             backLabel="Module 1"
           />
         }
@@ -445,7 +445,7 @@ export function CBLMFrontMatter() {
           <EditorToolbar
             crumbs={[
               { label: "CBC", href: "/" },
-              { label: `${ucMeta.code} CBLM`, href: "/cblm" },
+              { label: `${ucMeta.code} CBLM`, href: "/cbc/cblm" },
               { label: meta.label },
             ]}
             nextHref={nextNav?.href}

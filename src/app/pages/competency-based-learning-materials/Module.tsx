@@ -76,11 +76,11 @@ export function CBLMModule() {
   return (
     <CblmPageLayout>
       <div className={cblm.breadcrumb}>
-        <Link to="/">
-          CBC Generation
-        </Link>
+        <Link to="/cbc">CBC Generation</Link>
         {" › "}
-        <span style={{ color: "#1565C0" }}>{ucMeta.code} CLM</span>
+        <Link to="/cbc/clm" style={{ color: "#1565C0" }}>
+          {ucMeta.code} CLM
+        </Link>
         {" › "}
         <strong>CBLM</strong>
       </div>
@@ -95,13 +95,13 @@ export function CBLMModule() {
           </p>
         </div>
         <div className="flex gap-2 flex-shrink-0">
-          <Link to="/cblm/front-matter" className={cblmBtn("secondary")}>
+          <Link to="/cbc/front-matter" className={cblmBtn("secondary")}>
             📄 Front Matter
           </Link>
-          <Link to="/cblm/video-scripts" className={cblmBtn("secondary")}>
+          <Link to="/cbc/video-scripts" className={cblmBtn("secondary")}>
             🎬 Video Scripts
           </Link>
-          <Link to="/cblm/export" className={cblmBtn("secondary")}>
+          <Link to="/cbc/export" className={cblmBtn("secondary")}>
             ⬇ Export .docx
           </Link>
           <button type="button" className={cblmBtn("success")} onClick={() => modal.open("finalizeModal")}>
@@ -187,7 +187,7 @@ export function CBLMModule() {
         >
           All Step 1 sections are auto-populated from the Finalized CLM ({ucMeta.code}) and CBC. Read-only — no AI
           generation.{" "}
-          <Link to="/cblm/front-matter" style={{ color: "#1565C0", marginLeft: 8 }}>
+          <Link to="/cbc/front-matter" style={{ color: "#1565C0", marginLeft: 8 }}>
             View Front Cover →
           </Link>
         </div>
@@ -237,9 +237,9 @@ export function CBLMModule() {
         </div>
         <div style={{ padding: "14px 20px", display: "flex", gap: 10 }}>
           {[
-            { label: "JS 1 →", to: "/cblm/editor?page=job-sheet" },
-            { label: "LET →", to: "/cblm/editor?page=learning-experiences-table" },
-            { label: "Export →", to: "/cblm/export" },
+            { label: "JS 1 →", to: "/cbc/editor?page=job-sheet" },
+            { label: "LET →", to: "/cbc/editor?page=learning-experiences-table" },
+            { label: "Export →", to: "/cbc/export" },
           ].map(({ label, to }) => (
             <Link
               key={label}
@@ -276,7 +276,7 @@ export function CBLMModule() {
           <span className={`${cblm.cardTitle} text-[#2E7D32]`}>
             🎬 Video Scripts (Media Scripts)
           </span>
-          <Link to="/cblm/video-scripts" className={cblmBtn("secondary", "text-xs")}>
+          <Link to="/cbc/video-scripts" className={cblmBtn("secondary", "text-xs")}>
             Open Video Scripts Dashboard
           </Link>
         </div>

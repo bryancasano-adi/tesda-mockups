@@ -52,7 +52,7 @@ function VsMenuItem({
 }
 
 function sheetEditorHref(code: string) {
-  return `/cblm/video-scripts/edit?sheet=${encodeURIComponent(code)}`;
+  return `/cbc/video-scripts/edit?sheet=${encodeURIComponent(code)}`;
 }
 
 function RowActions({
@@ -152,7 +152,7 @@ export function VideoScriptsDashboard() {
       <div className={cblm.breadcrumb}>
         <Link to="/">CBC</Link>
         {" › "}
-        <Link to="/cblm">
+        <Link to="/cbc/cblm">
           {ucMeta.code} CBLM
         </Link>
         {" › "}
