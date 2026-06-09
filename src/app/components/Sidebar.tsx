@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Bars3BottomLeftIcon,
   DocumentTextIcon,
   Cog6ToothIcon,
   ShoppingCartIcon,
 } from "@heroicons/react/24/outline";
+import { ChartBarIcon } from "lucide-react";
 
 const mockTrainingProjects = [
   {
@@ -55,6 +56,11 @@ const navigation = [
     href: "/supermarket-of-competencies",
     icon: <ShoppingCartIcon />,
   },
+  {
+    name: "Control Dashboard",
+    href: "/control-dashboard",
+    icon: <ChartBarIcon />,
+  },
 ];
 
 interface SidebarProps {
@@ -63,7 +69,6 @@ interface SidebarProps {
 }
 
 export function Sidebar({ onClose, isOpen = true }: SidebarProps) {
-  const location = useLocation();
   const navigate = useNavigate();
 
   const [projectSearch, setProjectSearch] = useState("");
@@ -114,8 +119,6 @@ export function Sidebar({ onClose, isOpen = true }: SidebarProps) {
           {/* Navigation */}
           <nav className="py-6 px-8 border-b border-gray-200 flex flex-col gap-1 flex-shrink-0">
             {navigation.map((item) => {
-              const isActive = location.pathname === item.href;
-
               return (
                 <NavLink
                   key={item.name}
@@ -167,31 +170,31 @@ export function Sidebar({ onClose, isOpen = true }: SidebarProps) {
                           "Food and Beverage Services NC II";
 
                       return (
-                      <div
-                        key={`training-${project.project_id || index}`}
-                        role="button"
-                        tabIndex={0}
-                        onClick={() =>
-                          handleProjectClick(
-                            project.sub_sector_id,
-                            project.project_id,
-                          )
-                        }
-                        onKeyDown={(e) =>
-                          handleProjectKeyDown(
-                            e,
-                            project.sub_sector_id,
-                            project.project_id,
-                          )
-                        }
-                        className={`text-sm hover:bg-blue-50 hover:text-blue-800 cursor-pointer py-1 px-2 rounded truncate ${
-                          isCBLMProject
-                            ? "bg-blue-50 text-blue-800 font-medium"
-                            : "text-black"
-                        }`}
-                      >
-                        {project.project_name}
-                      </div>
+                        <div
+                          key={`training-${project.project_id || index}`}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() =>
+                            handleProjectClick(
+                              project.sub_sector_id,
+                              project.project_id,
+                            )
+                          }
+                          onKeyDown={(e) =>
+                            handleProjectKeyDown(
+                              e,
+                              project.sub_sector_id,
+                              project.project_id,
+                            )
+                          }
+                          className={`text-sm hover:bg-blue-50 hover:text-blue-800 cursor-pointer py-1 px-2 rounded truncate ${
+                            isCBLMProject
+                              ? "bg-blue-50 text-blue-800 font-medium"
+                              : "text-black"
+                          }`}
+                        >
+                          {project.project_name}
+                        </div>
                       );
                     })
                   ) : (

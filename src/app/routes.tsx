@@ -33,6 +33,7 @@ import { CBLMFrontMatter } from "./pages/competency-based-learning-materials/Fro
 import { CBLMExport } from "./pages/competency-based-learning-materials/Export";
 import { VideoScriptsDashboard } from "./pages/competency-based-learning-materials/VideoScriptsDashboard";
 import { VideoScriptEditor } from "./pages/competency-based-learning-materials/VideoScriptEditor";
+import { ControlDashboard } from "./pages/control-dashboard/Dashboard";
 
 export const router = createBrowserRouter([
   {
@@ -43,8 +44,8 @@ export const router = createBrowserRouter([
       { path: "/lam", Component: LevelAlignmentMatrix },
       { path: "/ig", Component: ImplementingGuidelines },
       {
-        // competency-based-learning-materials route proper, CBC and CLM components are for context only 
-        path: "/cbc", 
+        // competency-based-learning-materials route proper, CBC and CLM components are for context only
+        path: "/cbc",
         children: [
           { index: true, Component: CbcMainDashboard },
           { path: "clm", Component: ClmUcView },
@@ -79,6 +80,7 @@ export const router = createBrowserRouter([
       { path: "/cats/sag", Component: SAGView },
       { path: "/cats/cars", Component: CARSView },
       { path: "/cats/export", Component: FinalExport },
+      { path: "/control-dashboard", Component: ControlDashboard },
       { path: "*", Component: NotFound },
     ],
   },

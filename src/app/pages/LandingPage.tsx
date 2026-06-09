@@ -7,6 +7,7 @@ import {
   AcademicCapIcon,
 } from "@heroicons/react/24/outline";
 import { Button } from "../components/ui/button";
+import { ChartBarIcon } from "lucide-react";
 
 const featureCards = [
   {
@@ -36,17 +37,25 @@ const featureCards = [
   {
     title: "Competency-Based Learning Materials",
     description:
-      "Generate CBLM modules, review learning sheets, manage front matter and export TESDA-ready documents.",
+      "Generate CBLM modules, review learning sheets, manage front matter and export documents.",
     href: "/cbc",
     icon: AcademicCapIcon,
     accent: "from-amber-500 to-orange-600",
+  },
+  {
+    title: "Control Dashboard",
+    description:
+      "Monitor and manage all tools, user access, and system settings from a centralized dashboard.",
+    href: "/control-dashboard",
+    icon: ChartBarIcon,
+    accent: "from-gray-500 to-gray-700",
   },
 ];
 
 export function LandingPage() {
   return (
     <main className="min-h-screen bg-slate-50 px-6 py-16 text-slate-900">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-full">
         {/* Header */}
         <header className="text-center">
           <h1 className="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
@@ -60,7 +69,7 @@ export function LandingPage() {
         </header>
 
         {/* Cards */}
-        <section className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
+        <section className="mt-14 grid gap-6 sm:grid-cols-3 lg:grid-cols-3">
           {featureCards.map((card) => {
             const Icon = card.icon;
 
