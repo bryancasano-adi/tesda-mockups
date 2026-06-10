@@ -10,26 +10,44 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { Play, CheckCircle2, XCircle, Target } from "lucide-react";
+import { Play, CheckCircle2, XCircle, Target, FileDown } from "lucide-react";
 import {
   StatCard,
   ChartCard,
   SectionDivider,
   DataTable,
+  ActionButton,
+  exportToExcel,
 } from "./PagePrimitives";
-import { genPipelineData, genStatusTotals } from "./sharedData";
+import { genPipelineData, genStatusTotals, genBySector } from "./sharedData";
 
 const LEGEND = [
-  { c: "#2196f3", l: "Started" },
-  { c: "#16a34a", l: "Completed" },
+  { c: "#2196f3", l: "Generated" },
+  { c: "#16a34a", l: "Finalized" },
   { c: "#f44336", l: "Failed" },
 ];
 
 export function GenPipelineModule() {
-  const totalStarted = genPipelineData.reduce((s, d) => s + d.started, 0);
-  const totalCompleted = genPipelineData.reduce((s, d) => s + d.completed, 0);
+  const totalGenerated = genPipelineData.reduce((s, d) => s + d.generated, 0);
+  const totalFinalized = genPipelineData.reduce((s, d) => s + d.finalized, 0);
   const totalFailed = genPipelineData.reduce((s, d) => s + d.failed, 0);
   const grandTotal = genStatusTotals.reduce((s, d) => s + d.value, 0);
+
+  function handleExport() {
+    exportToExcel(
+      ["Date", "Generated", "Finalized", "Failed", "Success %"],
+      genPipelineData.map((r) => [
+        r.date,
+        r.generated,
+        r.finalized,
+        r.failed,
+        r.generated > 0
+          ? `${((r.finalized / r.generated) * 100).toFixed(0)}%`
+          : "—",
+      ]),
+      "generation_pipeline_report",
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -37,20 +55,20 @@ export function GenPipelineModule() {
       <div className="flex flex-col gap-4">
         <SectionDivider
           title="Document Generation Pipeline"
-          subtitle="Daily job counts — started, completed, and failed"
+          subtitle="Daily job counts — generated, finalized, and failed"
         />
         <div className="flex gap-4">
           <StatCard
-            label="Jobs Started"
-            value={totalStarted}
+            label="Jobs Generated"
+            value={totalGenerated}
             sub="Total generation requests"
             color="#2196f3"
             Icon={Play}
           />
           <StatCard
-            label="Completed"
-            value={totalCompleted}
-            sub="Successfully generated"
+            label="Finalized"
+            value={totalFinalized}
+            sub="Successfully finalized"
             color="#16a34a"
             Icon={CheckCircle2}
           />
@@ -63,8 +81,8 @@ export function GenPipelineModule() {
           />
           <StatCard
             label="Success Rate"
-            value={`${((totalCompleted / totalStarted) * 100).toFixed(1)}%`}
-            sub="Completion rate"
+            value={`${((totalFinalized / totalGenerated) * 100).toFixed(1)}%`}
+            sub="Finalization rate"
             color="#9c27b0"
             Icon={Target}
           />
@@ -72,7 +90,7 @@ export function GenPipelineModule() {
 
         <ChartCard
           title="Generation Pipeline Per Day"
-          subtitle="Started vs Completed vs Failed"
+          subtitle="Generated vs Finalized vs Failed"
           action={
             <div className="flex gap-4">
               {LEGEND.map((d, i) => (
@@ -113,16 +131,16 @@ export function GenPipelineModule() {
                 }}
               />
               <Bar
-                dataKey="started"
+                dataKey="generated"
                 fill="#2196f3"
                 radius={[3, 3, 0, 0]}
-                name="Started"
+                name="Generated"
               />
               <Bar
-                dataKey="completed"
+                dataKey="finalized"
                 fill="#16a34a"
                 radius={[3, 3, 0, 0]}
-                name="Completed"
+                name="Finalized"
               />
               <Bar
                 dataKey="failed"
@@ -137,6 +155,11 @@ export function GenPipelineModule() {
         <ChartCard
           title="Pipeline Detail by Day"
           subtitle="Per-day breakdown with success rate"
+          action={
+            <ActionButton onClick={handleExport} variant="outline" size="sm">
+              <FileDown size={13} /> Export Excel
+            </ActionButton>
+          }
         >
           <DataTable
             columns={[
@@ -150,22 +173,22 @@ export function GenPipelineModule() {
                 ),
               },
               {
-                key: "started",
-                header: "Started",
+                key: "generated",
+                header: "Generated",
                 align: "right",
                 render: (row) => (
                   <span className="font-semibold" style={{ color: "#2196f3" }}>
-                    {row.started}
+                    {row.generated}
                   </span>
                 ),
               },
               {
-                key: "completed",
-                header: "Completed",
+                key: "finalized",
+                header: "Finalized",
                 align: "right",
                 render: (row) => (
                   <span className="font-semibold" style={{ color: "#16a34a" }}>
-                    {row.completed}
+                    {row.finalized}
                   </span>
                 ),
               },
@@ -185,8 +208,8 @@ export function GenPipelineModule() {
                 align: "right",
                 render: (row) => (
                   <span style={{ color: "#64748b" }}>
-                    {row.started > 0
-                      ? `${((row.completed / row.started) * 100).toFixed(0)}%`
+                    {row.generated > 0
+                      ? `${((row.finalized / row.generated) * 100).toFixed(0)}%`
                       : "—"}
                   </span>
                 ),
@@ -202,7 +225,7 @@ export function GenPipelineModule() {
       <div className="flex flex-col gap-4">
         <SectionDivider
           title="Generation Status Analytics"
-          subtitle="Aggregate job totals by status category"
+          subtitle="Aggregate job totals by KGALING status"
         />
         <div className="flex gap-4">
           {genStatusTotals.map((s, i) => (
@@ -225,7 +248,7 @@ export function GenPipelineModule() {
         <div className="grid grid-cols-2 gap-4">
           <ChartCard
             title="Generation Totals"
-            subtitle="Processing vs Completed vs Failed"
+            subtitle="Generated vs Finalized vs Failed"
           >
             <ResponsiveContainer width="100%" height={240}>
               <PieChart>
@@ -257,7 +280,7 @@ export function GenPipelineModule() {
 
           <ChartCard
             title="Status Breakdown"
-            subtitle="Jobs and share per status"
+            subtitle="Jobs and share per KGALING status"
           >
             <DataTable
               columns={[
@@ -325,6 +348,78 @@ export function GenPipelineModule() {
             />
           </ChartCard>
         </div>
+      </div>
+
+      {/* ── Per Sector Generation ── */}
+      <div className="flex flex-col gap-4">
+        <SectionDivider
+          title="Generation Per Sector"
+          subtitle="Generated, finalized, and failed counts by sector"
+        />
+        <ChartCard
+          title="Generation Pipeline by Sector"
+          subtitle="KGALING status breakdown across sectors"
+          action={
+            <div className="flex gap-4">
+              {LEGEND.map((d, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-1.5 text-[11px]"
+                  style={{ color: "#64748b" }}
+                >
+                  <div
+                    className="w-2.5 h-2.5 rounded-sm"
+                    style={{ background: d.c }}
+                  />
+                  {d.l}
+                </div>
+              ))}
+            </div>
+          }
+        >
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={genBySector} barCategoryGap="25%" barGap={3}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis
+                dataKey="sector"
+                tick={{ fontSize: 9, fill: "#94a3b8" }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 10, fill: "#94a3b8" }}
+                axisLine={false}
+                tickLine={false}
+                allowDecimals={false}
+              />
+              <Tooltip
+                contentStyle={{
+                  borderRadius: 10,
+                  border: "none",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                }}
+              />
+              <Bar
+                dataKey="generated"
+                fill="#2196f3"
+                radius={[3, 3, 0, 0]}
+                name="Generated"
+              />
+              <Bar
+                dataKey="finalized"
+                fill="#16a34a"
+                radius={[3, 3, 0, 0]}
+                name="Finalized"
+              />
+              <Bar
+                dataKey="failed"
+                fill="#f44336"
+                radius={[3, 3, 0, 0]}
+                name="Failed"
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
       </div>
     </div>
   );

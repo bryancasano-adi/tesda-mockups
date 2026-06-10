@@ -10,27 +10,28 @@ import {
   Line,
 } from "recharts";
 import { Cpu, Activity, DollarSign, FileText, FileDown } from "lucide-react";
-import { StatCard, ChartCard, DataTable, ActionButton } from "./PagePrimitives";
-import { tokenUsageData, tokenTrendData } from "./sharedData";
+import {
+  StatCard,
+  ChartCard,
+  SectionDivider,
+  DataTable,
+  ActionButton,
+  exportToExcel,
+} from "./PagePrimitives";
+import { tokenUsageData, tokenTrendData, tokenBySector } from "./sharedData";
+
+const sortedTokenData = [...tokenUsageData].sort((a, b) => b.tokens - a.tokens);
 
 export function TokenUsageModule() {
   const totalTokens = tokenUsageData.reduce((s, d) => s + d.tokens, 0);
   const avgTokens = Math.round(totalTokens / tokenUsageData.length);
 
   function handleExport() {
-    const rows = [
-      ["Document", "Tokens Used", "Est. Cost"],
-      ...tokenUsageData.map((d) => [d.doc, d.tokens, d.cost]),
-      ["TOTAL", totalTokens, "~$1.30"],
-    ];
-    const csv = rows.map((r) => r.join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "token_usage_report.csv";
-    a.click();
-    URL.revokeObjectURL(url);
+    exportToExcel(
+      ["#", "Document", "Tokens Used", "Est. Cost"],
+      sortedTokenData.map((d, i) => [i + 1, d.doc, d.tokens, d.cost]),
+      "token_usage_report",
+    );
   }
 
   return (
@@ -68,15 +69,15 @@ export function TokenUsageModule() {
 
       <ChartCard
         title="Token Usage Per Generated Document"
-        subtitle="Horizontal comparison of tokens consumed per doc type"
+        subtitle="Ranked by tokens consumed — highest first"
         action={
           <ActionButton onClick={handleExport} variant="outline" size="sm">
-            <FileDown size={13} /> Export CSV
+            <FileDown size={13} /> Export Excel
           </ActionButton>
         }
       >
         <ResponsiveContainer width="100%" height={220}>
-          <BarChart data={tokenUsageData} layout="vertical" barSize={18}>
+          <BarChart data={sortedTokenData} layout="vertical" barSize={18}>
             <CartesianGrid
               strokeDasharray="3 3"
               stroke="#f1f5f9"
@@ -158,10 +159,10 @@ export function TokenUsageModule() {
 
       <ChartCard
         title="Token Usage Report — Per Document"
-        subtitle="Detailed per-document token counts and estimated costs"
+        subtitle="Ranked by tokens used — highest first"
         action={
           <ActionButton onClick={handleExport} variant="primary" size="sm">
-            <FileDown size={13} /> Export Full Report
+            <FileDown size={13} /> Export Excel
           </ActionButton>
         }
       >
@@ -194,16 +195,6 @@ export function TokenUsageModule() {
               ),
             },
             {
-              key: "share",
-              header: "% of Total",
-              align: "right",
-              render: (row) => (
-                <span style={{ color: "#64748b" }}>
-                  {((row.tokens / totalTokens) * 100).toFixed(1)}%
-                </span>
-              ),
-            },
-            {
               key: "cost",
               header: "Est. Cost",
               align: "right",
@@ -212,7 +203,7 @@ export function TokenUsageModule() {
               ),
             },
           ]}
-          rows={tokenUsageData}
+          rows={sortedTokenData}
           keyExtractor={(_, i) => i}
           footer={
             <>
@@ -230,12 +221,6 @@ export function TokenUsageModule() {
                 {totalTokens.toLocaleString()}
               </td>
               <td
-                className="py-3 px-3 text-right font-semibold"
-                style={{ color: "#0f172a" }}
-              >
-                100%
-              </td>
-              <td
                 className="py-3 px-3 text-right font-bold"
                 style={{ color: "#0f172a" }}
               >
@@ -245,6 +230,158 @@ export function TokenUsageModule() {
           }
         />
       </ChartCard>
+
+      {/* ── Per Sector Token Usage ── */}
+      <div className="flex flex-col gap-4">
+        <SectionDivider
+          title="Token Usage Per Sector"
+          subtitle="AI token consumption broken down by sector"
+        />
+        <ChartCard
+          title="Token Consumption by Sector"
+          subtitle="Horizontal comparison of tokens consumed per sector"
+        >
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={tokenBySector} layout="vertical" barSize={18}>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="#f1f5f9"
+                horizontal={false}
+              />
+              <XAxis
+                type="number"
+                tick={{ fontSize: 10, fill: "#94a3b8" }}
+                axisLine={false}
+                tickLine={false}
+                tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
+              />
+              <YAxis
+                dataKey="sector"
+                type="category"
+                tick={{ fontSize: 10, fill: "#64748b" }}
+                width={120}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip
+                formatter={(v: number) => [
+                  `${v.toLocaleString()} tokens`,
+                  "Tokens",
+                ]}
+                contentStyle={{
+                  borderRadius: 10,
+                  border: "none",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                }}
+              />
+              <Bar
+                dataKey="tokens"
+                fill="#7b1fa2"
+                radius={[0, 4, 4, 0]}
+                name="Tokens Used"
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard
+          title="Sector Token Report"
+          subtitle="Token usage and estimated cost per sector"
+        >
+          <DataTable
+            columns={[
+              {
+                key: "#",
+                header: "#",
+                render: (_, i) => (
+                  <span style={{ color: "#94a3b8" }}>{i + 1}</span>
+                ),
+              },
+              {
+                key: "sector",
+                header: "Sector",
+                render: (row) => (
+                  <span className="font-medium" style={{ color: "#0f172a" }}>
+                    {row.sector}
+                  </span>
+                ),
+              },
+              {
+                key: "tokens",
+                header: "Tokens Used",
+                align: "right",
+                render: (row) => (
+                  <span className="font-bold" style={{ color: "#7b1fa2" }}>
+                    {row.tokens.toLocaleString()}
+                  </span>
+                ),
+              },
+              {
+                key: "cost",
+                header: "Est. Cost",
+                align: "right",
+                render: (row) => (
+                  <span style={{ color: "#334155" }}>{row.cost}</span>
+                ),
+              },
+            ]}
+            rows={tokenBySector}
+            keyExtractor={(_, i) => i}
+          />
+        </ChartCard>
+      </div>
+
+      {/* ── Token Interpretation Footer ── */}
+      <div
+        className="rounded-2xl p-5 border border-[#e2e8f0]"
+        style={{ background: "#f8fafc" }}
+      >
+        <p
+          className="text-[13px] font-semibold mb-3"
+          style={{ color: "#334155" }}
+        >
+          How to Interpret Token Usage vs. Estimated Cost
+        </p>
+        <div className="grid grid-cols-3 gap-4 text-[12px]" style={{ color: "#64748b" }}>
+          <div className="flex flex-col gap-1.5">
+            <p className="font-semibold text-[11px] uppercase tracking-wider" style={{ color: "#94a3b8" }}>
+              What is a Token?
+            </p>
+            <p>
+              A token is roughly 4 characters or ¾ of a word. The AI model
+              reads your document as a sequence of tokens to understand context
+              and generate content.
+            </p>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <p className="font-semibold text-[11px] uppercase tracking-wider" style={{ color: "#94a3b8" }}>
+              How is Cost Estimated?
+            </p>
+            <p>
+              Estimated cost uses the model's per-token pricing (input +
+              output tokens combined). Longer documents with more context
+              naturally consume more tokens and cost more.
+            </p>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <p className="font-semibold text-[11px] uppercase tracking-wider" style={{ color: "#94a3b8" }}>
+              Tips for Optimization
+            </p>
+            <p>
+              Shorter prompts, fewer uploaded reference pages, and targeted
+              templates reduce token consumption. Reusing finalized documents
+              avoids redundant generation costs.
+            </p>
+          </div>
+        </div>
+        <p
+          className="text-[11px] mt-4 pt-3 border-t border-[#e2e8f0]"
+          style={{ color: "#94a3b8" }}
+        >
+          Costs shown are approximations based on current model pricing and may
+          vary. Actual billing is determined by Anthropic's usage logs.
+        </p>
+      </div>
     </div>
   );
 }

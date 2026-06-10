@@ -26,10 +26,17 @@ export const dailyActiveUsers = [
 // ─── Upload & Export ──────────────────────────────────────────────────────────
 
 export const docUploadsPerDay = [
-  { date: "05/04", uploads: 25 }, { date: "05/05", uploads: 19 }, { date: "05/06", uploads: 41 },
-  { date: "05/07", uploads: 1  }, { date: "05/08", uploads: 1  }, { date: "05/09", uploads: 22 },
-  { date: "05/11", uploads: 23 }, { date: "05/12", uploads: 32 }, { date: "05/13", uploads: 9  },
-  { date: "05/14", uploads: 7  }, { date: "05/15", uploads: 1  },
+  { date: "05/04", uploads: 25, breakdown: { CS: 10, TR: 8,  FM: 5, EP: 2 } },
+  { date: "05/05", uploads: 19, breakdown: { CS: 7,  TR: 6,  FM: 4, EP: 2 } },
+  { date: "05/06", uploads: 41, breakdown: { CS: 15, TR: 14, FM: 8, EP: 4 } },
+  { date: "05/07", uploads: 1,  breakdown: { CS: 1 } },
+  { date: "05/08", uploads: 1,  breakdown: { TR: 1 } },
+  { date: "05/09", uploads: 22, breakdown: { CS: 8,  TR: 7,  FM: 5, EP: 2 } },
+  { date: "05/11", uploads: 23, breakdown: { CS: 9,  TR: 8,  FM: 4, EP: 2 } },
+  { date: "05/12", uploads: 32, breakdown: { CS: 12, TR: 10, FM: 6, EP: 4 } },
+  { date: "05/13", uploads: 9,  breakdown: { CS: 3,  TR: 4,  FM: 2 } },
+  { date: "05/14", uploads: 7,  breakdown: { CS: 3,  TR: 2,  FM: 2 } },
+  { date: "05/15", uploads: 1,  breakdown: { CS: 1 } },
 ];
 
 export const docxExportsPerDay = [
@@ -39,24 +46,34 @@ export const docxExportsPerDay = [
 ];
 
 // ─── Generation Pipeline ──────────────────────────────────────────────────────
+// Status terms follow KGALING: Generated, Finalized, Failed
 
 export const genPipelineData = [
-  { date: "05/04", started: 5,   completed: 4,   failed: 0 },
-  { date: "05/05", started: 12,  completed: 10,  failed: 1 },
-  { date: "05/06", started: 8,   completed: 7,   failed: 0 },
-  { date: "05/07", started: 3,   completed: 2,   failed: 1 },
-  { date: "05/08", started: 2,   completed: 2,   failed: 0 },
-  { date: "05/09", started: 18,  completed: 16,  failed: 0 },
-  { date: "05/11", started: 280, completed: 270, failed: 3 },
-  { date: "05/12", started: 40,  completed: 38,  failed: 1 },
-  { date: "05/13", started: 15,  completed: 12,  failed: 0 },
-  { date: "05/14", started: 8,   completed: 7,   failed: 0 },
+  { date: "05/04", generated: 5,   finalized: 4,   failed: 0 },
+  { date: "05/05", generated: 12,  finalized: 10,  failed: 1 },
+  { date: "05/06", generated: 8,   finalized: 7,   failed: 0 },
+  { date: "05/07", generated: 3,   finalized: 2,   failed: 1 },
+  { date: "05/08", generated: 2,   finalized: 2,   failed: 0 },
+  { date: "05/09", generated: 18,  finalized: 16,  failed: 0 },
+  { date: "05/11", generated: 280, finalized: 270, failed: 3 },
+  { date: "05/12", generated: 40,  finalized: 38,  failed: 1 },
+  { date: "05/13", generated: 15,  finalized: 12,  failed: 0 },
+  { date: "05/14", generated: 8,   finalized: 7,   failed: 0 },
 ];
 
 export const genStatusTotals = [
-  { name: "Processing", value: 441, color: "#4caf50", pct: "50%" },
-  { name: "Completed",  value: 434, color: "#2196f3", pct: "49%" },
-  { name: "Failed",     value: 5,   color: "#f44336", pct: "1%"  },
+  { name: "Generated", value: 441, color: "#4caf50", pct: "50%" },
+  { name: "Finalized", value: 434, color: "#2196f3", pct: "49%" },
+  { name: "Failed",    value: 5,   color: "#f44336", pct: "1%"  },
+];
+
+export const genBySector = [
+  { sector: "ICT & Animation", generated: 180, finalized: 160, failed: 2 },
+  { sector: "Construction",    generated: 95,  finalized: 88,  failed: 1 },
+  { sector: "Tourism",         generated: 75,  finalized: 68,  failed: 0 },
+  { sector: "Agriculture",     generated: 60,  finalized: 55,  failed: 1 },
+  { sector: "Welding",         generated: 45,  finalized: 40,  failed: 1 },
+  { sector: "Health Care",     generated: 30,  finalized: 28,  failed: 0 },
 ];
 
 // ─── Token Usage ──────────────────────────────────────────────────────────────
@@ -80,17 +97,26 @@ export const tokenTrendData = [
   { date: "05/14", tokens: 6800  },
 ];
 
+export const tokenBySector = [
+  { sector: "ICT & Animation", tokens: 18400, cost: "$0.57" },
+  { sector: "Construction",    tokens: 9200,  cost: "$0.29" },
+  { sector: "Tourism",         tokens: 7100,  cost: "$0.22" },
+  { sector: "Agriculture",     tokens: 5600,  cost: "$0.17" },
+  { sector: "Welding",         tokens: 4300,  cost: "$0.13" },
+  { sector: "Health Care",     tokens: 3200,  cost: "$0.10" },
+];
+
 // ─── Sector Analytics ─────────────────────────────────────────────────────────
 
 export const sectorData = [
-  { sector: "ICT & Animation", tbs: 48, cs: 14, inDev: 12, forReview: 8,  approved: 28, activity: "High"   },
-  { sector: "Automotive",      tbs: 22, cs: 6,  inDev: 5,  forReview: 4,  approved: 13, activity: "High"   },
-  { sector: "Construction",    tbs: 31, cs: 9,  inDev: 7,  forReview: 11, approved: 13, activity: "Medium" },
-  { sector: "Agriculture",     tbs: 19, cs: 4,  inDev: 3,  forReview: 5,  approved: 11, activity: "Medium" },
-  { sector: "Tourism",         tbs: 28, cs: 8,  inDev: 6,  forReview: 6,  approved: 16, activity: "High"   },
-  { sector: "Electronics",     tbs: 14, cs: 3,  inDev: 2,  forReview: 3,  approved: 9,  activity: "Low"    },
-  { sector: "Welding",         tbs: 24, cs: 7,  inDev: 4,  forReview: 9,  approved: 11, activity: "Medium" },
-  { sector: "Health Care",     tbs: 16, cs: 5,  inDev: 3,  forReview: 4,  approved: 9,  activity: "Medium" },
+  { sector: "ICT & Animation", tbs: 48, cs: 14, inDev: 12, forReview: 8,  approved: 28, finalized: 22, activity: "High",   breakdown: { TR: 20, CS: 14, FM: 8,  EP: 6 } },
+  { sector: "Automotive",      tbs: 22, cs: 6,  inDev: 5,  forReview: 4,  approved: 13, finalized: 11, activity: "High",   breakdown: { TR: 12, CS: 6,  FM: 3,  EP: 1 } },
+  { sector: "Construction",    tbs: 31, cs: 9,  inDev: 7,  forReview: 11, approved: 13, finalized: 13, activity: "Medium", breakdown: { TR: 18, CS: 9,  FM: 4  } },
+  { sector: "Agriculture",     tbs: 19, cs: 4,  inDev: 3,  forReview: 5,  approved: 11, finalized: 9,  activity: "Medium", breakdown: { TR: 12, CS: 4,  FM: 3  } },
+  { sector: "Tourism",         tbs: 28, cs: 8,  inDev: 6,  forReview: 6,  approved: 16, finalized: 14, activity: "High",   breakdown: { TR: 16, CS: 8,  FM: 4  } },
+  { sector: "Electronics",     tbs: 14, cs: 3,  inDev: 2,  forReview: 3,  approved: 9,  finalized: 7,  activity: "Low",    breakdown: { TR: 8,  CS: 3,  FM: 2,  EP: 1 } },
+  { sector: "Welding",         tbs: 24, cs: 7,  inDev: 4,  forReview: 9,  approved: 11, finalized: 9,  activity: "Medium", breakdown: { TR: 14, CS: 7,  FM: 3  } },
+  { sector: "Health Care",     tbs: 16, cs: 5,  inDev: 3,  forReview: 4,  approved: 9,  finalized: 7,  activity: "Medium", breakdown: { TR: 9,  CS: 5,  FM: 2  } },
 ];
 
 export const statusOfDocsData = [

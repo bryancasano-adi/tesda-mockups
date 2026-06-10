@@ -23,7 +23,8 @@ import {
   BookOpen,
   FileCheck,
   Award,
-  Star,
+  FileDown,
+  ChevronRight,
 } from "lucide-react";
 import {
   StatCard,
@@ -32,6 +33,7 @@ import {
   DataTable,
   StatusBadge,
   ActionButton,
+  exportToExcel,
 } from "./PagePrimitives";
 import {
   sectorData,
@@ -43,26 +45,102 @@ import {
   DOC_TYPES,
   STATUSES,
   QUAL_LEVELS,
-  STATUS_CHIP,
   ACTIVITY_LEVELS,
   REGIONAL_LEVEL_COLOR,
 } from "./sharedData";
 
-const PRIORITY_SECTORS = [
-  { label: "ICT & Animation", Icon: Cpu, color: "#1976d2", bg: "#e3f2fd" },
-  { label: "Construction", Icon: Building2, color: "#f57c00", bg: "#fff3e0" },
-  { label: "Agriculture", Icon: Leaf, color: "#2e7d32", bg: "#e8f5e9" },
-  { label: "Tourism", Icon: Globe, color: "#9c27b0", bg: "#f3e5f5" },
-  { label: "Energy", Icon: Zap, color: "#f44336", bg: "#fce4ec" },
-];
+const SECTOR_ICON_MAP: Record<
+  string,
+  { Icon: React.ElementType; color: string; bg: string }
+> = {
+  "ICT & Animation": { Icon: Cpu,      color: "#1976d2", bg: "#e3f2fd" },
+  Construction:      { Icon: Building2, color: "#f57c00", bg: "#fff3e0" },
+  Agriculture:       { Icon: Leaf,      color: "#2e7d32", bg: "#e8f5e9" },
+  Tourism:           { Icon: Globe,     color: "#9c27b0", bg: "#f3e5f5" },
+  Energy:            { Icon: Zap,       color: "#f44336", bg: "#fce4ec" },
+  Welding:           { Icon: Zap,       color: "#e65100", bg: "#fbe9e7" },
+  Electronics:       { Icon: Cpu,       color: "#0288d1", bg: "#e1f5fe" },
+  Automotive:        { Icon: Building2, color: "#455a64", bg: "#eceff1" },
+  "Health Care":     { Icon: Award,     color: "#c62828", bg: "#fce4ec" },
+};
+
+type SectorBreakdownPayload = {
+  sector: string;
+  tbs: number;
+  cs: number;
+  breakdown?: Record<string, number>;
+};
+
+function SectorBreakdownTooltip({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean;
+  payload?: { payload: SectorBreakdownPayload }[];
+  label?: string;
+}) {
+  if (!active || !payload?.length) return null;
+  const d = payload[0].payload;
+  return (
+    <div
+      className="rounded-xl text-[12px] p-3 min-w-[160px]"
+      style={{
+        background: "#fff",
+        border: "none",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+      }}
+    >
+      <p className="font-semibold mb-1" style={{ color: "#0f172a" }}>
+        {label}
+      </p>
+      <div className="flex gap-4 mb-2">
+        <span style={{ color: "#64748b" }}>
+          TBs:{" "}
+          <span className="font-bold" style={{ color: "#1976d2" }}>
+            {d.tbs}
+          </span>
+        </span>
+        <span style={{ color: "#64748b" }}>
+          CS:{" "}
+          <span className="font-bold" style={{ color: "#f57c00" }}>
+            {d.cs}
+          </span>
+        </span>
+      </div>
+      {d.breakdown && Object.keys(d.breakdown).length > 0 && (
+        <div
+          className="border-t pt-2 mt-1 flex flex-col gap-1"
+          style={{ borderColor: "#f1f5f9" }}
+        >
+          <p
+            className="text-[10px] uppercase tracking-wider mb-0.5"
+            style={{ color: "#94a3b8" }}
+          >
+            Doc Breakdown
+          </p>
+          {Object.entries(d.breakdown).map(([key, val]) => (
+            <div key={key} className="flex justify-between gap-6">
+              <span style={{ color: "#475569" }}>{key}</span>
+              <span className="font-bold" style={{ color: "#0f172a" }}>
+                {val}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function SectorAnalyticsModule() {
   const totalTBs = sectorData.reduce((s, d) => s + d.tbs, 0);
   const totalCS = sectorData.reduce((s, d) => s + d.cs, 0);
   const totalApproved = sectorData.reduce((s, d) => s + d.approved, 0);
-  const mostRequested = sectorData.reduce((a, b) => (a.tbs > b.tbs ? a : b));
   const totalDocs = statusOfDocsData.reduce((s, d) => s + d.value, 0);
 
+  const [activeSector, setActiveSector] = useState("All");
+  const [showAllSectors, setShowAllSectors] = useState(false);
   const [query, setQuery] = useState("");
   const [sector, setSector] = useState("All Sectors");
   const [subsector, setSubsector] = useState("All Sub-Sectors");
@@ -70,6 +148,26 @@ export function SectorAnalyticsModule() {
   const [status, setStatus] = useState("All Status");
   const [qualLevel, setQualLevel] = useState("All Levels");
   const [submitted, setSubmitted] = useState(false);
+
+  const sectorNames = useMemo(
+    () => ["All", ...sectorData.map((d) => d.sector)],
+    [],
+  );
+
+  const filteredSectorData = useMemo(() => {
+    if (activeSector === "All") return sectorData;
+    return sectorData.filter((d) => d.sector === activeSector);
+  }, [activeSector]);
+
+  // Top 5 sectors ranked by finalized count (descending)
+  const topPrioritySectors = useMemo(
+    () => [...sectorData].sort((a, b) => b.finalized - a.finalized).slice(0, 5),
+    [],
+  );
+  const allSectorsByFinalized = useMemo(
+    () => [...sectorData].sort((a, b) => b.finalized - a.finalized),
+    [],
+  );
 
   const activeFilterCount =
     [sector, subsector, docType, status, qualLevel].filter(
@@ -121,8 +219,42 @@ export function SectorAnalyticsModule() {
     setSubmitted(false);
   }
 
+  function handleExportSectorSummary() {
+    exportToExcel(
+      ["Sector", "TBs", "CS", "In Dev", "For Review", "Approved", "Finalized", "Activity"],
+      sectorData.map((r) => [
+        r.sector, r.tbs, r.cs, r.inDev, r.forReview, r.approved, r.finalized, r.activity,
+      ]),
+      "sector_summary",
+    );
+  }
+
   return (
     <div className="flex flex-col gap-5">
+      {/* ── Sector Filter (main tab) ── */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span
+          className="text-[11px] font-semibold uppercase tracking-wider"
+          style={{ color: "#94a3b8" }}
+        >
+          Sector
+        </span>
+        <div className="w-px h-4 bg-slate-200" />
+        {sectorNames.map((s) => (
+          <button
+            key={s}
+            onClick={() => setActiveSector(s)}
+            className={`px-3 py-1 rounded-full text-[12px] font-medium border transition-colors cursor-pointer ${
+              activeSector === s
+                ? "bg-slate-900 text-white border-slate-900"
+                : "bg-white text-slate-600 border-slate-200 hover:border-slate-400 hover:text-slate-900"
+            }`}
+          >
+            {s}
+          </button>
+        ))}
+      </div>
+
       {/* ── KPI Cards ── */}
       <div className="flex gap-4">
         <StatCard
@@ -146,31 +278,6 @@ export function SectorAnalyticsModule() {
           color="#f57c00"
           Icon={Award}
         />
-        <div
-          className="flex-1 min-w-[130px] rounded-2xl p-5 flex flex-col justify-between gap-3"
-          style={{
-            background: "linear-gradient(135deg, #1976d2 0%, #1565c0 100%)",
-            boxShadow: "0 4px 14px rgba(25,118,210,0.3)",
-          }}
-        >
-          <div className="flex items-start justify-between gap-2">
-            <p className="text-[11px] font-bold uppercase tracking-widest leading-tight text-white/70">
-              Most Requested
-            </p>
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 bg-white/20">
-              <Star size={15} className="text-white" strokeWidth={2} />
-            </div>
-          </div>
-          <div>
-            <p className="text-[20px] font-bold leading-tight tracking-tight text-white">
-              {mostRequested.sector}
-            </p>
-            <p className="text-[12px] mt-1 text-white/70">
-              {mostRequested.tbs} TBs · {mostRequested.cs} CS
-            </p>
-          </div>
-          <div className="h-[3px] w-10 rounded-full bg-white/40" />
-        </div>
       </div>
 
       {/* ── TBs/CSs per Sector + Status of Docs ── */}
@@ -178,7 +285,7 @@ export function SectorAnalyticsModule() {
         <div className="col-span-2">
           <ChartCard
             title="TBs and CSs per Sector"
-            subtitle="Training Bodies vs Competency Standards by sector"
+            subtitle="Training Bodies vs Competency Standards — hover for doc type breakdown"
             action={
               <div className="flex gap-4">
                 {[
@@ -201,7 +308,11 @@ export function SectorAnalyticsModule() {
             }
           >
             <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={sectorData} barCategoryGap="25%" barGap={4}>
+              <BarChart
+                data={filteredSectorData}
+                barCategoryGap="25%"
+                barGap={4}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                 <XAxis
                   dataKey="sector"
@@ -215,13 +326,7 @@ export function SectorAnalyticsModule() {
                   tickLine={false}
                   allowDecimals={false}
                 />
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: 10,
-                    border: "none",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                  }}
-                />
+                <Tooltip content={<SectorBreakdownTooltip />} />
                 <Bar
                   dataKey="tbs"
                   fill="#1976d2"
@@ -297,63 +402,195 @@ export function SectorAnalyticsModule() {
         </ChartCard>
       </div>
 
-      {/* ── Top Priority Sectors ── */}
+      {/* ── Top Priority Sectors (ranked by finalized) ── */}
       <div>
-        <p
-          className="text-[14px] font-semibold mb-3"
-          style={{ color: "#0f172a" }}
-        >
-          Top Priority Sectors
-        </p>
-        <div className="grid grid-cols-5 gap-3">
-          {PRIORITY_SECTORS.map((s, i) => {
-            const row =
-              sectorData.find((d) => d.sector === s.label) ?? sectorData[i];
-            const Icon = s.Icon;
-            return (
-              <div
-                key={i}
-                className="rounded-2xl p-4 flex flex-col items-center text-center gap-2"
-                style={{
-                  background: "#ffffff",
-                  boxShadow:
-                    "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
-                }}
-              >
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center"
-                  style={{ background: s.bg }}
-                >
-                  <Icon size={20} style={{ color: s.color }} />
-                </div>
-                <p
-                  className="text-[12px] font-semibold leading-tight"
-                  style={{ color: "#0f172a" }}
-                >
-                  {s.label}
-                </p>
-                <div className="flex gap-3 text-[11px]">
-                  <span>
-                    <span className="font-bold" style={{ color: s.color }}>
-                      {row.tbs}
-                    </span>{" "}
-                    <span style={{ color: "#94a3b8" }}>TB</span>
-                  </span>
-                  <span>
-                    <span className="font-bold" style={{ color: "#f57c00" }}>
-                      {row.cs}
-                    </span>{" "}
-                    <span style={{ color: "#94a3b8" }}>CS</span>
-                  </span>
-                </div>
-                <div
-                  className="h-[2px] w-8 rounded-full"
-                  style={{ background: s.color }}
-                />
-              </div>
-            );
-          })}
+        <div className="flex items-center justify-between mb-3">
+          <p
+            className="text-[14px] font-semibold"
+            style={{ color: "#0f172a" }}
+          >
+            Top Priority Sectors{" "}
+            <span
+              className="text-[11px] font-normal ml-1"
+              style={{ color: "#94a3b8" }}
+            >
+              ranked by docs finalized
+            </span>
+          </p>
+          <button
+            onClick={() => setShowAllSectors((v) => !v)}
+            className="flex items-center gap-1 text-[12px] font-medium hover:underline cursor-pointer"
+            style={{ color: "#1976d2" }}
+          >
+            {showAllSectors ? "Show Top 5" : "View All"}
+            <ChevronRight
+              size={13}
+              style={{
+                transform: showAllSectors ? "rotate(90deg)" : "rotate(0deg)",
+                transition: "transform 0.2s",
+              }}
+            />
+          </button>
         </div>
+
+        {showAllSectors ? (
+          /* Expanded: show all sectors as a table */
+          <div
+            className="rounded-2xl overflow-hidden"
+            style={{
+              background: "#ffffff",
+              boxShadow:
+                "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+            }}
+          >
+            <DataTable
+              columns={[
+                {
+                  key: "rank",
+                  header: "#",
+                  render: (_, i) => (
+                    <span className="font-bold" style={{ color: "#94a3b8" }}>
+                      {i + 1}
+                    </span>
+                  ),
+                },
+                {
+                  key: "sector",
+                  header: "Sector",
+                  render: (row) => {
+                    const meta = SECTOR_ICON_MAP[row.sector];
+                    const Icon = meta?.Icon ?? BookOpen;
+                    return (
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
+                          style={{ background: meta?.bg ?? "#f1f5f9" }}
+                        >
+                          <Icon
+                            size={13}
+                            style={{ color: meta?.color ?? "#64748b" }}
+                          />
+                        </div>
+                        <span
+                          className="font-semibold"
+                          style={{ color: "#0f172a" }}
+                        >
+                          {row.sector}
+                        </span>
+                      </div>
+                    );
+                  },
+                },
+                {
+                  key: "finalized",
+                  header: "Docs Finalized",
+                  align: "right",
+                  render: (row) => (
+                    <span className="font-bold" style={{ color: "#16a34a" }}>
+                      {row.finalized}
+                    </span>
+                  ),
+                },
+                {
+                  key: "tbs",
+                  header: "TBs",
+                  align: "right",
+                  render: (row) => (
+                    <span className="font-semibold" style={{ color: "#1976d2" }}>
+                      {row.tbs}
+                    </span>
+                  ),
+                },
+                {
+                  key: "cs",
+                  header: "CS",
+                  align: "right",
+                  render: (row) => (
+                    <span className="font-semibold" style={{ color: "#f57c00" }}>
+                      {row.cs}
+                    </span>
+                  ),
+                },
+                {
+                  key: "activity",
+                  header: "Activity",
+                  align: "center",
+                  render: (row) => (
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${ACTIVITY_LEVELS[row.activity]}`}
+                    >
+                      {row.activity}
+                    </span>
+                  ),
+                },
+              ]}
+              rows={allSectorsByFinalized}
+              keyExtractor={(_, i) => i}
+            />
+          </div>
+        ) : (
+          /* Collapsed: show top 5 cards */
+          <div className="grid grid-cols-5 gap-3">
+            {topPrioritySectors.map((row, i) => {
+              const meta = SECTOR_ICON_MAP[row.sector];
+              const Icon = meta?.Icon ?? BookOpen;
+              return (
+                <div
+                  key={i}
+                  className="rounded-2xl p-4 flex flex-col items-center text-center gap-2"
+                  style={{
+                    background: "#ffffff",
+                    boxShadow:
+                      "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+                  }}
+                >
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+                    style={{ background: meta?.bg ?? "#f1f5f9" }}
+                  >
+                    <Icon
+                      size={20}
+                      style={{ color: meta?.color ?? "#64748b" }}
+                    />
+                  </div>
+                  <p
+                    className="text-[12px] font-semibold leading-tight"
+                    style={{ color: "#0f172a" }}
+                  >
+                    {row.sector}
+                  </p>
+                  <div className="flex gap-3 text-[11px]">
+                    <span>
+                      <span
+                        className="font-bold"
+                        style={{ color: meta?.color ?? "#64748b" }}
+                      >
+                        {row.tbs}
+                      </span>{" "}
+                      <span style={{ color: "#94a3b8" }}>TB</span>
+                    </span>
+                    <span>
+                      <span className="font-bold" style={{ color: "#f57c00" }}>
+                        {row.cs}
+                      </span>{" "}
+                      <span style={{ color: "#94a3b8" }}>CS</span>
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1 text-[11px]">
+                    <span className="font-bold" style={{ color: "#16a34a" }}>
+                      {row.finalized}
+                    </span>{" "}
+                    <span style={{ color: "#94a3b8" }}>finalized</span>
+                  </div>
+                  <div
+                    className="h-[2px] w-8 rounded-full"
+                    style={{ background: meta?.color ?? "#64748b" }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* ── Regional Implementation ── */}
@@ -420,7 +657,7 @@ export function SectorAnalyticsModule() {
       {/* ── Development Status per Sector ── */}
       <ChartCard
         title="Development Status Per Sector"
-        subtitle="In-development, review, and approved counts by sector"
+        subtitle="In-development, review, and approved counts by sector — hover for doc type breakdown"
         action={
           <div className="flex gap-4">
             {[
@@ -444,7 +681,11 @@ export function SectorAnalyticsModule() {
         }
       >
         <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={sectorData} barCategoryGap="25%" barGap={3}>
+          <BarChart
+            data={filteredSectorData}
+            barCategoryGap="25%"
+            barGap={3}
+          >
             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
             <XAxis
               dataKey="sector"
@@ -458,13 +699,7 @@ export function SectorAnalyticsModule() {
               tickLine={false}
               allowDecimals={false}
             />
-            <Tooltip
-              contentStyle={{
-                borderRadius: 10,
-                border: "none",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-              }}
-            />
+            <Tooltip content={<SectorBreakdownTooltip />} />
             <Bar
               dataKey="inDev"
               fill="#9c27b0"
@@ -490,7 +725,16 @@ export function SectorAnalyticsModule() {
       {/* ── Sector Summary Table ── */}
       <ChartCard
         title="Sector Summary"
-        subtitle="All sectors with TBs, CS, and development status"
+        subtitle="All sectors with TBs, CS, finalized count, and development status"
+        action={
+          <ActionButton
+            onClick={handleExportSectorSummary}
+            variant="outline"
+            size="sm"
+          >
+            <FileDown size={13} /> Export Excel
+          </ActionButton>
+        }
       >
         <DataTable
           columns={[
@@ -550,6 +794,16 @@ export function SectorAnalyticsModule() {
               render: (row) => (
                 <span className="font-semibold" style={{ color: "#16a34a" }}>
                   {row.approved}
+                </span>
+              ),
+            },
+            {
+              key: "finalized",
+              header: "Finalized",
+              align: "center",
+              render: (row) => (
+                <span className="font-bold" style={{ color: "#2196f3" }}>
+                  {row.finalized}
                 </span>
               ),
             },

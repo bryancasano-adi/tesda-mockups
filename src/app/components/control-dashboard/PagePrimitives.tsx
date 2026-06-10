@@ -1,5 +1,22 @@
 import type { LucideIcon } from "lucide-react";
 
+// ─── exportToExcel ────────────────────────────────────────────────────────────
+
+export function exportToExcel(
+  headers: string[],
+  rows: (string | number)[][],
+  filename: string,
+) {
+  const table = `<table><thead><tr>${headers.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+  const blob = new Blob([table], { type: "application/vnd.ms-excel" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${filename}.xls`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 // ─── StatCard ─────────────────────────────────────────────────────────────────
 
 type StatCardProps = {

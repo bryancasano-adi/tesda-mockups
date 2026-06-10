@@ -7,13 +7,20 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { LogIn, Users, TrendingUp, BarChart2 } from "lucide-react";
-import { StatCard, ChartCard, DataTable } from "./PagePrimitives";
+import { LogIn, Users, FileDown } from "lucide-react";
+import { StatCard, ChartCard, DataTable, ActionButton, exportToExcel } from "./PagePrimitives";
 import { loginsByDay, loginsByUser, dailyActiveUsers } from "./sharedData";
 
 export function UserActivityModule() {
   const totalLogins = loginsByDay.reduce((s, d) => s + d.logins, 0);
-  const peakDay = loginsByDay.reduce((a, b) => (a.logins > b.logins ? a : b));
+
+  function handleExport() {
+    exportToExcel(
+      ["#", "User Email", "Total Logins"],
+      loginsByUser.map((r, i) => [i + 1, r.email, r.logins]),
+      "logins_by_user",
+    );
+  }
 
   return (
     <div className="flex flex-col gap-5">
@@ -31,20 +38,6 @@ export function UserActivityModule() {
           sub="Distinct accounts"
           color="#1976d2"
           Icon={Users}
-        />
-        <StatCard
-          label="Peak Login Day"
-          value={peakDay.date}
-          sub={`${peakDay.logins} logins`}
-          color="#f57c00"
-          Icon={TrendingUp}
-        />
-        <StatCard
-          label="Avg Logins / Day"
-          value={(totalLogins / loginsByDay.length).toFixed(1)}
-          sub="Rolling average"
-          color="#9c27b0"
-          Icon={BarChart2}
         />
       </div>
 
@@ -121,7 +114,12 @@ export function UserActivityModule() {
 
       <ChartCard
         title="Logins by User"
-        subtitle="Individual login counts with share percentage"
+        subtitle="Individual login counts"
+        action={
+          <ActionButton onClick={handleExport} variant="outline" size="sm">
+            <FileDown size={13} /> Export Excel
+          </ActionButton>
+        }
       >
         <DataTable
           columns={[
@@ -148,16 +146,6 @@ export function UserActivityModule() {
               render: (row) => (
                 <span className="font-bold" style={{ color: "#1976d2" }}>
                   {row.logins}
-                </span>
-              ),
-            },
-            {
-              key: "share",
-              header: "% Share",
-              align: "right",
-              render: (row) => (
-                <span style={{ color: "#64748b" }}>
-                  {((row.logins / totalLogins) * 100).toFixed(0)}%
                 </span>
               ),
             },
