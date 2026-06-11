@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import {
   BarChart,
   Bar,
@@ -9,7 +10,7 @@ import {
   LineChart,
   Line,
 } from "recharts";
-import { Cpu, Activity, DollarSign, FileText, FileDown } from "lucide-react";
+import { Cpu, Activity, DollarSign, FileText, FileDown, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   StatCard,
   ChartCard,
@@ -22,9 +23,54 @@ import { tokenUsageData, tokenTrendData, tokenBySector } from "./sharedData";
 
 const sortedTokenData = [...tokenUsageData].sort((a, b) => b.tokens - a.tokens);
 
+type TrendPeriod = "quarterly" | "monthly" | "weekly" | "daily";
+
+const TREND_PERIOD_LABELS: Record<TrendPeriod, string> = {
+  quarterly: "Quarterly",
+  monthly: "Monthly",
+  weekly: "Weekly",
+  daily: "Daily (last 24hrs)",
+};
+
+const DOC_PER_PAGE = 5;
+const SECTOR_PER_PAGE = 5;
+
 export function TokenUsageModule() {
   const totalTokens = tokenUsageData.reduce((s, d) => s + d.tokens, 0);
   const avgTokens = Math.round(totalTokens / tokenUsageData.length);
+
+  const [trendPeriod, setTrendPeriod] = useState<TrendPeriod>("monthly");
+  const [docSearch, setDocSearch] = useState("");
+  const [docPage, setDocPage] = useState(1);
+  const [sectorSearch, setSectorSearch] = useState("");
+  const [sectorPage, setSectorPage] = useState(1);
+
+  const filteredTrendData = useMemo(() => {
+    if (trendPeriod === "daily") return tokenTrendData.slice(-1);
+    if (trendPeriod === "weekly") return tokenTrendData.slice(-7);
+    return tokenTrendData;
+  }, [trendPeriod]);
+
+  const filteredDocs = sortedTokenData.filter((r) =>
+    r.doc.toLowerCase().includes(docSearch.toLowerCase()),
+  );
+  const docPageCount = Math.max(1, Math.ceil(filteredDocs.length / DOC_PER_PAGE));
+  const pagedDocs = filteredDocs.slice(
+    (docPage - 1) * DOC_PER_PAGE,
+    docPage * DOC_PER_PAGE,
+  );
+
+  const filteredSectors = tokenBySector.filter((r) =>
+    r.sector.toLowerCase().includes(sectorSearch.toLowerCase()),
+  );
+  const sectorPageCount = Math.max(
+    1,
+    Math.ceil(filteredSectors.length / SECTOR_PER_PAGE),
+  );
+  const pagedSectors = filteredSectors.slice(
+    (sectorPage - 1) * SECTOR_PER_PAGE,
+    sectorPage * SECTOR_PER_PAGE,
+  );
 
   function handleExport() {
     exportToExcel(
@@ -120,10 +166,23 @@ export function TokenUsageModule() {
 
       <ChartCard
         title="Token Usage Trend Over Time"
-        subtitle="Cumulative daily token consumption"
+        subtitle={`Cumulative token consumption — ${TREND_PERIOD_LABELS[trendPeriod].toLowerCase()} view`}
+        action={
+          <select
+            value={trendPeriod}
+            onChange={(e) => setTrendPeriod(e.target.value as TrendPeriod)}
+            className="border border-[#e2e8f0] rounded-lg px-2.5 py-1 text-[12px] bg-white focus:outline-none focus:border-[#7b1fa2] focus:ring-1 focus:ring-[#7b1fa2] transition-colors cursor-pointer"
+            style={{ color: "#334155" }}
+          >
+            <option value="quarterly">Quarterly</option>
+            <option value="monthly">Monthly</option>
+            <option value="weekly">Weekly</option>
+            <option value="daily">Daily (last 24hrs)</option>
+          </select>
+        }
       >
         <ResponsiveContainer width="100%" height={200}>
-          <LineChart data={tokenTrendData}>
+          <LineChart data={filteredTrendData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
             <XAxis
               dataKey="date"
@@ -161,9 +220,29 @@ export function TokenUsageModule() {
         title="Token Usage Report — Per Document"
         subtitle="Ranked by tokens used — highest first"
         action={
-          <ActionButton onClick={handleExport} variant="primary" size="sm">
-            <FileDown size={13} /> Export Excel
-          </ActionButton>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Search
+                size={13}
+                className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                style={{ color: "#94a3b8" }}
+              />
+              <input
+                type="text"
+                value={docSearch}
+                onChange={(e) => {
+                  setDocSearch(e.target.value);
+                  setDocPage(1);
+                }}
+                placeholder="Search by document..."
+                className="pl-8 pr-3 py-1.5 border border-[#e2e8f0] rounded-xl text-[12px] w-48 focus:outline-none focus:border-[#1976d2] focus:ring-1 focus:ring-[#1976d2] transition-colors"
+                style={{ color: "#334155" }}
+              />
+            </div>
+            <ActionButton onClick={handleExport} variant="primary" size="sm">
+              <FileDown size={13} /> Export Excel
+            </ActionButton>
+          </div>
         }
       >
         <DataTable
@@ -172,7 +251,9 @@ export function TokenUsageModule() {
               key: "#",
               header: "#",
               render: (_, i) => (
-                <span style={{ color: "#94a3b8" }}>{i + 1}</span>
+                <span style={{ color: "#94a3b8" }}>
+                  {(docPage - 1) * DOC_PER_PAGE + i + 1}
+                </span>
               ),
             },
             {
@@ -203,8 +284,8 @@ export function TokenUsageModule() {
               ),
             },
           ]}
-          rows={sortedTokenData}
-          keyExtractor={(_, i) => i}
+          rows={pagedDocs}
+          keyExtractor={(row) => row.doc}
           footer={
             <>
               <td
@@ -229,6 +310,41 @@ export function TokenUsageModule() {
             </>
           }
         />
+
+        {/* Pagination */}
+        {docPageCount > 1 && (
+          <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#f1f5f9]">
+            <p className="text-[12px]" style={{ color: "#94a3b8" }}>
+              Showing{" "}
+              {filteredDocs.length === 0
+                ? 0
+                : (docPage - 1) * DOC_PER_PAGE + 1}
+              –{Math.min(docPage * DOC_PER_PAGE, filteredDocs.length)} of{" "}
+              {filteredDocs.length}
+            </p>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setDocPage((p) => Math.max(1, p - 1))}
+                disabled={docPage === 1}
+                className="w-7 h-7 flex items-center justify-center rounded-lg border border-[#e2e8f0] bg-white disabled:opacity-40 hover:bg-[#f8fafc] transition-colors cursor-pointer disabled:cursor-default"
+              >
+                <ChevronLeft size={13} style={{ color: "#475569" }} />
+              </button>
+              <span className="text-[12px] px-2" style={{ color: "#475569" }}>
+                {docPage} / {docPageCount}
+              </span>
+              <button
+                onClick={() =>
+                  setDocPage((p) => Math.min(docPageCount, p + 1))
+                }
+                disabled={docPage === docPageCount}
+                className="w-7 h-7 flex items-center justify-center rounded-lg border border-[#e2e8f0] bg-white disabled:opacity-40 hover:bg-[#f8fafc] transition-colors cursor-pointer disabled:cursor-default"
+              >
+                <ChevronRight size={13} style={{ color: "#475569" }} />
+              </button>
+            </div>
+          </div>
+        )}
       </ChartCard>
 
       {/* ── Per Sector Token Usage ── */}
@@ -287,6 +403,26 @@ export function TokenUsageModule() {
         <ChartCard
           title="Sector Token Report"
           subtitle="Token usage and estimated cost per sector"
+          action={
+            <div className="relative">
+              <Search
+                size={13}
+                className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                style={{ color: "#94a3b8" }}
+              />
+              <input
+                type="text"
+                value={sectorSearch}
+                onChange={(e) => {
+                  setSectorSearch(e.target.value);
+                  setSectorPage(1);
+                }}
+                placeholder="Search by sector..."
+                className="pl-8 pr-3 py-1.5 border border-[#e2e8f0] rounded-xl text-[12px] w-48 focus:outline-none focus:border-[#1976d2] focus:ring-1 focus:ring-[#1976d2] transition-colors"
+                style={{ color: "#334155" }}
+              />
+            </div>
+          }
         >
           <DataTable
             columns={[
@@ -294,7 +430,9 @@ export function TokenUsageModule() {
                 key: "#",
                 header: "#",
                 render: (_, i) => (
-                  <span style={{ color: "#94a3b8" }}>{i + 1}</span>
+                  <span style={{ color: "#94a3b8" }}>
+                    {(sectorPage - 1) * SECTOR_PER_PAGE + i + 1}
+                  </span>
                 ),
               },
               {
@@ -325,9 +463,44 @@ export function TokenUsageModule() {
                 ),
               },
             ]}
-            rows={tokenBySector}
-            keyExtractor={(_, i) => i}
+            rows={pagedSectors}
+            keyExtractor={(row) => row.sector}
           />
+
+          {/* Pagination */}
+          {sectorPageCount > 1 && (
+            <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#f1f5f9]">
+              <p className="text-[12px]" style={{ color: "#94a3b8" }}>
+                Showing{" "}
+                {filteredSectors.length === 0
+                  ? 0
+                  : (sectorPage - 1) * SECTOR_PER_PAGE + 1}
+                –{Math.min(sectorPage * SECTOR_PER_PAGE, filteredSectors.length)}{" "}
+                of {filteredSectors.length}
+              </p>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setSectorPage((p) => Math.max(1, p - 1))}
+                  disabled={sectorPage === 1}
+                  className="w-7 h-7 flex items-center justify-center rounded-lg border border-[#e2e8f0] bg-white disabled:opacity-40 hover:bg-[#f8fafc] transition-colors cursor-pointer disabled:cursor-default"
+                >
+                  <ChevronLeft size={13} style={{ color: "#475569" }} />
+                </button>
+                <span className="text-[12px] px-2" style={{ color: "#475569" }}>
+                  {sectorPage} / {sectorPageCount}
+                </span>
+                <button
+                  onClick={() =>
+                    setSectorPage((p) => Math.min(sectorPageCount, p + 1))
+                  }
+                  disabled={sectorPage === sectorPageCount}
+                  className="w-7 h-7 flex items-center justify-center rounded-lg border border-[#e2e8f0] bg-white disabled:opacity-40 hover:bg-[#f8fafc] transition-colors cursor-pointer disabled:cursor-default"
+                >
+                  <ChevronRight size={13} style={{ color: "#475569" }} />
+                </button>
+              </div>
+            </div>
+          )}
         </ChartCard>
       </div>
 

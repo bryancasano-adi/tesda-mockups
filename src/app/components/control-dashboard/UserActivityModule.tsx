@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   BarChart,
   Bar,
@@ -7,12 +8,26 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { LogIn, Users, FileDown } from "lucide-react";
+import { LogIn, Users, FileDown, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { StatCard, ChartCard, DataTable, ActionButton, exportToExcel } from "./PagePrimitives";
 import { loginsByDay, loginsByUser, dailyActiveUsers } from "./sharedData";
 
+const LOGINS_PER_PAGE = 5;
+
 export function UserActivityModule() {
   const totalLogins = loginsByDay.reduce((s, d) => s + d.logins, 0);
+
+  const [loginSearch, setLoginSearch] = useState("");
+  const [loginPage, setLoginPage] = useState(1);
+
+  const filteredLogins = loginsByUser.filter((r) =>
+    r.email.toLowerCase().includes(loginSearch.toLowerCase()),
+  );
+  const loginPageCount = Math.max(1, Math.ceil(filteredLogins.length / LOGINS_PER_PAGE));
+  const pagedLogins = filteredLogins.slice(
+    (loginPage - 1) * LOGINS_PER_PAGE,
+    loginPage * LOGINS_PER_PAGE,
+  );
 
   function handleExport() {
     exportToExcel(
@@ -116,9 +131,29 @@ export function UserActivityModule() {
         title="Logins by User"
         subtitle="Individual login counts"
         action={
-          <ActionButton onClick={handleExport} variant="outline" size="sm">
-            <FileDown size={13} /> Export Excel
-          </ActionButton>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Search
+                size={13}
+                className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                style={{ color: "#94a3b8" }}
+              />
+              <input
+                type="text"
+                value={loginSearch}
+                onChange={(e) => {
+                  setLoginSearch(e.target.value);
+                  setLoginPage(1);
+                }}
+                placeholder="Search by email..."
+                className="pl-8 pr-3 py-1.5 border border-[#e2e8f0] rounded-xl text-[12px] w-48 focus:outline-none focus:border-[#1976d2] focus:ring-1 focus:ring-[#1976d2] transition-colors"
+                style={{ color: "#334155" }}
+              />
+            </div>
+            <ActionButton onClick={handleExport} variant="outline" size="sm">
+              <FileDown size={13} /> Export Excel
+            </ActionButton>
+          </div>
         }
       >
         <DataTable
@@ -127,7 +162,9 @@ export function UserActivityModule() {
               key: "#",
               header: "#",
               render: (_, i) => (
-                <span style={{ color: "#94a3b8" }}>{i + 1}</span>
+                <span style={{ color: "#94a3b8" }}>
+                  {(loginPage - 1) * LOGINS_PER_PAGE + i + 1}
+                </span>
               ),
             },
             {
@@ -150,9 +187,44 @@ export function UserActivityModule() {
               ),
             },
           ]}
-          rows={loginsByUser}
-          keyExtractor={(_, i) => i}
+          rows={pagedLogins}
+          keyExtractor={(row) => row.email}
         />
+
+        {/* Pagination */}
+        {loginPageCount > 1 && (
+          <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#f1f5f9]">
+            <p className="text-[12px]" style={{ color: "#94a3b8" }}>
+              Showing{" "}
+              {filteredLogins.length === 0
+                ? 0
+                : (loginPage - 1) * LOGINS_PER_PAGE + 1}
+              –{Math.min(loginPage * LOGINS_PER_PAGE, filteredLogins.length)}{" "}
+              of {filteredLogins.length}
+            </p>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setLoginPage((p) => Math.max(1, p - 1))}
+                disabled={loginPage === 1}
+                className="w-7 h-7 flex items-center justify-center rounded-lg border border-[#e2e8f0] bg-white disabled:opacity-40 hover:bg-[#f8fafc] transition-colors cursor-pointer disabled:cursor-default"
+              >
+                <ChevronLeft size={13} style={{ color: "#475569" }} />
+              </button>
+              <span className="text-[12px] px-2" style={{ color: "#475569" }}>
+                {loginPage} / {loginPageCount}
+              </span>
+              <button
+                onClick={() =>
+                  setLoginPage((p) => Math.min(loginPageCount, p + 1))
+                }
+                disabled={loginPage === loginPageCount}
+                className="w-7 h-7 flex items-center justify-center rounded-lg border border-[#e2e8f0] bg-white disabled:opacity-40 hover:bg-[#f8fafc] transition-colors cursor-pointer disabled:cursor-default"
+              >
+                <ChevronRight size={13} style={{ color: "#475569" }} />
+              </button>
+            </div>
+          </div>
+        )}
       </ChartCard>
     </div>
   );

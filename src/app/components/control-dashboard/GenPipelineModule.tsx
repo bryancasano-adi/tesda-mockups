@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   BarChart,
   Bar,
@@ -10,7 +11,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { Play, CheckCircle2, XCircle, Target, FileDown } from "lucide-react";
+import { Play, CheckCircle2, XCircle, Target, FileDown, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   StatCard,
   ChartCard,
@@ -27,11 +28,28 @@ const LEGEND = [
   { c: "#f44336", l: "Failed" },
 ];
 
+const PIPELINE_PER_PAGE = 5;
+
 export function GenPipelineModule() {
   const totalGenerated = genPipelineData.reduce((s, d) => s + d.generated, 0);
   const totalFinalized = genPipelineData.reduce((s, d) => s + d.finalized, 0);
   const totalFailed = genPipelineData.reduce((s, d) => s + d.failed, 0);
   const grandTotal = genStatusTotals.reduce((s, d) => s + d.value, 0);
+
+  const [pipelineSearch, setPipelineSearch] = useState("");
+  const [pipelinePage, setPipelinePage] = useState(1);
+
+  const filteredPipeline = genPipelineData.filter((r) =>
+    r.date.toLowerCase().includes(pipelineSearch.toLowerCase()),
+  );
+  const pipelinePageCount = Math.max(
+    1,
+    Math.ceil(filteredPipeline.length / PIPELINE_PER_PAGE),
+  );
+  const pagedPipeline = filteredPipeline.slice(
+    (pipelinePage - 1) * PIPELINE_PER_PAGE,
+    pipelinePage * PIPELINE_PER_PAGE,
+  );
 
   function handleExport() {
     exportToExcel(
@@ -156,9 +174,29 @@ export function GenPipelineModule() {
           title="Pipeline Detail by Day"
           subtitle="Per-day breakdown with success rate"
           action={
-            <ActionButton onClick={handleExport} variant="outline" size="sm">
-              <FileDown size={13} /> Export Excel
-            </ActionButton>
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <Search
+                  size={13}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                  style={{ color: "#94a3b8" }}
+                />
+                <input
+                  type="text"
+                  value={pipelineSearch}
+                  onChange={(e) => {
+                    setPipelineSearch(e.target.value);
+                    setPipelinePage(1);
+                  }}
+                  placeholder="Search by date..."
+                  className="pl-8 pr-3 py-1.5 border border-[#e2e8f0] rounded-xl text-[12px] w-44 focus:outline-none focus:border-[#1976d2] focus:ring-1 focus:ring-[#1976d2] transition-colors"
+                  style={{ color: "#334155" }}
+                />
+              </div>
+              <ActionButton onClick={handleExport} variant="outline" size="sm">
+                <FileDown size={13} /> Export Excel
+              </ActionButton>
+            </div>
           }
         >
           <DataTable
@@ -215,9 +253,47 @@ export function GenPipelineModule() {
                 ),
               },
             ]}
-            rows={genPipelineData}
-            keyExtractor={(_, i) => i}
+            rows={pagedPipeline}
+            keyExtractor={(row) => row.date}
           />
+
+          {/* Pagination */}
+          {pipelinePageCount > 1 && (
+            <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#f1f5f9]">
+              <p className="text-[12px]" style={{ color: "#94a3b8" }}>
+                Showing{" "}
+                {filteredPipeline.length === 0
+                  ? 0
+                  : (pipelinePage - 1) * PIPELINE_PER_PAGE + 1}
+                –{Math.min(
+                  pipelinePage * PIPELINE_PER_PAGE,
+                  filteredPipeline.length,
+                )}{" "}
+                of {filteredPipeline.length}
+              </p>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setPipelinePage((p) => Math.max(1, p - 1))}
+                  disabled={pipelinePage === 1}
+                  className="w-7 h-7 flex items-center justify-center rounded-lg border border-[#e2e8f0] bg-white disabled:opacity-40 hover:bg-[#f8fafc] transition-colors cursor-pointer disabled:cursor-default"
+                >
+                  <ChevronLeft size={13} style={{ color: "#475569" }} />
+                </button>
+                <span className="text-[12px] px-2" style={{ color: "#475569" }}>
+                  {pipelinePage} / {pipelinePageCount}
+                </span>
+                <button
+                  onClick={() =>
+                    setPipelinePage((p) => Math.min(pipelinePageCount, p + 1))
+                  }
+                  disabled={pipelinePage === pipelinePageCount}
+                  className="w-7 h-7 flex items-center justify-center rounded-lg border border-[#e2e8f0] bg-white disabled:opacity-40 hover:bg-[#f8fafc] transition-colors cursor-pointer disabled:cursor-default"
+                >
+                  <ChevronRight size={13} style={{ color: "#475569" }} />
+                </button>
+              </div>
+            </div>
+          )}
         </ChartCard>
       </div>
 

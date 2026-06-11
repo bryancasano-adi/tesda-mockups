@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, SlidersHorizontal } from "lucide-react";
 import { UserActivityModule } from "../../components/control-dashboard/UserActivityModule";
 import { DocExportModule } from "../../components/control-dashboard/DocExportModule";
 import { GenPipelineModule } from "../../components/control-dashboard/GenPipelineModule";
 import { TokenUsageModule } from "../../components/control-dashboard/TokenUsageModule";
 import { SectorAnalyticsModule } from "../../components/control-dashboard/SectorAnalyticsModule";
+import { ActionButton } from "../../components/control-dashboard/PagePrimitives";
 
 type Tab = { id: string; label: string; description: string };
 
@@ -32,7 +33,7 @@ const TABS: Tab[] = [
   {
     id: "sector-analytics",
     label: "Sector-Based Analytics",
-    description: "TBs, CSs per sector, regional data & search",
+    description: "TRs, CSs per sector, regional data & search",
   },
 ];
 
@@ -40,6 +41,7 @@ export function ControlDashboard() {
   const [activeTab, setActiveTab] = useState("user-activity");
   const [dateFrom, setDateFrom] = useState("2025-05-04");
   const [dateTo, setDateTo] = useState("2025-05-15");
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const active = TABS.find((t) => t.id === activeTab)!;
 
   return (
@@ -100,9 +102,19 @@ export function ControlDashboard() {
               className="border border-[#e2e8f0] rounded-lg px-2.5 py-1 text-[12px] text-[#334155] focus:outline-none focus:border-[#1976d2] focus:ring-1 focus:ring-[#1976d2] transition-colors bg-white"
             />
           </div>
-          <span className="ml-auto text-[11px] text-[#94a3b8]">
-            Showing data for selected period
+          <span className="text-[11px] text-[#94a3b8]">
+            Showing data for selected period.
           </span>
+          <div className="flex-1" />
+          {activeTab === "sector-analytics" && (
+            <ActionButton
+              onClick={() => setShowAdvancedSearch(true)}
+              variant="primary"
+              size="sm"
+            >
+              <SlidersHorizontal size={13} /> Advanced Search & Filtering
+            </ActionButton>
+          )}
         </div>
 
         {/* Module content */}
@@ -111,7 +123,12 @@ export function ControlDashboard() {
           {activeTab === "upload-export" && <DocExportModule />}
           {activeTab === "gen-pipeline" && <GenPipelineModule />}
           {activeTab === "token-usage" && <TokenUsageModule />}
-          {activeTab === "sector-analytics" && <SectorAnalyticsModule />}
+          {activeTab === "sector-analytics" && (
+            <SectorAnalyticsModule
+              showAdvancedSearch={showAdvancedSearch}
+              onCloseAdvancedSearch={() => setShowAdvancedSearch(false)}
+            />
+          )}
         </div>
       </div>
     </div>

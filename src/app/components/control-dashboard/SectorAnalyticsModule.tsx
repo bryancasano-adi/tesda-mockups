@@ -25,6 +25,7 @@ import {
   Award,
   FileDown,
   ChevronRight,
+  ChevronLeft,
 } from "lucide-react";
 import {
   StatCard,
@@ -53,15 +54,15 @@ const SECTOR_ICON_MAP: Record<
   string,
   { Icon: React.ElementType; color: string; bg: string }
 > = {
-  "ICT & Animation": { Icon: Cpu,      color: "#1976d2", bg: "#e3f2fd" },
-  Construction:      { Icon: Building2, color: "#f57c00", bg: "#fff3e0" },
-  Agriculture:       { Icon: Leaf,      color: "#2e7d32", bg: "#e8f5e9" },
-  Tourism:           { Icon: Globe,     color: "#9c27b0", bg: "#f3e5f5" },
-  Energy:            { Icon: Zap,       color: "#f44336", bg: "#fce4ec" },
-  Welding:           { Icon: Zap,       color: "#e65100", bg: "#fbe9e7" },
-  Electronics:       { Icon: Cpu,       color: "#0288d1", bg: "#e1f5fe" },
-  Automotive:        { Icon: Building2, color: "#455a64", bg: "#eceff1" },
-  "Health Care":     { Icon: Award,     color: "#c62828", bg: "#fce4ec" },
+  "ICT & Animation": { Icon: Cpu, color: "#1976d2", bg: "#e3f2fd" },
+  Construction: { Icon: Building2, color: "#f57c00", bg: "#fff3e0" },
+  Agriculture: { Icon: Leaf, color: "#2e7d32", bg: "#e8f5e9" },
+  Tourism: { Icon: Globe, color: "#9c27b0", bg: "#f3e5f5" },
+  Energy: { Icon: Zap, color: "#f44336", bg: "#fce4ec" },
+  Welding: { Icon: Zap, color: "#e65100", bg: "#fbe9e7" },
+  Electronics: { Icon: Cpu, color: "#0288d1", bg: "#e1f5fe" },
+  Automotive: { Icon: Building2, color: "#455a64", bg: "#eceff1" },
+  "Health Care": { Icon: Award, color: "#c62828", bg: "#fce4ec" },
 };
 
 type SectorBreakdownPayload = {
@@ -96,7 +97,7 @@ function SectorBreakdownTooltip({
       </p>
       <div className="flex gap-4 mb-2">
         <span style={{ color: "#64748b" }}>
-          TBs:{" "}
+          TRs:{" "}
           <span className="font-bold" style={{ color: "#1976d2" }}>
             {d.tbs}
           </span>
@@ -133,7 +134,17 @@ function SectorBreakdownTooltip({
   );
 }
 
-export function SectorAnalyticsModule() {
+const SECTOR_SUMMARY_PER_PAGE = 5;
+
+type SectorAnalyticsModuleProps = {
+  showAdvancedSearch: boolean;
+  onCloseAdvancedSearch: () => void;
+};
+
+export function SectorAnalyticsModule({
+  showAdvancedSearch,
+  onCloseAdvancedSearch,
+}: SectorAnalyticsModuleProps) {
   const totalTBs = sectorData.reduce((s, d) => s + d.tbs, 0);
   const totalCS = sectorData.reduce((s, d) => s + d.cs, 0);
   const totalApproved = sectorData.reduce((s, d) => s + d.approved, 0);
@@ -149,6 +160,9 @@ export function SectorAnalyticsModule() {
   const [qualLevel, setQualLevel] = useState("All Levels");
   const [submitted, setSubmitted] = useState(false);
 
+  const [summarySearch, setSummarySearch] = useState("");
+  const [summaryPage, setSummaryPage] = useState(1);
+
   const sectorNames = useMemo(
     () => ["All", ...sectorData.map((d) => d.sector)],
     [],
@@ -159,7 +173,6 @@ export function SectorAnalyticsModule() {
     return sectorData.filter((d) => d.sector === activeSector);
   }, [activeSector]);
 
-  // Top 5 sectors ranked by finalized count (descending)
   const topPrioritySectors = useMemo(
     () => [...sectorData].sort((a, b) => b.finalized - a.finalized).slice(0, 5),
     [],
@@ -167,6 +180,18 @@ export function SectorAnalyticsModule() {
   const allSectorsByFinalized = useMemo(
     () => [...sectorData].sort((a, b) => b.finalized - a.finalized),
     [],
+  );
+
+  const filteredSummary = sectorData.filter((r) =>
+    r.sector.toLowerCase().includes(summarySearch.toLowerCase()),
+  );
+  const summaryPageCount = Math.max(
+    1,
+    Math.ceil(filteredSummary.length / SECTOR_SUMMARY_PER_PAGE),
+  );
+  const pagedSummary = filteredSummary.slice(
+    (summaryPage - 1) * SECTOR_SUMMARY_PER_PAGE,
+    summaryPage * SECTOR_SUMMARY_PER_PAGE,
   );
 
   const activeFilterCount =
@@ -221,9 +246,25 @@ export function SectorAnalyticsModule() {
 
   function handleExportSectorSummary() {
     exportToExcel(
-      ["Sector", "TBs", "CS", "In Dev", "For Review", "Approved", "Finalized", "Activity"],
+      [
+        "Sector",
+        "TRs",
+        "CS",
+        "In Dev",
+        "For Review",
+        "Approved",
+        "Finalized",
+        "Activity",
+      ],
       sectorData.map((r) => [
-        r.sector, r.tbs, r.cs, r.inDev, r.forReview, r.approved, r.finalized, r.activity,
+        r.sector,
+        r.tbs,
+        r.cs,
+        r.inDev,
+        r.forReview,
+        r.approved,
+        r.finalized,
+        r.activity,
       ]),
       "sector_summary",
     );
@@ -231,6 +272,400 @@ export function SectorAnalyticsModule() {
 
   return (
     <div className="flex flex-col gap-5">
+      {/* ── Advanced Search Modal ── */}
+      {showAdvancedSearch && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(0,0,0,0.5)" }}
+        >
+          <div
+            className="bg-white rounded-md w-full max-w-6xl min-h-[90vh] overflow-y-auto"
+            style={{
+              boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
+            }}
+          >
+            {/* Modal header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#f1f5f9] sticky top-0 bg-white z-10">
+              <div className="flex items-center gap-2">
+                <div>
+                  <p
+                    className="text-[16px] font-bold"
+                    style={{ color: "#0f172a" }}
+                  >
+                    Intelligent Search & Advanced Filtering
+                  </p>
+                  <p
+                    className="text-[12px] mt-0.5"
+                    style={{ color: "#94a3b8" }}
+                  >
+                    Find qualifications by concept, theme, or structured
+                    criteria
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={onCloseAdvancedSearch}
+                className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#f1f5f9] transition-colors cursor-pointer"
+              >
+                <X size={16} style={{ color: "#64748b" }} />
+              </button>
+            </div>
+
+            {/* Modal body */}
+            <div className="p-6 flex flex-col gap-5">
+              {/* Advanced Filtering */}
+              <div
+                className="rounded-2xl p-5"
+                style={{
+                  background: "#ffffff",
+                  border: "1px solid #f1f5f9",
+                }}
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-7 h-7 rounded-lg bg-[#eff6ff] flex items-center justify-center">
+                    <SlidersHorizontal size={14} className="text-[#1976d2]" />
+                  </div>
+                  <h3
+                    className="text-[14px] font-semibold"
+                    style={{ color: "#0f172a" }}
+                  >
+                    Advanced Filtering Options
+                  </h3>
+                  {activeFilterCount > 0 && (
+                    <span className="ml-auto bg-[#1976d2] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">
+                      {activeFilterCount} active
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                  {[
+                    {
+                      label: "Sector",
+                      val: sector,
+                      set: setSector,
+                      opts: SECTORS,
+                    },
+                    {
+                      label: "Sub-Sector",
+                      val: subsector,
+                      set: setSubsector,
+                      opts: SUBSECTORS,
+                    },
+                    {
+                      label: "Document Type",
+                      val: docType,
+                      set: setDocType,
+                      opts: DOC_TYPES,
+                    },
+                    {
+                      label: "Status",
+                      val: status,
+                      set: setStatus,
+                      opts: STATUSES,
+                    },
+                    {
+                      label: "Qualification Level",
+                      val: qualLevel,
+                      set: setQualLevel,
+                      opts: QUAL_LEVELS,
+                    },
+                  ].map((f, i) => (
+                    <div key={i}>
+                      <label
+                        className="text-[11px] font-semibold block mb-1.5"
+                        style={{ color: "#64748b" }}
+                      >
+                        {f.label}
+                      </label>
+                      <select
+                        value={f.val}
+                        onChange={(e) => {
+                          f.set(e.target.value);
+                          setSubmitted(true);
+                        }}
+                        className="w-full border border-[#e2e8f0] rounded-xl px-3 py-2 text-[12px] bg-white focus:outline-none focus:border-[#1976d2] focus:ring-1 focus:ring-[#1976d2] transition-colors"
+                        style={{ color: "#334155" }}
+                      >
+                        {f.opts.map((o, j) => (
+                          <option key={j}>{o}</option>
+                        ))}
+                      </select>
+                    </div>
+                  ))}
+                  <div>
+                    <label
+                      className="text-[11px] font-semibold block mb-1.5"
+                      style={{ color: "#64748b" }}
+                    >
+                      Keyword / Theme
+                    </label>
+                    <input
+                      type="text"
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && setSubmitted(true)}
+                      placeholder="e.g. greening, sustainability..."
+                      className="w-full border border-[#e2e8f0] rounded-xl px-3 py-2 text-[12px] focus:outline-none focus:border-[#1976d2] focus:ring-1 focus:ring-[#1976d2] transition-colors"
+                      style={{ color: "#334155" }}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  <ActionButton
+                    onClick={() => setSubmitted(true)}
+                    variant="primary"
+                    size="md"
+                  >
+                    <SlidersHorizontal size={14} /> Apply Filters
+                  </ActionButton>
+                  <ActionButton onClick={resetAll} variant="outline" size="md">
+                    Reset
+                  </ActionButton>
+                  {activeFilterCount > 0 && (
+                    <span
+                      className="text-[12px] ml-1"
+                      style={{ color: "#64748b" }}
+                    >
+                      <span
+                        className="font-semibold"
+                        style={{ color: "#334155" }}
+                      >
+                        Active:{" "}
+                      </span>
+                      {[
+                        sector !== "All Sectors" && sector,
+                        subsector !== "All Sub-Sectors" && subsector,
+                        docType !== "All Types" && docType,
+                        status !== "All Status" && status,
+                        qualLevel !== "All Levels" && qualLevel,
+                        query && `"${query}"`,
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")}
+                      <button
+                        onClick={resetAll}
+                        className="ml-2 inline-flex items-center gap-0.5 hover:underline"
+                        style={{ color: "#1976d2" }}
+                      >
+                        <X size={11} /> Clear all
+                      </button>
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Intelligent Search */}
+              <div
+                className="rounded-2xl p-5"
+                style={{
+                  background: "#ffffff",
+                  border: "1px solid #f1f5f9",
+                }}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-7 h-7 rounded-lg bg-[#eff6ff] flex items-center justify-center">
+                    <Search size={14} className="text-[#1976d2]" />
+                  </div>
+                  <h3
+                    className="text-[14px] font-semibold"
+                    style={{ color: "#0f172a" }}
+                  >
+                    Intelligent Search Function
+                  </h3>
+                </div>
+                <p
+                  className="text-[12px] mb-4 mt-0.5"
+                  style={{ color: "#94a3b8" }}
+                >
+                  AI-powered semantic search retrieves related TESDA
+                  qualifications even if exact keywords don't match the title.
+                </p>
+
+                <div className="flex gap-2 mb-3">
+                  <input
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && setSubmitted(true)}
+                    placeholder="Search by keyword, theme, or concept..."
+                    className="flex-1 border border-[#e2e8f0] rounded-xl px-4 py-2.5 text-[13px] focus:outline-none focus:border-[#1976d2] focus:ring-1 focus:ring-[#1976d2] transition-colors"
+                    style={{ color: "#334155" }}
+                  />
+                  <ActionButton
+                    onClick={() => setSubmitted(true)}
+                    variant="primary"
+                    size="md"
+                  >
+                    <Search size={14} /> Search
+                  </ActionButton>
+                </div>
+
+                <div className="flex flex-wrap gap-2 mb-4">
+                  <span
+                    className="text-[12px] self-center"
+                    style={{ color: "#94a3b8" }}
+                  >
+                    Try:
+                  </span>
+                  {[
+                    "greening",
+                    "renewable energy",
+                    "sustainable",
+                    "eco-friendly",
+                    "organic",
+                  ].map((tag) => (
+                    <button
+                      key={tag}
+                      onClick={() => {
+                        setQuery(tag);
+                        setSubmitted(true);
+                      }}
+                      className={`px-2.5 py-0.5 rounded-full text-[12px] border transition-colors cursor-pointer ${query === tag ? "border-[#90caf9] text-[#1976d2]" : "border-[#e2e8f0] hover:border-[#1976d2] hover:text-[#1976d2]"}`}
+                      style={{
+                        background: query === tag ? "#eff6ff" : "#f8fafc",
+                        color: query === tag ? "#1976d2" : "#64748b",
+                      }}
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+
+                {showResults ? (
+                  <>
+                    <div className="flex items-center justify-between mb-3">
+                      <p
+                        className="text-[12px] font-medium"
+                        style={{ color: "#475569" }}
+                      >
+                        {filtered.length > 0
+                          ? `${filtered.length} result${filtered.length !== 1 ? "s" : ""} found`
+                          : "No results found"}
+                        {query && (
+                          <span style={{ color: "#94a3b8" }}>
+                            {" "}
+                            for <em>"{query}"</em>
+                          </span>
+                        )}
+                      </p>
+                      {filtered.length > 0 && query && (
+                        <p className="text-[11px]" style={{ color: "#94a3b8" }}>
+                          Sorted by semantic match score
+                        </p>
+                      )}
+                    </div>
+
+                    {filtered.length > 0 ? (
+                      <div className="rounded-xl overflow-hidden border border-[#f1f5f9]">
+                        <div
+                          className="border-b border-[#f1f5f9] grid gap-2 px-4 py-2.5"
+                          style={{
+                            gridTemplateColumns:
+                              "1fr 70px 130px 70px 70px 90px",
+                            background: "#f8fafc",
+                          }}
+                        >
+                          {[
+                            "Qualification Title",
+                            "Level",
+                            "Sector",
+                            "Type",
+                            "Match",
+                            "Status",
+                          ].map((h, i) => (
+                            <span
+                              key={i}
+                              className="text-[10px] font-bold uppercase tracking-wider"
+                              style={{
+                                color: "#94a3b8",
+                                textAlign: i >= 3 ? "right" : "left",
+                              }}
+                            >
+                              {h}
+                            </span>
+                          ))}
+                        </div>
+                        {filtered.map((row, i) => (
+                          <div
+                            key={i}
+                            className="grid px-4 py-3 border-b border-[#f8fafc] hover:bg-[#f8fafc] cursor-pointer text-[12px] items-center gap-2 transition-colors"
+                            style={{
+                              gridTemplateColumns:
+                                "1fr 70px 130px 70px 70px 90px",
+                            }}
+                          >
+                            <span
+                              className="font-medium"
+                              style={{ color: "#0f172a" }}
+                            >
+                              {row.title}
+                            </span>
+                            <span style={{ color: "#64748b" }}>{row.nc}</span>
+                            <span style={{ color: "#64748b" }}>
+                              {row.sector}
+                            </span>
+                            <span>
+                              <span
+                                className="px-1.5 py-0.5 rounded-lg text-[10px] font-semibold"
+                                style={{
+                                  background: "#eff6ff",
+                                  color: "#1976d2",
+                                }}
+                              >
+                                {row.docType}
+                              </span>
+                            </span>
+                            <span className="text-right">
+                              {query ? (
+                                <span
+                                  className="font-bold"
+                                  style={{ color: "#1976d2" }}
+                                >
+                                  {row.match}%
+                                </span>
+                              ) : (
+                                <span style={{ color: "#cbd5e1" }}>—</span>
+                              )}
+                            </span>
+                            <span className="text-right">
+                              <StatusBadge label={row.status} />
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="rounded-xl border border-dashed border-[#e2e8f0] p-8 text-center">
+                        <p className="text-[14px]" style={{ color: "#94a3b8" }}>
+                          No qualifications match your current filters.
+                        </p>
+                        <button
+                          onClick={resetAll}
+                          className="mt-2 text-[13px] hover:underline"
+                          style={{ color: "#1976d2" }}
+                        >
+                          Clear all filters
+                        </button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="rounded-xl border border-dashed border-[#e2e8f0] p-8 text-center">
+                    <div className="w-12 h-12 rounded-2xl bg-[#f1f5f9] flex items-center justify-center mx-auto mb-3">
+                      <Search size={22} style={{ color: "#cbd5e1" }} />
+                    </div>
+                    <p className="text-[13px]" style={{ color: "#94a3b8" }}>
+                      Enter a search term or apply filters above to see results.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Sector Filter (main tab) ── */}
       <div className="flex items-center gap-2 flex-wrap">
         <span
@@ -258,9 +693,9 @@ export function SectorAnalyticsModule() {
       {/* ── KPI Cards ── */}
       <div className="flex gap-4">
         <StatCard
-          label="Total Active TB"
+          label="Total Active TR"
           value={totalTBs}
-          sub="Training bodies"
+          sub="Training Regulations"
           color="#1976d2"
           Icon={BookOpen}
         />
@@ -280,16 +715,16 @@ export function SectorAnalyticsModule() {
         />
       </div>
 
-      {/* ── TBs/CSs per Sector + Status of Docs ── */}
+      {/* ── TRs/CSs per Sector + Status of Docs ── */}
       <div className="grid grid-cols-3 gap-4">
         <div className="col-span-2">
           <ChartCard
-            title="TBs and CSs per Sector"
-            subtitle="Training Bodies vs Competency Standards — hover for doc type breakdown"
+            title="TRs and CSs per Sector"
+            subtitle="Training Regulations vs Competency Standards — hover for doc type breakdown"
             action={
               <div className="flex gap-4">
                 {[
-                  { c: "#1976d2", l: "TBs" },
+                  { c: "#1976d2", l: "TRs" },
                   { c: "#f57c00", l: "CS" },
                 ].map((d, i) => (
                   <div
@@ -331,7 +766,7 @@ export function SectorAnalyticsModule() {
                   dataKey="tbs"
                   fill="#1976d2"
                   radius={[3, 3, 0, 0]}
-                  name="TBs"
+                  name="TRs"
                 />
                 <Bar
                   dataKey="cs"
@@ -405,10 +840,7 @@ export function SectorAnalyticsModule() {
       {/* ── Top Priority Sectors (ranked by finalized) ── */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <p
-            className="text-[14px] font-semibold"
-            style={{ color: "#0f172a" }}
-          >
+          <p className="text-[14px] font-semibold" style={{ color: "#0f172a" }}>
             Top Priority Sectors{" "}
             <span
               className="text-[11px] font-normal ml-1"
@@ -434,7 +866,6 @@ export function SectorAnalyticsModule() {
         </div>
 
         {showAllSectors ? (
-          /* Expanded: show all sectors as a table */
           <div
             className="rounded-2xl overflow-hidden"
             style={{
@@ -493,10 +924,13 @@ export function SectorAnalyticsModule() {
                 },
                 {
                   key: "tbs",
-                  header: "TBs",
+                  header: "TRs",
                   align: "right",
                   render: (row) => (
-                    <span className="font-semibold" style={{ color: "#1976d2" }}>
+                    <span
+                      className="font-semibold"
+                      style={{ color: "#1976d2" }}
+                    >
                       {row.tbs}
                     </span>
                   ),
@@ -506,7 +940,10 @@ export function SectorAnalyticsModule() {
                   header: "CS",
                   align: "right",
                   render: (row) => (
-                    <span className="font-semibold" style={{ color: "#f57c00" }}>
+                    <span
+                      className="font-semibold"
+                      style={{ color: "#f57c00" }}
+                    >
                       {row.cs}
                     </span>
                   ),
@@ -529,7 +966,6 @@ export function SectorAnalyticsModule() {
             />
           </div>
         ) : (
-          /* Collapsed: show top 5 cards */
           <div className="grid grid-cols-5 gap-3">
             {topPrioritySectors.map((row, i) => {
               const meta = SECTOR_ICON_MAP[row.sector];
@@ -567,7 +1003,7 @@ export function SectorAnalyticsModule() {
                       >
                         {row.tbs}
                       </span>{" "}
-                      <span style={{ color: "#94a3b8" }}>TB</span>
+                      <span style={{ color: "#94a3b8" }}>TR</span>
                     </span>
                     <span>
                       <span className="font-bold" style={{ color: "#f57c00" }}>
@@ -596,7 +1032,7 @@ export function SectorAnalyticsModule() {
       {/* ── Regional Implementation ── */}
       <ChartCard
         title="Regional Implementation"
-        subtitle="TBs per region with activity level"
+        subtitle="TRs per region with activity level"
         action={
           <div className="flex gap-4">
             {["High", "Medium", "Low"].map((lvl) => {
@@ -640,7 +1076,7 @@ export function SectorAnalyticsModule() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={`text-[12px] font-bold ${c.text}`}>
-                    {r.tbs} TBs
+                    {r.tbs} TRs
                   </span>
                   <span
                     className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${c.badge} ${c.text}`}
@@ -681,11 +1117,7 @@ export function SectorAnalyticsModule() {
         }
       >
         <ResponsiveContainer width="100%" height={200}>
-          <BarChart
-            data={filteredSectorData}
-            barCategoryGap="25%"
-            barGap={3}
-          >
+          <BarChart data={filteredSectorData} barCategoryGap="25%" barGap={3}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
             <XAxis
               dataKey="sector"
@@ -725,15 +1157,35 @@ export function SectorAnalyticsModule() {
       {/* ── Sector Summary Table ── */}
       <ChartCard
         title="Sector Summary"
-        subtitle="All sectors with TBs, CS, finalized count, and development status"
+        subtitle="All sectors with TRs, CS, finalized count, and development status"
         action={
-          <ActionButton
-            onClick={handleExportSectorSummary}
-            variant="outline"
-            size="sm"
-          >
-            <FileDown size={13} /> Export Excel
-          </ActionButton>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Search
+                size={13}
+                className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                style={{ color: "#94a3b8" }}
+              />
+              <input
+                type="text"
+                value={summarySearch}
+                onChange={(e) => {
+                  setSummarySearch(e.target.value);
+                  setSummaryPage(1);
+                }}
+                placeholder="Search by sector..."
+                className="pl-8 pr-3 py-1.5 border border-[#e2e8f0] rounded-xl text-[12px] w-44 focus:outline-none focus:border-[#1976d2] focus:ring-1 focus:ring-[#1976d2] transition-colors"
+                style={{ color: "#334155" }}
+              />
+            </div>
+            <ActionButton
+              onClick={handleExportSectorSummary}
+              variant="outline"
+              size="sm"
+            >
+              <FileDown size={13} /> Export Excel
+            </ActionButton>
+          </div>
         }
       >
         <DataTable
@@ -749,7 +1201,7 @@ export function SectorAnalyticsModule() {
             },
             {
               key: "tbs",
-              header: "TBs",
+              header: "TRs",
               align: "center",
               render: (row) => (
                 <span className="font-bold" style={{ color: "#1976d2" }}>
@@ -820,341 +1272,49 @@ export function SectorAnalyticsModule() {
               ),
             },
           ]}
-          rows={sectorData}
-          keyExtractor={(_, i) => i}
+          rows={pagedSummary}
+          keyExtractor={(row) => row.sector}
         />
-      </ChartCard>
 
-      {/* ════════════════════════════════════════════════════════════════════════
-          Search & Filter Section
-      ══════════════════════════════════════════════════════════════════════════ */}
-
-      <div className="mt-2">
-        <SectionDivider
-          title="Intelligent Search & Advanced Filtering"
-          subtitle="Find qualifications by concept, theme, or structured criteria"
-        />
-      </div>
-
-      {/* ── Advanced Filtering ── */}
-      <div
-        className="rounded-2xl p-5"
-        style={{
-          background: "#ffffff",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
-        }}
-      >
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-7 h-7 rounded-lg bg-[#eff6ff] flex items-center justify-center">
-            <SlidersHorizontal size={14} className="text-[#1976d2]" />
-          </div>
-          <h3
-            className="text-[14px] font-semibold"
-            style={{ color: "#0f172a" }}
-          >
-            Advanced Filtering Options
-          </h3>
-          {activeFilterCount > 0 && (
-            <span className="ml-auto bg-[#1976d2] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">
-              {activeFilterCount} active
-            </span>
-          )}
-        </div>
-
-        <div className="grid grid-cols-3 gap-4 mb-4">
-          {[
-            { label: "Sector", val: sector, set: setSector, opts: SECTORS },
-            {
-              label: "Sub-Sector",
-              val: subsector,
-              set: setSubsector,
-              opts: SUBSECTORS,
-            },
-            {
-              label: "Document Type",
-              val: docType,
-              set: setDocType,
-              opts: DOC_TYPES,
-            },
-            { label: "Status", val: status, set: setStatus, opts: STATUSES },
-            {
-              label: "Qualification Level",
-              val: qualLevel,
-              set: setQualLevel,
-              opts: QUAL_LEVELS,
-            },
-          ].map((f, i) => (
-            <div key={i}>
-              <label
-                className="text-[11px] font-semibold block mb-1.5"
-                style={{ color: "#64748b" }}
-              >
-                {f.label}
-              </label>
-              <select
-                value={f.val}
-                onChange={(e) => {
-                  f.set(e.target.value);
-                  setSubmitted(true);
-                }}
-                className="w-full border border-[#e2e8f0] rounded-xl px-3 py-2 text-[12px] bg-white focus:outline-none focus:border-[#1976d2] focus:ring-1 focus:ring-[#1976d2] transition-colors"
-                style={{ color: "#334155" }}
-              >
-                {f.opts.map((o, j) => (
-                  <option key={j}>{o}</option>
-                ))}
-              </select>
-            </div>
-          ))}
-          <div>
-            <label
-              className="text-[11px] font-semibold block mb-1.5"
-              style={{ color: "#64748b" }}
-            >
-              Keyword / Theme
-            </label>
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && setSubmitted(true)}
-              placeholder="e.g. greening, sustainability..."
-              className="w-full border border-[#e2e8f0] rounded-xl px-3 py-2 text-[12px] focus:outline-none focus:border-[#1976d2] focus:ring-1 focus:ring-[#1976d2] transition-colors"
-              style={{ color: "#334155" }}
-            />
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 flex-wrap">
-          <ActionButton
-            onClick={() => setSubmitted(true)}
-            variant="primary"
-            size="md"
-          >
-            <SlidersHorizontal size={14} /> Apply Filters
-          </ActionButton>
-          <ActionButton onClick={resetAll} variant="outline" size="md">
-            Reset
-          </ActionButton>
-          {activeFilterCount > 0 && (
-            <span className="text-[12px] ml-1" style={{ color: "#64748b" }}>
-              <span className="font-semibold" style={{ color: "#334155" }}>
-                Active:{" "}
-              </span>
-              {[
-                sector !== "All Sectors" && sector,
-                subsector !== "All Sub-Sectors" && subsector,
-                docType !== "All Types" && docType,
-                status !== "All Status" && status,
-                qualLevel !== "All Levels" && qualLevel,
-                query && `"${query}"`,
-              ]
-                .filter(Boolean)
-                .join(" · ")}
-              <button
-                onClick={resetAll}
-                className="ml-2 inline-flex items-center gap-0.5 hover:underline"
-                style={{ color: "#1976d2" }}
-              >
-                <X size={11} /> Clear all
-              </button>
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* ── Intelligent Search ── */}
-      <div
-        className="rounded-2xl p-5"
-        style={{
-          background: "#ffffff",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
-        }}
-      >
-        <div className="flex items-center gap-2 mb-1">
-          <div className="w-7 h-7 rounded-lg bg-[#eff6ff] flex items-center justify-center">
-            <Search size={14} className="text-[#1976d2]" />
-          </div>
-          <h3
-            className="text-[14px] font-semibold"
-            style={{ color: "#0f172a" }}
-          >
-            Intelligent Search Function
-          </h3>
-        </div>
-        <p className="text-[12px] mb-4 mt-0.5" style={{ color: "#94a3b8" }}>
-          AI-powered semantic search retrieves related TESDA qualifications even
-          if exact keywords don't match the title.
-        </p>
-
-        <div className="flex gap-2 mb-3">
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && setSubmitted(true)}
-            placeholder="Search by keyword, theme, or concept..."
-            className="flex-1 border border-[#e2e8f0] rounded-xl px-4 py-2.5 text-[13px] focus:outline-none focus:border-[#1976d2] focus:ring-1 focus:ring-[#1976d2] transition-colors"
-            style={{ color: "#334155" }}
-          />
-          <ActionButton
-            onClick={() => setSubmitted(true)}
-            variant="primary"
-            size="md"
-          >
-            <Search size={14} /> Search
-          </ActionButton>
-        </div>
-
-        <div className="flex flex-wrap gap-2 mb-4">
-          <span
-            className="text-[12px] self-center"
-            style={{ color: "#94a3b8" }}
-          >
-            Try:
-          </span>
-          {[
-            "greening",
-            "renewable energy",
-            "sustainable",
-            "eco-friendly",
-            "organic",
-          ].map((tag) => (
-            <button
-              key={tag}
-              onClick={() => {
-                setQuery(tag);
-                setSubmitted(true);
-              }}
-              className={`px-2.5 py-0.5 rounded-full text-[12px] border transition-colors cursor-pointer ${query === tag ? "border-[#90caf9] text-[#1976d2]" : "border-[#e2e8f0] hover:border-[#1976d2] hover:text-[#1976d2]"}`}
-              style={{
-                background: query === tag ? "#eff6ff" : "#f8fafc",
-                color: query === tag ? "#1976d2" : "#64748b",
-              }}
-            >
-              {tag}
-            </button>
-          ))}
-        </div>
-
-        {showResults ? (
-          <>
-            <div className="flex items-center justify-between mb-3">
-              <p
-                className="text-[12px] font-medium"
-                style={{ color: "#475569" }}
-              >
-                {filtered.length > 0
-                  ? `${filtered.length} result${filtered.length !== 1 ? "s" : ""} found`
-                  : "No results found"}
-                {query && (
-                  <span style={{ color: "#94a3b8" }}>
-                    {" "}
-                    for <em>"{query}"</em>
-                  </span>
-                )}
-              </p>
-              {filtered.length > 0 && query && (
-                <p className="text-[11px]" style={{ color: "#94a3b8" }}>
-                  Sorted by semantic match score
-                </p>
-              )}
-            </div>
-
-            {filtered.length > 0 ? (
-              <div className="rounded-xl overflow-hidden border border-[#f1f5f9]">
-                <div
-                  className="border-b border-[#f1f5f9] grid gap-2 px-4 py-2.5"
-                  style={{
-                    gridTemplateColumns: "1fr 70px 130px 70px 70px 90px",
-                    background: "#f8fafc",
-                  }}
-                >
-                  {[
-                    "Qualification Title",
-                    "Level",
-                    "Sector",
-                    "Type",
-                    "Match",
-                    "Status",
-                  ].map((h, i) => (
-                    <span
-                      key={i}
-                      className="text-[10px] font-bold uppercase tracking-wider"
-                      style={{
-                        color: "#94a3b8",
-                        textAlign: i >= 3 ? "right" : "left",
-                      }}
-                    >
-                      {h}
-                    </span>
-                  ))}
-                </div>
-                {filtered.map((row, i) => (
-                  <div
-                    key={i}
-                    className="grid px-4 py-3 border-b border-[#f8fafc] hover:bg-[#f8fafc] cursor-pointer text-[12px] items-center gap-2 transition-colors"
-                    style={{
-                      gridTemplateColumns: "1fr 70px 130px 70px 70px 90px",
-                    }}
-                  >
-                    <span className="font-medium" style={{ color: "#0f172a" }}>
-                      {row.title}
-                    </span>
-                    <span style={{ color: "#64748b" }}>{row.nc}</span>
-                    <span style={{ color: "#64748b" }}>{row.sector}</span>
-                    <span>
-                      <span
-                        className="px-1.5 py-0.5 rounded-lg text-[10px] font-semibold"
-                        style={{ background: "#eff6ff", color: "#1976d2" }}
-                      >
-                        {row.docType}
-                      </span>
-                    </span>
-                    <span className="text-right">
-                      {query ? (
-                        <span
-                          className="font-bold"
-                          style={{ color: "#1976d2" }}
-                        >
-                          {row.match}%
-                        </span>
-                      ) : (
-                        <span style={{ color: "#cbd5e1" }}>—</span>
-                      )}
-                    </span>
-                    <span className="text-right">
-                      <StatusBadge label={row.status} />
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="rounded-xl border border-dashed border-[#e2e8f0] p-8 text-center">
-                <p className="text-[14px]" style={{ color: "#94a3b8" }}>
-                  No qualifications match your current filters.
-                </p>
-                <button
-                  onClick={resetAll}
-                  className="mt-2 text-[13px] hover:underline"
-                  style={{ color: "#1976d2" }}
-                >
-                  Clear all filters
-                </button>
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="rounded-xl border border-dashed border-[#e2e8f0] p-8 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-[#f1f5f9] flex items-center justify-center mx-auto mb-3">
-              <Search size={22} style={{ color: "#cbd5e1" }} />
-            </div>
-            <p className="text-[13px]" style={{ color: "#94a3b8" }}>
-              Enter a search term or apply filters above to see results.
+        {/* Pagination */}
+        {summaryPageCount > 1 && (
+          <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#f1f5f9]">
+            <p className="text-[12px]" style={{ color: "#94a3b8" }}>
+              Showing{" "}
+              {filteredSummary.length === 0
+                ? 0
+                : (summaryPage - 1) * SECTOR_SUMMARY_PER_PAGE + 1}
+              –
+              {Math.min(
+                summaryPage * SECTOR_SUMMARY_PER_PAGE,
+                filteredSummary.length,
+              )}{" "}
+              of {filteredSummary.length}
             </p>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setSummaryPage((p) => Math.max(1, p - 1))}
+                disabled={summaryPage === 1}
+                className="w-7 h-7 flex items-center justify-center rounded-lg border border-[#e2e8f0] bg-white disabled:opacity-40 hover:bg-[#f8fafc] transition-colors cursor-pointer disabled:cursor-default"
+              >
+                <ChevronLeft size={13} style={{ color: "#475569" }} />
+              </button>
+              <span className="text-[12px] px-2" style={{ color: "#475569" }}>
+                {summaryPage} / {summaryPageCount}
+              </span>
+              <button
+                onClick={() =>
+                  setSummaryPage((p) => Math.min(summaryPageCount, p + 1))
+                }
+                disabled={summaryPage === summaryPageCount}
+                className="w-7 h-7 flex items-center justify-center rounded-lg border border-[#e2e8f0] bg-white disabled:opacity-40 hover:bg-[#f8fafc] transition-colors cursor-pointer disabled:cursor-default"
+              >
+                <ChevronRight size={13} style={{ color: "#475569" }} />
+              </button>
+            </div>
           </div>
         )}
-      </div>
+      </ChartCard>
     </div>
   );
 }
