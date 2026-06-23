@@ -44,6 +44,11 @@ function SheetRow({ sheet }: { sheet: MockSheetRow }) {
   );
 }
 
+function formatLoBadge(loNumber: string) {
+  const trimmed = loNumber.trim();
+  return trimmed.toUpperCase().startsWith("LO") ? trimmed : `LO ${trimmed}`;
+}
+
 function LOSection({
   lo,
   defaultOpen,
@@ -55,38 +60,56 @@ function LOSection({
 }) {
   const [open, setOpen] = useState(defaultOpen ?? false);
 
+  const headerExtra = (
+    <>
+      <span className="inline-flex shrink-0 rounded-full border border-gray-200 bg-white px-2 py-0.5 text-[11px] font-medium text-gray-600">
+        {lo.sheets.length} {lo.sheets.length === 1 ? "sheet" : "sheets"}
+      </span>
+      {lo.finalized ? (
+        <span className="inline-flex shrink-0 rounded-full bg-green-50 px-2 py-0.5 text-[11px] font-medium text-green-700">
+          ✓ Finalized
+        </span>
+      ) : lo.sheets.length > 0 ? (
+        <span className="inline-flex shrink-0 rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-700">
+          In Progress
+        </span>
+      ) : null}
+    </>
+  );
+
   return (
-    <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+    <div className="overflow-hidden rounded-md border border-gray-200 transition-colors">
       <button
-        className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-gray-50"
+        aria-expanded={open}
+        className={`flex w-full cursor-pointer items-center justify-between gap-2 px-4 py-3 transition-colors ${
+          open
+            ? "border-b border-gray-100 bg-blue-50 hover:bg-blue-100/60"
+            : "bg-blue-50 hover:bg-blue-100/60"
+        }`}
         type="button"
         onClick={() => setOpen((prev) => !prev)}
       >
-        <ChevronDownIcon
-          className={cn(
-            "h-4 w-4 shrink-0 text-gray-500 transition-transform",
-            open && "rotate-180",
-          )}
-        />
-        <div className="min-w-0 flex-1">
-          <div className="text-sm font-semibold text-gray-900">
-            LO {lo.loNumber} — {lo.loTitle}
-          </div>
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          <span className="inline-flex shrink-0 items-center rounded-full bg-blue-700 px-2 py-0.5 text-xs font-bold text-white">
+            {formatLoBadge(lo.loNumber)}
+          </span>
+          <span className="truncate text-left text-sm font-semibold text-gray-900">
+            {lo.loTitle}
+          </span>
         </div>
-        <span className="inline-flex shrink-0 rounded-full border border-gray-200 bg-white px-2 py-0.5 text-[11px] font-medium text-gray-600">
-          {lo.sheets.length} {lo.sheets.length === 1 ? "sheet" : "sheets"}
-        </span>
-        {lo.finalized ? (
-          <span className="inline-flex shrink-0 rounded-full bg-green-50 px-2 py-0.5 text-[11px] font-medium text-green-700">
-            ✓ Finalized
-          </span>
-        ) : lo.sheets.length > 0 ? (
-          <span className="inline-flex shrink-0 rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-700">
-            In Progress
-          </span>
-        ) : null}
+        <div className="flex shrink-0 items-center gap-2">
+          {headerExtra}
+          <ChevronDownIcon
+            className={cn(
+              "h-4 w-4 shrink-0 text-gray-500 transition-transform",
+              open && "rotate-180",
+            )}
+          />
+        </div>
       </button>
-      {open ? <div className="space-y-2 border-t border-gray-100 px-4 py-4">{children}</div> : null}
+      {open ? (
+        <div className="space-y-2 bg-white px-4 py-4">{children}</div>
+      ) : null}
     </div>
   );
 }

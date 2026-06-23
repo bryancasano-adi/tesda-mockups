@@ -36,27 +36,10 @@ function ContextBlock({
 function ConsolidationNavEntry({
   item,
   active,
-  locked,
 }: {
   item: (typeof CONSOLIDATION_NAV)[number];
   active: boolean;
-  locked: boolean;
 }) {
-  if (locked) {
-    return (
-      <div
-        className="px-3 py-2 text-[11px] text-gray-400"
-        title={item.subtitle}
-      >
-        <div className="truncate">{item.label}</div>
-        <div className="mt-0.5 truncate text-[10px] text-gray-400">
-          {item.subtitle}
-        </div>
-        <span className="text-[10px]">🔒 Locked</span>
-      </div>
-    );
-  }
-
   return (
     <Link
       className={`block px-3 py-2 text-[11px] leading-snug no-underline ${
@@ -81,14 +64,12 @@ function ConsolidationNavEntry({
 
 export function ConsolidationShell({
   activePage,
-  unlocked,
   pageStatus,
   notice,
   taskSheetCodes,
   children,
 }: {
   activePage: ConsolidationPageId;
-  unlocked: boolean;
   pageStatus?: "draft" | "finalized";
   notice: string;
   taskSheetCodes: string;
@@ -97,9 +78,6 @@ export function ConsolidationShell({
   const navigate = useNavigate();
   const activeLabel = consolidationPageLabel(activePage);
   const nextPage = nextConsolidationPage(activePage);
-  const selectableNavItems = CONSOLIDATION_NAV.filter(
-    (item) => unlocked || item.id === "export",
-  );
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#F5F5F5]">
@@ -119,7 +97,6 @@ export function ConsolidationShell({
                 key={item.id}
                 active={activePage === item.id}
                 item={item}
-                locked={!unlocked && item.id !== "export"}
               />
             ))}
           </nav>
@@ -154,7 +131,7 @@ export function ConsolidationShell({
                   ↓ Export as .docx
                 </button>
               )}
-              {nextPage && unlocked && activePage !== "export" && (
+              {nextPage && activePage !== "export" && (
                 <Link
                   className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 no-underline"
                   to={consolidationNavHref(nextPage)}
@@ -181,7 +158,7 @@ export function ConsolidationShell({
                 );
               }}
             >
-              {selectableNavItems.map((item) => (
+              {CONSOLIDATION_NAV.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.subtitle}
                 </option>

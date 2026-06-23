@@ -262,25 +262,68 @@ export const moduleReferences = [
   { name: "CLM-UC001-2025.pdf", type: "CLM", usedIn: "IS 1.1.1", flagged: true },
 ];
 
+export type VideoScriptSheetType = "task-sheet" | "job-sheet";
+
+export type VideoScriptStatus =
+  | "not_started"
+  | "draft"
+  | "finalized"
+  | "locked";
+
 export type VideoScriptRow = {
   id: string;
-  type: "TS" | "JS";
+  sheetType: VideoScriptSheetType;
   code: string;
   title: string;
-  cblmStatus: string;
-  cblmBadge: string;
-  scriptStatus: string;
-  scriptBadge: string;
-  duration: string;
+  cblmStatus: "draft" | "finalized";
+  scriptStatus: VideoScriptStatus;
+  durationMinutes: number | null;
   eligible: boolean;
-  checked?: boolean;
+  lockReason?: string;
 };
 
 export const videoScriptRows: VideoScriptRow[] = [
-  { id: "ts-1-1-1", type: "TS", code: "TS 1.1.1", title: "Perform Pre-Inspection EV Safety Preparation", cblmStatus: "Finalized", cblmBadge: "b-finalized", scriptStatus: "Draft", scriptBadge: "b-draft", duration: "45 min", eligible: true, checked: true },
-  { id: "ts-1-2-1", type: "TS", code: "TS 1.2.1", title: "Conduct Exterior Visual Inspection", cblmStatus: "Finalized", cblmBadge: "b-finalized", scriptStatus: "Not Generated", scriptBadge: "b-pending", duration: "—", eligible: true },
-  { id: "ts-1-2-2", type: "TS", code: "TS 1.2.2", title: "Inspect HV System Warning Indicators", cblmStatus: "Finalized", cblmBadge: "b-finalized", scriptStatus: "Not Generated", scriptBadge: "b-pending", duration: "—", eligible: true },
-  { id: "js-1", type: "JS", code: "JS 1", title: "Integrated EV Fleet Inspection Job Sheet", cblmStatus: "Draft", cblmBadge: "b-draft", scriptStatus: "Locked", scriptBadge: "b-locked", duration: "—", eligible: false },
+  {
+    id: "ts-1-1-1",
+    sheetType: "task-sheet",
+    code: "TS 1.1.1",
+    title: "Perform Pre-Inspection EV Safety Preparation",
+    cblmStatus: "finalized",
+    scriptStatus: "draft",
+    durationMinutes: 45,
+    eligible: true,
+  },
+  {
+    id: "ts-1-2-1",
+    sheetType: "task-sheet",
+    code: "TS 1.2.1",
+    title: "Conduct Exterior Visual Inspection",
+    cblmStatus: "finalized",
+    scriptStatus: "not_started",
+    durationMinutes: 45,
+    eligible: true,
+  },
+  {
+    id: "ts-1-2-2",
+    sheetType: "task-sheet",
+    code: "TS 1.2.2",
+    title: "Inspect HV System Warning Indicators",
+    cblmStatus: "finalized",
+    scriptStatus: "not_started",
+    durationMinutes: 45,
+    eligible: true,
+  },
+  {
+    id: "js-1",
+    sheetType: "job-sheet",
+    code: "JS 1",
+    title: "Integrated EV Fleet Inspection Job Sheet",
+    cblmStatus: "draft",
+    scriptStatus: "locked",
+    durationMinutes: null,
+    eligible: false,
+    lockReason: "CBLM still in Draft",
+  },
 ];
 
 /** Dashboard module list — legacy F&B dashboard structure */

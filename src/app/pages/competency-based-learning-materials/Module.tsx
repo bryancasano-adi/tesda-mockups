@@ -182,12 +182,13 @@ export function CBLMModule() {
 
                 if (locked) {
                   return (
-                    <span
+                    <Link
                       key={page}
-                      className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-semibold text-gray-400"
+                      className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-semibold text-gray-400 hover:border-gray-300 hover:bg-gray-100 hover:text-gray-500 no-underline"
+                      to={consolidationNavHref(page)}
                     >
                       {label}
-                    </span>
+                    </Link>
                   );
                 }
 

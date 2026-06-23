@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { FlagIcon, TrashIcon } from "@heroicons/react/24/outline";
 
-import { SectionDivider } from "../CblmPrimitives";
-import { cblm, cblmBadge, cblmBtn } from "../cblmClasses";
+import { SectionDivider } from "../CblmFieldPrimitives";
+import {
+  ConsolidationMetaHeader,
+  ReferenceTypeBadge,
+} from "../consolidation-shared";
 import { moduleReferences } from "@/app/data/cblmData";
 
 type ReferenceRow = {
@@ -10,12 +13,6 @@ type ReferenceRow = {
   type: string;
   usedIn: string;
   flagged: boolean;
-};
-
-const TYPE_BADGE: Record<string, string> = {
-  CS: "bg-[#E3F2FD] text-[#1565C0]",
-  CBC: "bg-[#E8F5E9] text-[#2E7D32]",
-  CLM: "bg-[#FFF3E0] text-[#F57C00]",
 };
 
 export function ConsolidatedReferencesEditor({
@@ -43,42 +40,41 @@ export function ConsolidatedReferencesEditor({
 
   return (
     <>
-      <div className="mb-5 grid gap-3 rounded-md border border-[#E0E0E0] bg-[#FAFAFA] p-4 text-xs sm:grid-cols-2 lg:grid-cols-3">
-        <div>
-          <div className="text-[#999]">Code</div>
-          <div className="font-mono font-semibold text-[#1565C0]">REF</div>
-        </div>
-        <div>
-          <div className="text-[#999]">Type</div>
-          <div className="font-semibold text-[#333]">Consolidated References</div>
-        </div>
-        <div>
-          <div className="text-[#999]">Documents</div>
-          <div className="font-semibold text-[#333]">{references.length}</div>
-        </div>
-      </div>
+      <ConsolidationMetaHeader
+        code="REF"
+        extra={[{ label: "Documents", value: String(references.length) }]}
+        type="Consolidated References"
+      />
 
       <SectionDivider label="Reference Documents" />
-      <p className="mb-4 text-xs text-[#666]">
+      <p className="mb-4 text-xs text-gray-600">
         References across all Information Sheets. Verify accuracy before
         finalizing. Flagged citations appear with a visible indicator in the
         exported document.
       </p>
 
       {references.length === 0 ? (
-        <p className="text-sm text-[#999]">
+        <p className="text-sm text-gray-500">
           No references compiled yet. References are aggregated from finalized
           information sheets after Step 2 is finalized.
         </p>
       ) : (
         <div className="overflow-x-auto">
-          <table className={cblm.tbl}>
+          <table className="w-full min-w-[720px] border-collapse bg-white text-sm">
             <thead>
-              <tr>
-                <th className={cblm.tblTh}>Source Document</th>
-                <th className={`${cblm.tblTh} text-center`}>Type</th>
-                <th className={cblm.tblTh}>Used In</th>
-                <th className={`${cblm.tblTh} text-right`}>Actions</th>
+              <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs uppercase text-gray-500">
+                <th className="px-4 py-2.5 font-semibold text-gray-600">
+                  Source Document
+                </th>
+                <th className="px-4 py-2.5 text-center font-semibold text-gray-600">
+                  Type
+                </th>
+                <th className="px-4 py-2.5 font-semibold text-gray-600">
+                  Used In
+                </th>
+                <th className="px-4 py-2.5 text-right font-semibold text-gray-600">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -87,37 +83,32 @@ export function ConsolidatedReferencesEditor({
                   key={ref.name}
                   className={
                     ref.flagged
-                      ? "border-b border-[#FFCDD2] bg-[#FFEBEE]/40"
-                      : cblm.tblRow
+                      ? "border-b border-red-100 bg-red-50/40"
+                      : "border-b border-gray-100"
                   }
                 >
-                  <td className={cblm.tblTd}>
-                    <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
+                  <td className="px-4 py-3 font-mono text-xs text-gray-700">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span>{ref.name}</span>
                       {ref.flagged && (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#C62828]">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-red-700">
                           <FlagIcon className="h-3.5 w-3.5" />
                           Flagged
                         </span>
                       )}
                     </div>
                   </td>
-                  <td className={`${cblm.tblTd} text-center`}>
-                    <span
-                      className={cblmBadge(
-                        "b-validated",
-                        TYPE_BADGE[ref.type] ?? "",
-                      )}
-                    >
-                      {ref.type}
-                    </span>
+                  <td className="px-4 py-3 text-center">
+                    <ReferenceTypeBadge type={ref.type} />
                   </td>
-                  <td className={`${cblm.tblTd} text-xs`}>{ref.usedIn}</td>
-                  <td className={`${cblm.tblTd} text-right`}>
+                  <td className="px-4 py-3 text-xs text-gray-600">
+                    {ref.usedIn}
+                  </td>
+                  <td className="px-4 py-3 text-right">
                     <div className="inline-flex items-center gap-2">
                       {ref.flagged ? (
                         <button
-                          className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#C62828] hover:text-[#B71C1C]"
+                          className="inline-flex items-center gap-1 text-[11px] font-semibold text-red-700 hover:text-red-800"
                           type="button"
                           onClick={() => toggleFlag(ref.name)}
                         >
@@ -126,21 +117,21 @@ export function ConsolidatedReferencesEditor({
                         </button>
                       ) : (
                         <button
-                          className={cblmBtn("secondary", "text-[11px] px-2 py-1")}
+                          className="inline-flex items-center gap-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-[11px] font-semibold text-gray-700 hover:bg-gray-50"
                           type="button"
                           onClick={() => toggleFlag(ref.name)}
                         >
-                          <FlagIcon className="mr-1 inline h-3.5 w-3.5 text-[#666]" />
+                          <FlagIcon className="h-3.5 w-3.5 text-gray-500" />
                           Flag
                         </button>
                       )}
                       <button
                         aria-label={`Remove ${ref.name}`}
-                        className={cblmBtn("secondary", "text-[11px] px-2 py-1 hover:border-[#FFCDD2] hover:bg-[#FFEBEE] hover:text-[#C62828]")}
+                        className="inline-flex items-center gap-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-[11px] font-semibold text-gray-700 hover:border-red-200 hover:bg-red-50 hover:text-red-700"
                         type="button"
                         onClick={() => removeReference(ref.name)}
                       >
-                        <TrashIcon className="mr-1 inline h-3.5 w-3.5" />
+                        <TrashIcon className="h-3.5 w-3.5" />
                         Remove
                       </button>
                     </div>

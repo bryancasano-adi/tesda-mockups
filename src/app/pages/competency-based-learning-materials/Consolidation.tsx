@@ -16,25 +16,9 @@ import {
   useCblmToast,
 } from "@/app/components/competency-based-learning-materials/cblmMockupHooks";
 import {
-  consolidationUnlocked,
   consolidationPageStatuses,
   ucMeta,
 } from "@/app/data/cblmData";
-
-function LockedConsolidationMessage() {
-  return (
-    <div className="rounded-md border border-gray-200 bg-white p-6 text-sm text-gray-600">
-      <p className="font-semibold text-gray-800">
-        🔒 Locked — finalize all Step 2 sheets first
-      </p>
-      <p className="mt-2 text-xs leading-relaxed">
-        Job Sheet, Learning Experiences Table, and References are generated
-        automatically after all Step 2 sheets are finalized for every learning
-        outcome.
-      </p>
-    </div>
-  );
-}
 
 function pageNotice(page: ConsolidationPageId) {
   switch (page) {
@@ -60,15 +44,9 @@ export function CBLMConsolidation() {
   const page: ConsolidationPageId =
     pageParam && validPages.includes(pageParam) ? pageParam : "job-sheet";
 
-  const unlocked = consolidationUnlocked;
   const pageStatus = consolidationPageStatuses[page];
-  const showLocked = page !== "export" && !unlocked;
 
   const renderPage = (): ReactNode => {
-    if (showLocked) {
-      return <LockedConsolidationMessage />;
-    }
-
     switch (page) {
       case "job-sheet":
         return <JobSheetEditor showToast={showToast} />;
@@ -91,7 +69,6 @@ export function CBLMConsolidation() {
           notice={pageNotice(page)}
           pageStatus={page === "export" ? undefined : pageStatus}
           taskSheetCodes="TS 1.1.1"
-          unlocked={unlocked}
         >
           {renderPage()}
         </ConsolidationShell>

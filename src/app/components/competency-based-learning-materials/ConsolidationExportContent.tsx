@@ -1,382 +1,587 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 
-import { CblmModal } from "./CblmPrimitives";
+import { cn } from "./CblmFrontendPrimitives";
+import {
+  buildDefaultExportFileName,
+  exportReadinessSummary,
+  exportStatusLabel,
+} from "./mock-export-utils";
 import { cblmFrontMatterPath } from "@/app/utils/cblmRoutes";
-import { cblm, cblmBtn } from "./cblmClasses";
-import { useModal } from "./cblmMockupHooks";
-import { moduleReferences, ucMeta } from "@/app/data/cblmData";
+import { mockLoGroups, moduleReferences, ucMeta } from "@/app/data/cblmData";
 
-const readinessRows = [
-  {
-    section: "Front Matter",
-    dot: "#1B3A5C",
-    sheets: "6 / 6",
-    pct: 100,
-    status: "✓ Included",
-    color: "#2E7D32",
-  },
-  {
-    section: "LO 1 — Prepare",
-    dot: "#1565C0",
-    sheets: "6 / 11",
-    pct: 55,
-    status: "✓ Included",
-    color: "#2E7D32",
-    warn: true,
-  },
-  {
-    section: "LO 2 — Inspect",
-    dot: "#1565C0",
-    sheets: "0 / 11",
-    pct: 0,
-    status: "No validated sheets",
-    color: "#BDBDBD",
-    warn: true,
-  },
-  {
-    section: "LO 3 — Document",
-    dot: "#1565C0",
-    sheets: "0 / 3",
-    pct: 0,
-    status: "No validated sheets",
-    color: "#BDBDBD",
-    warn: true,
-  },
-  {
-    section: "Step 3 — Consolidation",
-    dot: "#2E7D32",
-    sheets: "0 / 3",
-    pct: 0,
-    status: "No validated sheets",
-    color: "#BDBDBD",
-    warn: true,
-  },
-  {
-    section: "Video Scripts",
-    dot: "#7C3AED",
-    sheets: "1 / 4",
-    pct: 25,
-    status: "✓ Included (draft)",
-    color: "#2E7D32",
-    warn: true,
-  },
+type IncludeSectionKey =
+  | "frontCover"
+  | "howToUse"
+  | "competencyList"
+  | "moduleContent"
+  | "prerequisites"
+  | "loSummary"
+  | "learningExperiences"
+  | "informationSheets"
+  | "selfChecks"
+  | "taskSheets"
+  | "pccSheets"
+  | "operationSheets"
+  | "jobSheet";
+
+type ExportSettingKey =
+  | "markDraft"
+  | "trainerSignature"
+  | "includePcc"
+  | "tesdaCover"
+  | "tableOfContents";
+
+const INCLUDE_SECTIONS: { key: IncludeSectionKey; label: string }[] = [
+  { key: "frontCover", label: "Front Cover & Revision History" },
+  { key: "howToUse", label: "How to Use This Module" },
+  { key: "competencyList", label: "List of Competencies" },
+  { key: "moduleContent", label: "Module Content" },
+  { key: "prerequisites", label: "Prerequisites" },
+  { key: "loSummary", label: "LO Summary Table" },
+  { key: "learningExperiences", label: "Learning Experiences Table (LET)" },
+  { key: "informationSheets", label: "All Information Sheets" },
+  { key: "selfChecks", label: "All Self-Check & Answer Keys" },
+  { key: "taskSheets", label: "All Task Sheets" },
+  { key: "pccSheets", label: "All PCC Sheets" },
+  { key: "operationSheets", label: "All Operation Sheets" },
+  { key: "jobSheet", label: "Job Sheet (JS 1)" },
 ];
 
-const includeSections = [
-  "Front Cover & Revision History",
-  "How to Use This Module",
-  "List of Competencies",
-  "Module Content",
-  "Prerequisites",
-  "LO Summary Table",
-  "Learning Experiences Table (LET)",
-  "All Information Sheets",
-  "All Self-Check & Answer Keys",
-  "All Task Sheets",
-  "All PCC Sheets",
-  "All Operation Sheets",
-  "Job Sheet (JS 1)",
+const EXPORT_SETTINGS: { key: ExportSettingKey; label: string }[] = [
+  { key: "markDraft", label: "Mark unvalidated sheets [DRAFT]" },
+  {
+    key: "trainerSignature",
+    label: "Include trainer signature block (validated sheets only)",
+  },
+  { key: "includePcc", label: "Include PCC in export" },
+  { key: "tesdaCover", label: "Apply TESDA cover page template" },
+  { key: "tableOfContents", label: "Generate Table of Contents" },
 ];
 
-const exportSettings = [
-  "Mark unvalidated sheets [DRAFT]",
-  "Include trainer signature block (validated sheets only)",
-  "Include PCC in export",
-  "Apply TESDA cover page template",
-  "Generate Table of Contents",
-];
+const DEFAULT_INCLUDE: Record<IncludeSectionKey, boolean> = {
+  frontCover: true,
+  howToUse: true,
+  competencyList: true,
+  moduleContent: true,
+  prerequisites: true,
+  loSummary: true,
+  learningExperiences: true,
+  informationSheets: true,
+  selfChecks: true,
+  taskSheets: true,
+  pccSheets: true,
+  operationSheets: true,
+  jobSheet: true,
+};
+
+const DEFAULT_SETTINGS: Record<ExportSettingKey, boolean> = {
+  markDraft: true,
+  trainerSignature: true,
+  includePcc: true,
+  tesdaCover: true,
+  tableOfContents: false,
+};
+
+function ExportCard({
+  title,
+  rightSlot,
+  children,
+}: {
+  title: string;
+  rightSlot?: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <div className="overflow-hidden rounded-md border border-gray-200 bg-white">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-200 px-4 py-3 sm:px-5">
+        <h3 className="text-sm font-semibold text-gray-800">{title}</h3>
+        {rightSlot}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function MetadataCell({
+  label,
+  value,
+  readOnly,
+}: {
+  label: string;
+  value: string;
+  readOnly?: boolean;
+}) {
+  return (
+    <div className="border-b border-r border-gray-100 px-4 py-3 sm:px-5">
+      <div className="mb-1 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+          {label}
+        </span>
+        {readOnly && (
+          <span className="rounded border border-gray-200 bg-gray-50 px-1.5 py-px text-[9px] font-bold text-gray-400">
+            Read-only
+          </span>
+        )}
+      </div>
+      <div className="font-mono text-sm font-medium text-gray-800">{value}</div>
+    </div>
+  );
+}
+
+function ReadinessBar({ pct }: { pct: number }) {
+  const clamped = Math.max(0, Math.min(100, pct));
+
+  return (
+    <div className="flex min-w-[120px] flex-1 items-center gap-2">
+      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-200">
+        <div
+          className={cn(
+            "h-full transition-all duration-300",
+            clamped >= 100
+              ? "bg-green-500"
+              : clamped > 0
+                ? "bg-blue-600"
+                : "bg-gray-300",
+          )}
+          style={{ width: `${clamped}%` }}
+        />
+      </div>
+      <span className="w-8 shrink-0 text-right text-xs text-gray-500">
+        {clamped}%
+      </span>
+    </div>
+  );
+}
+
+function ExportCheckbox({
+  checked,
+  disabled,
+  label,
+  onChange,
+}: {
+  checked: boolean;
+  disabled?: boolean;
+  label: string;
+  onChange?: (checked: boolean) => void;
+}) {
+  return (
+    <label
+      className={cn(
+        "flex items-start gap-2.5 py-1.5 text-sm",
+        disabled
+          ? "cursor-not-allowed text-gray-400"
+          : "cursor-pointer text-gray-700",
+      )}
+    >
+      <input
+        checked={checked}
+        className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border border-gray-300 bg-white accent-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+        disabled={disabled}
+        style={{ colorScheme: "light" }}
+        type="checkbox"
+        onChange={(event) => onChange?.(event.target.checked)}
+      />
+      <span>{label}</span>
+    </label>
+  );
+}
+
+function ExportConfirmModal({
+  open,
+  fileName,
+  flaggedCount,
+  unvalidated,
+  markDraft,
+  isExporting,
+  onClose,
+  onConfirm,
+}: {
+  open: boolean;
+  fileName: string;
+  flaggedCount: number;
+  unvalidated: number;
+  markDraft: boolean;
+  isExporting: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  if (!open) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md rounded-lg bg-white p-5 shadow-xl"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <h2 className="text-lg font-semibold text-gray-900">
+          Export CBLM as .docx
+        </h2>
+        <div className="mt-3 space-y-2 text-sm text-gray-600">
+          <p>
+            Generates a Word document following the TESDA CBLM template: front
+            matter, module content, sheets, job sheet, learning experiences
+            table, and references.
+          </p>
+          <p className="font-mono text-xs text-gray-800">{fileName}</p>
+          {markDraft && unvalidated > 0 && (
+            <p className="text-xs text-amber-700">
+              {unvalidated} sheet{unvalidated === 1 ? "" : "s"} will be marked
+              [DRAFT].
+            </p>
+          )}
+          {flaggedCount > 0 && (
+            <p className="text-xs text-red-700">
+              {flaggedCount} reference{flaggedCount === 1 ? "" : "s"} will be
+              marked ⚑ FLAGGED in the references table.
+            </p>
+          )}
+        </div>
+        <div className="mt-5 flex justify-end gap-2">
+          <button
+            className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+            disabled={isExporting}
+            type="button"
+            onClick={onClose}
+          >
+            Cancel
+          </button>
+          <button
+            className="rounded-md bg-blue-700 px-3 py-1.5 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-70"
+            disabled={isExporting}
+            type="button"
+            onClick={onConfirm}
+          >
+            {isExporting ? "Processing..." : "Download"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function ConsolidationExportContent({
   showToast,
 }: {
   showToast: (msg: string, color?: string) => void;
 }) {
-  const modal = useModal();
-  const flaggedCount = moduleReferences.filter((ref) => ref.flagged).length;
-  const [fileName, setFileName] = useState(`${ucMeta.documentNo}.docx`);
+  const { validated, total, unvalidated, rows: readinessRows } = useMemo(
+    () => exportReadinessSummary(mockLoGroups),
+    [],
+  );
+  const flaggedReferenceCount = useMemo(
+    () => moduleReferences.filter((ref) => ref.flagged).length,
+    [],
+  );
+
+  const [includeSections, setIncludeSections] =
+    useState(DEFAULT_INCLUDE);
+  const [exportSettings, setExportSettings] = useState(DEFAULT_SETTINGS);
+  const [fileName, setFileName] = useState(buildDefaultExportFileName);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+
+  const toggleInclude = (key: IncludeSectionKey, checked: boolean) => {
+    setIncludeSections((prev) => ({ ...prev, [key]: checked }));
+  };
+
+  const toggleSetting = (key: ExportSettingKey, checked: boolean) => {
+    setExportSettings((prev) => ({ ...prev, [key]: checked }));
+  };
+
+  const handleExport = () => {
+    setIsExporting(true);
+    window.setTimeout(() => {
+      setIsExporting(false);
+      setShowExportModal(false);
+      showToast(`Export complete — ${fileName}`, "#1565C0");
+    }, 600);
+  };
 
   return (
     <div className="space-y-5">
-      {flaggedCount > 0 && (
-        <div className="rounded-md border border-[#FFCDD2] bg-[#FFEBEE] px-4 py-3">
-          <p className="text-sm font-semibold text-[#C62828]">
-            {flaggedCount} flagged reference
-            {flaggedCount === 1 ? "" : "s"} will appear with a visible ⚑
-            FLAGGED indicator in the exported document.
+      {flaggedReferenceCount > 0 && (
+        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3">
+          <p className="text-sm font-semibold text-red-800">
+            {flaggedReferenceCount} flagged reference
+            {flaggedReferenceCount === 1 ? "" : "s"} will appear with a visible
+            ⚑ FLAGGED indicator in the exported document.
           </p>
         </div>
       )}
 
-      <div className="rounded-md border border-[#FFB74D] bg-[#FFF3E0] px-4 py-3">
-        <p className="text-sm font-semibold text-[#E65100]">
-          21 of 34 content sheets are not yet validated
-        </p>
-        <p className="mt-1 text-xs leading-relaxed text-[#795548]">
-          Unvalidated sheets will be included but marked <strong>[DRAFT]</strong>.
-          Finalize all sheets before distributing externally.
-        </p>
-      </div>
+      {unvalidated > 0 && (
+        <div className="rounded-md border border-amber-300 bg-amber-50 px-4 py-3">
+          <p className="text-sm font-semibold text-amber-900">
+            {unvalidated} of {total} content sheets are not yet validated
+          </p>
+          <p className="mt-1 text-xs leading-relaxed text-amber-800">
+            Unvalidated sheets will be included in the export but marked{" "}
+            <strong>[DRAFT]</strong> at the top of each sheet. They will not
+            carry a trainer signature block. Finalize all sheets before
+            distributing the document externally.
+          </p>
+        </div>
+      )}
 
-      <div className={cblm.card} style={{ marginBottom: 0 }}>
-        <div className={cblm.cardHdr}>
-          <span className={cblm.cardTitle}>Document Control — Export Metadata</span>
+      <ExportCard
+        rightSlot={
           <Link
-            className="text-blue-700 hover:underline"
+            className="text-xs font-medium text-blue-700 no-underline hover:underline"
             to={cblmFrontMatterPath()}
           >
             Edit in Front Matter →
           </Link>
+        }
+        title="Document Control — Export Metadata"
+      >
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4">
+          <MetadataCell label="Document No." readOnly value={ucMeta.documentNo} />
+          <MetadataCell
+            label="Revision No."
+            readOnly
+            value={ucMeta.revision.padStart(2, "0")}
+          />
+          <MetadataCell label="Issued By" readOnly value="TESDA" />
+          <MetadataCell label="Developed By" value="Joel Fornoles" />
+          <MetadataCell
+            label="Qualification"
+            readOnly
+            value={ucMeta.qualificationName}
+          />
+          <MetadataCell label="Module" readOnly value="Module 1" />
+          <MetadataCell label="Date Developed" value="May 2026" />
+          <MetadataCell label="Date Revised" value="—" />
         </div>
-        <div
-          className={cblm.cardBody}
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: 0,
-            padding: 0,
-          }}
-        >
-          {[
-            ["Document No.", ucMeta.documentNo],
-            ["Revision No.", ucMeta.revision],
-            ["Qualification", ucMeta.project],
-            ["Module", "Module 1 of 3"],
-            ["Issued By", "TESDA"],
-            ["Developed By", "Joel Fornoles"],
-            ["Date Developed", "May 2026"],
-            ["Date Revised", "—"],
-          ].map(([label, value]) => (
-            <div
-              key={label}
-              style={{
-                padding: "14px 20px",
-                borderRight: "1px solid #F0F0F0",
-                borderBottom: "1px solid #F0F0F0",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 10,
-                  fontWeight: 600,
-                  color: "#999",
-                  textTransform: "uppercase",
-                  marginBottom: 4,
-                }}
-              >
-                {label}
-              </div>
-              <div
-                style={{
-                  fontSize: 13,
-                  fontWeight: 500,
-                  fontFamily: label === "Document No." ? "monospace" : "inherit",
-                }}
-              >
-                {value}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      </ExportCard>
 
-      <div className={cblm.card} style={{ marginBottom: 0 }}>
-        <div className={cblm.cardHdr}>
-          <span className={cblm.cardTitle}>Sheet Readiness by Section</span>
-          <span style={{ fontSize: 12, color: "#666" }}>
-            7 of 38 total sheets validated
+      <ExportCard
+        rightSlot={
+          <span className="text-xs text-gray-500">
+            {validated} of {total} total sheets validated
           </span>
-        </div>
-        <table className={cblm.tbl}>
-          <thead>
-            <tr>
-              <th className={cblm.tblTh}>Section</th>
-              <th className={`${cblm.tblTh} w-[120px] text-center`}>Sheets</th>
-              <th className={`${cblm.tblTh} w-60`}>Readiness</th>
-              <th className={`${cblm.tblTh} w-[120px] text-center`}>
-                Export Status
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {readinessRows.map((row) => (
-              <tr key={row.section} className={cblm.tblRow}>
-                <td className={cblm.tblTd}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <div
-                      style={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: "50%",
-                        background: row.dot,
-                      }}
-                    />
-                    <span style={{ fontSize: 13, fontWeight: 500 }}>
-                      {row.section}
-                    </span>
-                    {row.warn && (
-                      <span style={{ fontSize: 10, color: "#F57C00" }}>
-                        ⚠ Unvalidated marked [DRAFT]
-                      </span>
-                    )}
-                  </div>
-                </td>
-                <td className={`${cblm.tblTd} text-center`}>{row.sheets}</td>
-                <td className={cblm.tblTd}>
-                  <div className="flex items-center gap-2">
-                    <div className={`${cblm.progBar} flex-1`}>
-                      <div
-                        className={cblm.progFill}
-                        style={{
-                          width: `${row.pct}%`,
-                          background: row.pct > 0 ? "#1565C0" : "#BDBDBD",
-                        }}
-                      />
-                    </div>
-                    <span style={{ fontSize: 12, color: "#666", width: 32 }}>
-                      {row.pct}%
-                    </span>
-                  </div>
-                </td>
-                <td
-                  className={`${cblm.tblTd} text-center text-xs`}
-                  style={{ color: row.color }}
-                >
-                  {row.status}
-                </td>
+        }
+        title="Sheet Readiness by Section"
+      >
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px] border-collapse text-sm">
+            <thead>
+              <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs uppercase text-gray-500">
+                <th className="px-4 py-2.5 font-semibold text-gray-600">
+                  Section
+                </th>
+                <th className="w-28 px-4 py-2.5 text-center font-semibold text-gray-600">
+                  Sheets
+                </th>
+                <th className="w-56 px-4 py-2.5 font-semibold text-gray-600">
+                  Readiness
+                </th>
+                <th className="w-36 px-4 py-2.5 text-center font-semibold text-gray-600">
+                  Export Status
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {readinessRows.map((row) => {
+                const pct =
+                  row.total === 0
+                    ? 0
+                    : Math.round((row.validated / row.total) * 100);
+                const status = exportStatusLabel(row.validated, row.total);
+                const hasUnvalidated =
+                  row.total > 0 && row.validated < row.total;
 
-      <div className={cblm.card} style={{ marginBottom: 0 }}>
-        <div className={cblm.cardHdr}>
-          <span className={cblm.cardTitle}>Export Options</span>
+                return (
+                  <tr key={row.id} className="border-b border-gray-100">
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span
+                          className="inline-block h-2 w-2 shrink-0 rounded-full"
+                          style={{ backgroundColor: row.dotColor }}
+                        />
+                        <span className="font-medium text-gray-800">
+                          {row.section}
+                        </span>
+                        {hasUnvalidated && (
+                          <span className="text-[10px] text-amber-700">
+                            ⚠ Unvalidated sheets marked [DRAFT]
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-center text-gray-700">
+                      {row.validated} / {row.total}
+                    </td>
+                    <td className="px-4 py-3">
+                      <ReadinessBar pct={pct} />
+                    </td>
+                    <td
+                      className={cn(
+                        "px-4 py-3 text-center text-xs font-medium",
+                        status.color,
+                      )}
+                    >
+                      {status.text}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
-        <div className="grid gap-6 p-5 sm:grid-cols-2">
+      </ExportCard>
+
+      <ExportCard title="Export Options">
+        <div className="grid gap-6 p-4 sm:grid-cols-2 sm:p-5">
           <div>
-            <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#999]">
+            <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
               Include Sections
             </h4>
-            <div className="space-y-1">
-              {includeSections.map((label) => (
-                <label
-                  key={label}
-                  className="flex items-start gap-2 py-1 text-sm text-[#555]"
-                >
-                  <input
-                    checked
-                    className="mt-0.5 h-4 w-4 accent-[#1565C0]"
-                    type="checkbox"
-                    readOnly
-                  />
-                  <span>{label}</span>
-                </label>
-              ))}
-              <label className="flex items-start gap-2 py-1 text-sm text-[#BDBDBD]">
-                <input
-                  checked={false}
-                  className="mt-0.5 h-4 w-4"
-                  disabled
-                  type="checkbox"
+            <div className="space-y-0.5">
+              {INCLUDE_SECTIONS.map((item) => (
+                <ExportCheckbox
+                  key={item.key}
+                  checked={includeSections[item.key]}
+                  label={item.label}
+                  onChange={(checked) => toggleInclude(item.key, checked)}
                 />
-                <span>Video Scripts</span>
-              </label>
+              ))}
+              <ExportCheckbox checked={false} disabled label="Video Scripts" />
             </div>
           </div>
+
           <div className="space-y-5">
             <div>
-              <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#999]">
+              <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
                 Export Settings
               </h4>
-              <div className="space-y-1 rounded-md border border-[#E0E0E0] bg-[#FAFAFA] p-3">
-                {exportSettings.map((label) => (
-                  <label
-                    key={label}
-                    className="flex items-start gap-2 py-1 text-sm text-[#555]"
-                  >
-                    <input
-                      checked={label !== "Generate Table of Contents"}
-                      className="mt-0.5 h-4 w-4 accent-[#1565C0]"
-                      type="checkbox"
-                      readOnly
-                    />
-                    <span>{label}</span>
-                  </label>
+              <div className="space-y-0.5 rounded-md border border-gray-200 bg-gray-50 p-3">
+                {EXPORT_SETTINGS.map((item) => (
+                  <ExportCheckbox
+                    key={item.key}
+                    checked={exportSettings[item.key]}
+                    label={item.label}
+                    onChange={(checked) => toggleSetting(item.key, checked)}
+                  />
                 ))}
               </div>
             </div>
+
             <div>
               <label
-                className="mb-1.5 block text-xs font-semibold text-[#666]"
+                className="mb-1.5 block text-xs font-semibold text-gray-600"
                 htmlFor="export-file-name"
               >
                 Output File Name
               </label>
               <input
-                className={cblm.fieldInput}
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 font-mono text-sm text-gray-800 outline-none focus:border-blue-500"
                 id="export-file-name"
                 type="text"
                 value={fileName}
                 onChange={(event) => setFileName(event.target.value)}
               />
-              <p className="mt-2 text-[11px] text-[#999]">
-                Format: Microsoft Word .docx — TESDA CBLM template styles applied
+              <p className="mt-2 text-[11px] leading-relaxed text-gray-500">
+                Format: Microsoft Word .docx — TESDA CBLM template styles
+                applied
+              </p>
+              <p className="text-[11px] text-gray-500">
+                Estimated size: ~2.4 MB including image placeholders
               </p>
             </div>
           </div>
         </div>
-      </div>
+      </ExportCard>
+
+      <ExportCard title="Export History">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px] border-collapse text-sm">
+            <thead>
+              <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs uppercase text-gray-500">
+                <th className="px-4 py-2.5 font-semibold text-gray-600">
+                  Export Date
+                </th>
+                <th className="px-4 py-2.5 font-semibold text-gray-600">
+                  Exported By
+                </th>
+                <th className="px-4 py-2.5 font-semibold text-gray-600">
+                  Revision No.
+                </th>
+                <th className="px-4 py-2.5 font-semibold text-gray-600">
+                  Sheets Included
+                </th>
+                <th className="px-4 py-2.5 font-semibold text-gray-600">
+                  Status
+                </th>
+                <th className="px-4 py-2.5 font-semibold text-gray-600">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {unvalidated > 0 ? (
+                <tr className="border-b border-gray-100">
+                  <td className="px-4 py-3 text-gray-700">2026-05-10 09:22</td>
+                  <td className="px-4 py-3 text-gray-700">Joel Fornoles</td>
+                  <td className="px-4 py-3 font-mono text-xs text-gray-700">
+                    {ucMeta.revision.padStart(2, "0")}
+                  </td>
+                  <td className="px-4 py-3 text-gray-700">
+                    {validated} validated, {unvalidated} [DRAFT]
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-semibold text-amber-700">
+                      Draft Export
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <button
+                      className="rounded border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                      type="button"
+                      onClick={() =>
+                        showToast(`Re-download started — ${fileName}`, "#1565C0")
+                      }
+                    >
+                      ↓ Re-download
+                    </button>
+                  </td>
+                </tr>
+              ) : (
+                <tr>
+                  <td
+                    className="px-4 py-8 text-center text-sm text-gray-500"
+                    colSpan={6}
+                  >
+                    No exports yet. Use Export as .docx to generate your first
+                    document.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </ExportCard>
 
       <button
         className="hidden"
         id="cblm-export-open"
         type="button"
-        onClick={() => modal.open("exportModal")}
+        onClick={() => setShowExportModal(true)}
       />
 
-      <CblmModal
-        darkHeader
-        footer={
-          <>
-            <button
-              className={cblmBtn("secondary")}
-              type="button"
-              onClick={modal.close}
-            >
-              Cancel
-            </button>
-            <button
-              className={cblmBtn("primary")}
-              type="button"
-              onClick={() => {
-                modal.close();
-                showToast(`Export started — ${fileName}`, "#1565C0");
-              }}
-            >
-              Download
-            </button>
-          </>
-        }
-        id="exportModal"
-        open={modal.isOpen("exportModal")}
-        title="Export CBLM as .docx"
-        onClose={modal.close}
-      >
-        <p style={{ fontSize: 13, color: "#666" }}>
-          Generates a Word document following the TESDA CBLM template: front
-          matter, module content, sheets, job sheet, learning experiences table,
-          and references.
-        </p>
-        <p className="mt-2 font-mono text-xs text-[#333]">{fileName}</p>
-        {flaggedCount > 0 && (
-          <p className="mt-2 text-xs text-[#C62828]">
-            {flaggedCount} reference{flaggedCount === 1 ? "" : "s"} will be
-            marked ⚑ FLAGGED in the references table.
-          </p>
-        )}
-      </CblmModal>
+      <ExportConfirmModal
+        fileName={fileName}
+        flaggedCount={flaggedReferenceCount}
+        isExporting={isExporting}
+        markDraft={exportSettings.markDraft}
+        open={showExportModal}
+        unvalidated={unvalidated}
+        onClose={() => setShowExportModal(false)}
+        onConfirm={handleExport}
+      />
     </div>
   );
 }
