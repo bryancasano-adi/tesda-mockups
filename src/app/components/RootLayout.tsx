@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
-import { isCblmRoute } from "@/app/utils/cblmRoutes";
+import { isCblmFullBleedRoute, isCblmRoute } from "@/app/utils/cblmRoutes";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
 
@@ -15,9 +15,10 @@ export function RootLayout() {
   const isNoVariantPage =
     location.pathname === "/" || location.pathname === "/cats";
   const variant = isCblmRoute(location.pathname) ? "cblm" : "cats";
+  const fullBleed = isCblmFullBleedRoute(location.pathname);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="flex h-screen flex-col overflow-hidden bg-gray-50">
       <Header
         onToggleSidebar={toggleSidebar}
         variant={isNoVariantPage ? undefined : variant}
@@ -27,10 +28,14 @@ export function RootLayout() {
         onFinalize={() => alert("Document has been finalized.")}
       />
 
-      <div className="flex flex-1 mt-10">
+      <div className="mt-10 flex min-h-0 flex-1 overflow-hidden">
         <Sidebar isOpen={sidebarOpen} />
 
-        <main className="flex-1 p-6">
+        <main
+          className={`flex min-h-0 flex-1 flex-col ${
+            fullBleed ? "overflow-hidden" : "overflow-auto p-6"
+          }`}
+        >
           <Outlet />
         </main>
       </div>
