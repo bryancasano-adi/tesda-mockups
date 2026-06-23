@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import { RootLayout } from "./components/RootLayout";
 
 import { CATSDashboard } from "./pages/competency-assessment-tool/CATSDashboard";
@@ -25,15 +25,16 @@ import { NotFound } from "./pages/competency-assessment-tool/NotFound";
 import { LevelAlignmentMatrix } from "./pages/level-alignment-matrix/level-alignment-matrix";
 import { ImplementingGuidelines } from "./pages/implementing-guidelines/implementing-guidelines";
 import { LandingPage } from "./pages/LandingPage";
-import { CbcMainDashboard } from "./pages/competency-based-learning-materials/CbcMainDashboard";
-import { ClmUcView } from "./pages/competency-based-learning-materials/ClmUcView";
+import { CblmDashboard } from "./pages/competency-based-learning-materials/CblmDashboard";
 import { CBLMModule } from "./pages/competency-based-learning-materials/Module";
 import { CBLMEditor } from "./pages/competency-based-learning-materials/Editor";
 import { CBLMFrontMatter } from "./pages/competency-based-learning-materials/FrontMatter";
+import { CBLMConsolidation } from "./pages/competency-based-learning-materials/Consolidation";
 import { CBLMExport } from "./pages/competency-based-learning-materials/Export";
 import { VideoScriptsDashboard } from "./pages/competency-based-learning-materials/VideoScriptsDashboard";
 import { VideoScriptEditor } from "./pages/competency-based-learning-materials/VideoScriptEditor";
 import { ControlDashboard } from "./pages/control-dashboard/Dashboard";
+import { CBLM_BASE } from "./utils/cblmRoutes";
 
 export const router = createBrowserRouter([
   {
@@ -44,18 +45,35 @@ export const router = createBrowserRouter([
       { path: "/lam", Component: LevelAlignmentMatrix },
       { path: "/ig", Component: ImplementingGuidelines },
       {
-        // competency-based-learning-materials route proper, CBC and CLM components are for context only
-        path: "/cbc",
+        path: CBLM_BASE,
         children: [
-          { index: true, Component: CbcMainDashboard },
-          { path: "clm", Component: ClmUcView },
-          { path: "cblm", Component: CBLMModule },
-          { path: "editor", Component: CBLMEditor },
-          { path: "front-matter", Component: CBLMFrontMatter },
-          { path: "export", Component: CBLMExport },
-          { path: "video-scripts", Component: VideoScriptsDashboard },
-          { path: "video-scripts/edit", Component: VideoScriptEditor },
+          { index: true, Component: CblmDashboard },
+          {
+            path: ":cblmId",
+            children: [
+              { index: true, Component: CBLMModule },
+              { path: "editor", Component: CBLMEditor },
+              { path: "consolidation", Component: CBLMConsolidation },
+              { path: "front-matter", Component: CBLMFrontMatter },
+              { path: "export", Component: CBLMExport },
+              {
+                path: "video-scripts",
+                children: [
+                  { index: true, Component: VideoScriptsDashboard },
+                  { path: "edit", Component: VideoScriptEditor },
+                ],
+              },
+            ],
+          },
         ],
+      },
+      {
+        path: "/cbc",
+        element: <Navigate replace to={CBLM_BASE} />,
+      },
+      {
+        path: "/cbc/clm",
+        element: <Navigate replace to={CBLM_BASE} />,
       },
       { path: "/cats", Component: CATSDashboard },
       { path: "/cats/evidence-plan", Component: EvidencePlanEditor },

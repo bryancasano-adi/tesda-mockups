@@ -1,24 +1,25 @@
 import { Link } from "react-router-dom";
 import type { SheetKind } from "@/app/pages/competency-based-learning-materials/Dashboard";
-import { cblmBtn } from "../cblmClasses";
+import { cblmEditorPath } from "@/app/utils/cblmRoutes";
 
 export function PlaceholderSheetEditor({
-  kind,
   meta,
 }: {
   kind: SheetKind;
   meta: { code: string; label: string };
 }) {
   return (
-    <div style={{ padding: 24, textAlign: "center", color: "#666" }}>
-      <p style={{ fontSize: 14, marginBottom: 12 }}>
-        <strong>{meta.code}</strong> — {meta.label} mockup is not included in the
-        current HTML export set.
+    <div className="rounded-md border border-gray-200 bg-white p-8 text-center text-sm text-gray-600">
+      <p className="mb-2 font-semibold text-gray-800">
+        {meta.code} — {meta.label}
       </p>
-      <p style={{ fontSize: 12, marginBottom: 16 }}>
-        Translated editors: IS, TS, JS, LET, and Video Scripts.
+      <p className="mb-4 text-xs text-gray-500">
+        This sheet type is not included in the current mockup set.
       </p>
-      <Link to="/cbc/editor?page=information-sheet" className={cblmBtn("primary", "text-xs")}>
+      <Link
+        className="inline-flex rounded-md bg-blue-700 px-3 py-1.5 text-xs font-semibold text-white no-underline hover:bg-blue-800"
+        to={cblmEditorPath(undefined, "information-sheet")}
+      >
         Open IS 1.1.1 Editor
       </Link>
     </div>

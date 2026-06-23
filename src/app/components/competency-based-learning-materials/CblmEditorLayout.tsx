@@ -8,21 +8,29 @@ export function CblmEditorLayout({
   children,
   sourcePanel,
 }: {
-  sheetNav: ReactNode;
-  toolbar: ReactNode;
-  notice: ReactNode;
+  sheetNav: ReactNode | null;
+  toolbar: ReactNode | null;
+  notice: ReactNode | null;
   children: ReactNode;
-  sourcePanel: ReactNode;
+  sourcePanel: ReactNode | null;
 }) {
+  const shellLayout = !toolbar && !notice;
+
   return (
-    <div className={cblm.editorRoot}>
-      <div className="-m-6 flex h-[calc(100vh-2.5rem)] flex-col overflow-hidden bg-[#F5F5F5]">
+    <div className="flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden text-sm text-[#333]">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#F5F5F5]">
         <div className={cblm.editorShell}>
           {sheetNav}
           <div className={cblm.editorCenter}>
             {toolbar}
             {notice}
-            <div className={cblm.editorScroll}>{children}</div>
+            {shellLayout ? (
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                {children}
+              </div>
+            ) : (
+              <div className={cblm.editorScroll}>{children}</div>
+            )}
           </div>
           {sourcePanel}
         </div>

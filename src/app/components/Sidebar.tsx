@@ -35,7 +35,7 @@ const mockTrainingProjects = [
   {
     project_id: "5",
     sub_sector_id: "e",
-    project_name: "Battery Electric Vehicle (BEV) Servicing Level II",
+    project_name: "BEV Servicing Level II",
   },
 ];
 
@@ -87,7 +87,7 @@ export function Sidebar({ onClose, isOpen = true }: SidebarProps) {
 
   const handleProjectClick = (subSectorId?: string, projectId?: string) => {
     if (subSectorId && projectId) {
-      navigate(projectId === "5" ? `/cbc` : `/`);
+      navigate(projectId === "5" ? "/cblm" : "/");
     }
   };
 

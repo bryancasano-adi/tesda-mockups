@@ -11,6 +11,10 @@ import {
   useSaveValidate,
 } from "@/app/components/competency-based-learning-materials/cblmMockupHooks";
 import { ucMeta, videoScriptRows } from "@/app/data/cblmData";
+import {
+  cblmVideoScriptEditorPath,
+  cblmVideoScriptsPath,
+} from "@/app/utils/cblmRoutes";
 import { cblm, cblmBadge, cblmBtn, cblmSourceTag } from "@/app/components/competency-based-learning-materials/cblmClasses";
 import { cn } from "@/app/components/ui/utils";
 
@@ -22,7 +26,7 @@ const vsNavItems = videoScriptRows
     badge: r.scriptStatus,
     badgeClass: r.scriptBadge,
     dotColor: r.scriptStatus === "Draft" ? "#F57C00" : "#2E7D32",
-    href: `/cbc/video-scripts/edit?sheet=${encodeURIComponent(r.code)}`,
+    href: cblmVideoScriptEditorPath(r.code),
   }));
 
 const scriptRows = [
@@ -51,23 +55,17 @@ export function VideoScriptEditor() {
             title="Video Scripts"
             subtitle={`${ucMeta.code} — Module 1`}
             items={[
-              { id: "vs-dash", label: "← All Scripts", badge: "Dashboard", badgeClass: "snb-active", dotColor: "#1565C0", href: "/cbc/video-scripts" },
+              { id: "vs-dash", label: "← All Scripts", badge: "Dashboard", badgeClass: "snb-active", dotColor: "#1565C0", href: cblmVideoScriptsPath() },
               ...vsNavItems,
             ]}
             activeId={row.id}
-            backHref="/cbc/video-scripts"
+            backHref={cblmVideoScriptsPath()}
             backLabel="Video Scripts"
           />
         }
         toolbar={
           <EditorToolbar
-            crumbs={[
-              { label: "CBC", href: "/" },
-              { label: `${ucMeta.code} CBLM`, href: "/cbc/module" },
-              { label: "Video Scripts", href: "/cbc/video-scripts" },
-              { label: row.code },
-            ]}
-            backHref="/cbc/video-scripts"
+            backHref={cblmVideoScriptsPath()}
             backLabel="Scripts"
             onSave={saveSheet}
             onValidate={validateSheet}
@@ -141,7 +139,7 @@ export function VideoScriptEditor() {
           </tbody>
         </table>
         <div className="mt-3">
-          <Link to="/cbc/module" className={cblmBtn("secondary", "text-xs")}>
+          <Link to={cblmModulePath()} className={cblmBtn("secondary", "text-xs")}>
             ← Module 1
           </Link>
         </div>

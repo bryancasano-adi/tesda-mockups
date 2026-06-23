@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState, type ReactNode } from "react";
-import { CblmPageLayout } from "@/app/components/competency-based-learning-materials/CblmEditorLayout";
+import { CblmPageShell } from "@/app/components/competency-based-learning-materials/CblmFrontendPrimitives";
 import { CblmDotsMenu, CblmModal } from "@/app/components/competency-based-learning-materials/CblmPrimitives";
 import {
   CblmToast,
@@ -9,6 +9,11 @@ import {
   useModal,
 } from "@/app/components/competency-based-learning-materials/cblmMockupHooks";
 import { ucMeta, videoScriptRows, type VideoScriptRow } from "@/app/data/cblmData";
+import {
+  cblmDashboardPath,
+  cblmModulePath,
+  cblmVideoScriptEditorPath,
+} from "@/app/utils/cblmRoutes";
 import {
   cblm,
   cblmBadge,
@@ -52,7 +57,7 @@ function VsMenuItem({
 }
 
 function sheetEditorHref(code: string) {
-  return `/cbc/video-scripts/edit?sheet=${encodeURIComponent(code)}`;
+  return cblmVideoScriptEditorPath(code);
 }
 
 function RowActions({
@@ -148,25 +153,25 @@ export function VideoScriptsDashboard() {
   const [rows, setRows] = useState(videoScriptRows);
 
   return (
-    <CblmPageLayout>
-      <div className={cblm.breadcrumb}>
-        <Link to="/">CBC</Link>
-        {" › "}
-        <Link to="/cbc/cblm">
-          {ucMeta.code} CBLM
+    <CblmPageShell>
+      <div className="mb-2">
+        <Link
+          className="text-sm font-medium text-blue-700 hover:underline"
+          to={cblmModulePath()}
+        >
+          ← Back to CBLM Module
         </Link>
-        {" › "}
-        <strong>Video Scripts</strong>
       </div>
 
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20 }}>
+      <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 style={{ fontSize: 20, fontWeight: 600, marginBottom: 4 }}>
+          <h1 className="text-xl font-semibold text-gray-900">
             Video Scripts — Module 1
           </h1>
-          <p style={{ fontSize: 14, color: "#666" }}>{ucMeta.title}</p>
-          <p style={{ fontSize: 12, color: "#999", marginTop: 4 }}>
-            One script per Task Sheet or Job Sheet · Two-column AUDIO | VIDEO format · 3–5 min target
+          <p className="mt-1 text-sm text-gray-600">{ucMeta.titleLower}</p>
+          <p className="mt-1 text-xs text-gray-400">
+            One script per Task Sheet or Job Sheet · Two-column AUDIO | VIDEO
+            format · 3–5 min target
           </p>
         </div>
         <div className={cn("relative flex items-center gap-2", dd.isOpen("vs-all") && "z-50")}>
@@ -363,6 +368,6 @@ export function VideoScriptsDashboard() {
       </CblmModal>
 
       <CblmToast toast={toast} />
-    </CblmPageLayout>
+    </CblmPageShell>
   );
 }

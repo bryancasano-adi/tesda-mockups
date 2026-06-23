@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { cblm, cblmBtn } from "./cblmClasses";
 
 export function EditorToolbar({
-  crumbs,
   backHref,
   backLabel,
   nextHref,
@@ -12,7 +11,6 @@ export function EditorToolbar({
   saved,
   showValidate = true,
 }: {
-  crumbs: { label: string; href?: string }[];
   backHref?: string;
   backLabel?: string;
   nextHref?: string;
@@ -24,19 +22,7 @@ export function EditorToolbar({
 }) {
   return (
     <div className={cblm.editorBar}>
-      <div className={cblm.breadcrumb} style={{ margin: 0 }}>
-        {crumbs.map((c, i) => (
-          <span key={c.label}>
-            {i > 0 && " › "}
-            {c.href ? (
-              <Link to={c.href}>{c.label}</Link>
-            ) : (
-              <strong>{c.label}</strong>
-            )}
-          </span>
-        ))}
-      </div>
-      <div className="ml-auto flex items-center gap-1.5">
+      <div className="flex items-center gap-1.5">
         {backHref && backLabel && (
           <Link to={backHref} className={cblmBtn("secondary", "text-xs")}>
             ← {backLabel}

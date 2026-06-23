@@ -6,7 +6,7 @@ export const cblm = {
   pageRoot: "text-sm text-[#333]",
   pageShell: "-m-6 min-h-[calc(100vh-2.5rem)] bg-[#F5F5F5]",
   pageContent: "px-7 py-6",
-  editorRoot: "w-full max-w-none text-sm text-[#333] pt-3",
+  editorRoot: "w-full max-w-none text-sm text-[#333]",
   editorShell: "flex flex-1 overflow-hidden",
   editorCenter: "flex min-w-0 flex-1 flex-col overflow-hidden",
   editorScroll: "flex-1 overflow-y-auto px-6 py-5",
@@ -63,7 +63,7 @@ export const cblm = {
   sniBadge: "mt-0.5 inline-block rounded-[3px] px-[5px] py-px text-[9px] font-semibold",
 
   editorBar:
-    "flex shrink-0 items-center gap-2 border-b border-[#E0E0E0] bg-white px-5 py-2.5",
+    "flex shrink-0 items-center justify-end gap-2 border-b border-[#E0E0E0] bg-white px-5 py-2",
   noticeBar:
     "shrink-0 border-b border-[#E0E0E0] bg-[#E3F2FD] px-5 py-2 text-xs text-[#1565C0]",
 

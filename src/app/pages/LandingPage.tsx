@@ -38,7 +38,7 @@ const featureCards = [
     title: "Competency-Based Learning Materials",
     description:
       "Generate CBLM modules, review learning sheets, manage front matter and export documents.",
-    href: "/cbc",
+    href: "/cblm",
     icon: AcademicCapIcon,
     accent: "from-amber-500 to-orange-600",
   },

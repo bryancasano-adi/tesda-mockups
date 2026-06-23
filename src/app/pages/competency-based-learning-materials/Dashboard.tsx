@@ -572,7 +572,7 @@ export function CBLMDashboard() {
             },
             {
               label: "Competency Based Learning Materials (CBLM)",
-              href: "/cbc",
+              href: "/cblm",
             },
           ]}
         />
@@ -777,11 +777,11 @@ export function CBLMDashboard() {
                         <td className="px-4 py-4">
                           <div className="flex items-center justify-center gap-2">
                             {item.current || item.status === "validated" ? (
-                              <ButtonLink to="/cbc/module" variant="outline">
+                              <ButtonLink to="/cblm/demo" variant="outline">
                                 Open
                               </ButtonLink>
                             ) : item.status === "review" ? (
-                              <ButtonLink to="/cbc/module" variant="orange">
+                              <ButtonLink to="/cblm/demo" variant="orange">
                                 Review
                               </ButtonLink>
                             ) : item.status === "generating" ? (

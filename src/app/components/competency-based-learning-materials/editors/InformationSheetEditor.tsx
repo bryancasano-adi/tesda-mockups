@@ -1,12 +1,13 @@
 import { useState } from "react";
+
 import {
-  CblmBadge,
   FieldEditable,
   FieldReadOnly,
-  MetaStrip,
-  SectionDivider,
-} from "../CblmPrimitives";
-import { cblm, cblmBtn } from "../cblmClasses";
+} from "../CblmFieldPrimitives";
+import {
+  InlineReferencesSection,
+  MetaHeader,
+} from "../sheet-editor-shared";
 
 const BODY_DEFAULT = `1. HIGH-VOLTAGE SAFETY FUNDAMENTALS
 
@@ -26,11 +27,8 @@ Step 3: Wait a minimum of 5 minutes for capacitors to discharge.
 Step 4: Locate and disengage the Manual Service Disconnect (MSD) if present.
 Step 5: Apply lockout tag and verify zero-voltage state with an approved voltage meter.`;
 
-export function InformationSheetEditor({
-  showToast,
-}: {
-  showToast: (msg: string, color?: string) => void;
-}) {
+export function InformationSheetEditor() {
+  const sheetCode = "IS 1.1.1";
   const [lo, setLo] = useState(
     "After completing this Information Sheet, you will be able to identify and apply mandatory safety protocols required before and during the inspection of high-voltage electric vehicles in a fleet servicing environment.",
   );
@@ -41,56 +39,37 @@ export function InformationSheetEditor({
 
   return (
     <>
-      <MetaStrip
-        items={[
-          { label: "Sheet Code", value: <span className="font-mono text-[#1565C0]">IS 1.1.1</span> },
-          { label: "Type", value: "Information Sheet" },
-          { label: "LO", value: "1.1 — Prepare for EV inspection" },
-          { label: "Content Item", value: "1 — Safety Protocols" },
-          { label: "Status", value: <CblmBadge variant="snb-done">✓ Finalized</CblmBadge> },
-          { label: "Phase", value: <span className="text-[#1565C0]">Phase 1 (LLM + CS/CBC/CLM)</span> },
-        ]}
-      />
+      <MetaHeader code={sheetCode} type="Information Sheet" />
       <FieldReadOnly
         label="IS Title"
         value="Safety Protocols for High-Voltage Electric Vehicle Inspection"
-        sourceTag="Source: CBC content item name"
       />
-      <FieldEditable label="Learning Objective" value={lo} onChange={setLo} rows={2} aiBoxId="ai-lo" showToast={showToast} />
-      <FieldEditable label="Body Content" value={body} onChange={setBody} rows={14} aiBoxId="ai-body" showToast={showToast} />
-      <FieldEditable label="Recommended Image Description" value={img} onChange={setImg} rows={3} aiBoxId="ai-img" showToast={showToast} />
-      <div className="mt-1.5 rounded border border-[#FFE082] bg-[#FFF8E1] px-3 py-2 text-[11px] text-[#795548]">
-        ⚠️ Trainer takes this description to an external image generation tool. K-Galing does not generate images.
-      </div>
-      <SectionDivider label="References — Auto-compiled" />
-      <table className={cblm.tbl}>
-        <thead>
-          <tr>
-            <th className={cblm.tblTh}>Source Document</th>
-            <th className={cblm.tblTh}>Type</th>
-            <th className={`${cblm.tblTh} text-center`}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {[
-            ["AUTBEV-CS-2025-v2.pdf", "b-validated", "CS"],
-            ["AUTBEV-CBC-2025-v1.pdf", "b-done", "CBC"],
-            ["CLM-UC001-2025.pdf", "b-draft", "CLM"],
-          ].map(([doc, badge, type]) => (
-            <tr key={doc} className={cblm.tblRow}>
-              <td className={`${cblm.tblTd} font-mono`}>{doc}</td>
-              <td className={cblm.tblTd}>
-                <CblmBadge variant={badge}>{type}</CblmBadge>
-              </td>
-              <td className={`${cblm.tblTd} text-center`}>
-                <button type="button" className={cblmBtn("secondary", "text-[11px] px-2 py-0.5")}>
-                  ⚑ Flag
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <FieldEditable
+        editing
+        label="Learning Objective"
+        rows={3}
+        value={lo}
+        onChange={setLo}
+      />
+      <FieldEditable
+        editing
+        label="Body Content"
+        rows={14}
+        value={body}
+        onChange={setBody}
+      />
+      <p className="mb-4 rounded border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-900">
+        Trainer takes the image description to an external image generation tool.
+        K-Galing does not generate images.
+      </p>
+      <FieldEditable
+        editing
+        label="Recommended Image Description"
+        rows={4}
+        value={img}
+        onChange={setImg}
+      />
+      <InlineReferencesSection sheetCode={sheetCode} />
     </>
   );
 }
