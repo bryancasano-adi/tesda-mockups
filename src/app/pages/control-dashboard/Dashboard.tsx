@@ -12,7 +12,6 @@ import { TokenUsageModule } from "../../components/control-dashboard/TokenUsageM
 import { SectorAnalyticsModule } from "../../components/control-dashboard/SectorAnalyticsModule";
 import { ActionButton } from "../../components/control-dashboard/PagePrimitives";
 import {
-  DOCUMENT_TYPES,
   ROLE_ACCESS,
   ROLE_OPTIONS,
   SECTOR_LOOKUP,
@@ -72,6 +71,11 @@ export function ControlDashboard() {
   const [docType, setDocType] = useState("All Document Types");
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const roleScope = ROLE_ACCESS[selectedRole];
+  const isAdminRole = selectedRole === "Super Admin" || selectedRole === "Admin";
+  const isManagerRole = selectedRole === "Manager";
+  const hasDocumentTypeAccess = (type: string) =>
+    roleScope.allowedDocumentTypes === "all" ||
+    roleScope.allowedDocumentTypes.includes(type);
   const roleRecords = getRoleRecords(selectedRole);
   const filteredRecords = applyReportFilters(roleRecords, {
     dateFrom,
@@ -106,6 +110,18 @@ export function ControlDashboard() {
   const docTypeOptions = Array.from(
     new Set(roleRecords.map((record) => record.documentType)),
   ).sort();
+  const sectorAnalyticsSections = {
+    trCsBySector:
+      roleScope.allowedDocumentTypes === "all" ||
+      hasDocumentTypeAccess("TR") ||
+      hasDocumentTypeAccess("CS"),
+    statusDocuments: true,
+    topPriority: isAdminRole && safeActiveTab === "sector-analytics",
+    regionalImplementation:
+      (isAdminRole || isManagerRole) && safeActiveTab === "regional",
+    developmentStatus: true,
+    sectorSummary: true,
+  };
 
   function toggleSubSector(value: string) {
     setSubSectors((current) =>
@@ -361,6 +377,7 @@ export function ControlDashboard() {
               showAdvancedSearch={showAdvancedSearch}
               onCloseAdvancedSearch={() => setShowAdvancedSearch(false)}
               records={filteredRecords}
+              sectionVisibility={sectorAnalyticsSections}
             />
           )}
           {safeActiveTab === "regional" && (
@@ -369,6 +386,7 @@ export function ControlDashboard() {
               onCloseAdvancedSearch={() => setShowAdvancedSearch(false)}
               variant="regional"
               records={filteredRecords}
+              sectionVisibility={sectorAnalyticsSections}
             />
           )}
           {safeActiveTab === "provincial" && (
@@ -377,6 +395,7 @@ export function ControlDashboard() {
               onCloseAdvancedSearch={() => setShowAdvancedSearch(false)}
               variant="provincial"
               records={filteredRecords}
+              sectionVisibility={sectorAnalyticsSections}
             />
           )}
         </div>

@@ -154,6 +154,14 @@ type SectorAnalyticsModuleProps = {
   onCloseAdvancedSearch: () => void;
   variant?: "admin" | "regional" | "provincial";
   records?: ReportRecord[];
+  sectionVisibility?: {
+    trCsBySector?: boolean;
+    statusDocuments?: boolean;
+    topPriority?: boolean;
+    regionalImplementation?: boolean;
+    developmentStatus?: boolean;
+    sectorSummary?: boolean;
+  };
 };
 
 export function SectorAnalyticsModule({
@@ -161,7 +169,17 @@ export function SectorAnalyticsModule({
   onCloseAdvancedSearch,
   variant = "admin",
   records,
+  sectionVisibility,
 }: SectorAnalyticsModuleProps) {
+  const visibleSections = {
+    trCsBySector: true,
+    statusDocuments: true,
+    topPriority: true,
+    regionalImplementation: true,
+    developmentStatus: true,
+    sectorSummary: true,
+    ...sectionVisibility,
+  };
   const visibleRecords = records ?? [];
   const useFilteredRecords = records !== undefined;
   const sectorRows = useFilteredRecords
@@ -791,20 +809,24 @@ export function SectorAnalyticsModule({
 
       {/* ── KPI Cards ── */}
       <div className="flex gap-4">
-        <StatCard
-          label="Total Active TR"
-          value={totalTBs}
-          sub="Training Regulations"
-          color="#1976d2"
-          Icon={BookOpen}
-        />
-        <StatCard
-          label="Total CS"
-          value={totalCS}
-          sub="Competency Standards"
-          color="#16a34a"
-          Icon={FileCheck}
-        />
+        {visibleSections.trCsBySector && (
+          <>
+            <StatCard
+              label="Total Active TR"
+              value={totalTBs}
+              sub="Training Regulations"
+              color="#1976d2"
+              Icon={BookOpen}
+            />
+            <StatCard
+              label="Total CS"
+              value={totalCS}
+              sub="Competency Standards"
+              color="#16a34a"
+              Icon={FileCheck}
+            />
+          </>
+        )}
         <StatCard
           label="Total Approved"
           value={totalApproved}
@@ -815,8 +837,20 @@ export function SectorAnalyticsModule({
       </div>
 
       {/* ── TRs/CSs per Sector + Status of Docs ── */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="col-span-2">
+      {(visibleSections.trCsBySector || visibleSections.statusDocuments) && (
+      <div
+        className={
+          visibleSections.trCsBySector && visibleSections.statusDocuments
+            ? "grid grid-cols-3 gap-4"
+            : "grid grid-cols-1 gap-4"
+        }
+      >
+        {visibleSections.trCsBySector && (
+        <div
+          className={
+            visibleSections.statusDocuments ? "col-span-2" : "col-span-1"
+          }
+        >
           <ChartCard
             title="TRs and CSs per Sector"
             subtitle="Training Regulations vs Competency Standards — hover for doc type breakdown"
@@ -884,7 +918,9 @@ export function SectorAnalyticsModule({
             )}
           </ChartCard>
         </div>
+        )}
 
+        {visibleSections.statusDocuments && (
         <ChartCard
           title="Status of Documents"
           subtitle={`${totalDocs} total documents`}
@@ -950,9 +986,12 @@ export function SectorAnalyticsModule({
             />
           )}
         </ChartCard>
+        )}
       </div>
+      )}
 
       {/* ── Top Priority Sectors (ranked by finalized) ── */}
+      {visibleSections.topPriority && (
       <div>
         <div className="flex items-center justify-between mb-3">
           <p className="text-[14px] font-semibold" style={{ color: "#0f172a" }}>
@@ -1148,8 +1187,10 @@ export function SectorAnalyticsModule({
           </div>
         )}
       </div>
+      )}
 
       {/* ── Regional Implementation ── */}
+      {visibleSections.regionalImplementation && (
       <ChartCard
         title="Regional Implementation"
         subtitle="TRs per region with activity level"
@@ -1209,8 +1250,10 @@ export function SectorAnalyticsModule({
           })}
         </div>
       </ChartCard>
+      )}
 
       {/* ── Development Status per Sector ── */}
+      {visibleSections.developmentStatus && (
       <ChartCard
         title="Development Status Per Sector"
         subtitle="In-development, review, and approved counts by sector — hover for doc type breakdown"
@@ -1280,8 +1323,10 @@ export function SectorAnalyticsModule({
           />
         )}
       </ChartCard>
+      )}
 
       {/* ── Sector Summary Table ── */}
+      {visibleSections.sectorSummary && (
       <ChartCard
         title="Sector Summary"
         subtitle="All sectors with TRs, CS, finalized count, and development status"
@@ -1442,6 +1487,7 @@ export function SectorAnalyticsModule({
           </div>
         )}
       </ChartCard>
+      )}
     </div>
   );
 }
