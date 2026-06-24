@@ -252,7 +252,77 @@ export const ROLE_ACCESS: Record<
 
 const base = new Date("2025-05-01T00:00:00");
 
-export const REPORT_RECORDS: ReportRecord[] = Array.from({ length: 42 }).flatMap((_, dayIndex) => {
+type MockRecordSeed = {
+  id: string;
+  date: string;
+  personIndex: number;
+  sector: string;
+  subSectorIndex?: number;
+  region: string;
+  province: string;
+  documentType: string;
+  status?: ReportRecord["status"];
+  uploads?: number;
+  exports?: number;
+  kbUploads?: number;
+  kbExports?: number;
+  generated?: number;
+  finalized?: number;
+  failed?: number;
+  tokenBase?: number;
+  modelIndex?: number;
+  useCase?: ReportRecord["useCase"];
+  errorMessage?: string;
+};
+
+function makeReportRecord(seed: MockRecordSeed): ReportRecord {
+  const [person, email] = PEOPLE[seed.personIndex % PEOPLE.length];
+  const subSectors = SECTOR_LOOKUP[seed.sector];
+  const subSector = subSectors[seed.subSectorIndex ?? 0] ?? "General";
+  const status = seed.status ?? "Finalized";
+  const generated = seed.generated ?? 4;
+  const failed = seed.failed ?? (status === "Failed" ? 1 : 0);
+  const finalized =
+    seed.finalized ??
+    Math.max(0, generated - failed - (status === "In Progress" ? 1 : 0));
+  const tokens =
+    seed.tokenBase ??
+    2200 +
+      generated * 420 +
+      DOCUMENT_TYPES.indexOf(seed.documentType) * 90 +
+      seed.personIndex * 35;
+
+  return {
+    id: seed.id,
+    date: seed.date,
+    displayDate: displayDate(seed.date),
+    person,
+    email,
+    sector: seed.sector,
+    subSector,
+    region: seed.region,
+    province: seed.province,
+    documentType: seed.documentType,
+    documentTitle: `${seed.sector} ${subSector} ${seed.documentType}`,
+    status,
+    uploads: seed.uploads ?? 1,
+    exports: seed.exports ?? 1,
+    kbUploads: seed.kbUploads ?? 0,
+    kbExports: seed.kbExports ?? 0,
+    generated,
+    finalized,
+    failed,
+    tokens,
+    cost: (tokens / 1000) * 0.003,
+    model: MODELS[(seed.modelIndex ?? seed.personIndex) % MODELS.length],
+    errorMessage:
+      seed.errorMessage ??
+      (failed ? "Validation failed: missing performance criteria coverage" : undefined),
+    useCase: seed.useCase ?? "TRA",
+  };
+}
+
+const GENERATED_REPORT_RECORDS: ReportRecord[] = Array.from({ length: 42 }).flatMap((_, dayIndex) => {
   const date = isoDate(base, dayIndex);
   const weekend = [0, 6].includes(new Date(`${date}T00:00:00`).getDay());
   return SECTOR_NAMES.flatMap((sector, sectorIndex) => {
@@ -296,6 +366,363 @@ export const REPORT_RECORDS: ReportRecord[] = Array.from({ length: 42 }).flatMap
     });
   });
 });
+
+const ROLE_COVERAGE_RECORDS: ReportRecord[] = [
+  makeReportRecord({
+    id: "manager-ict-cs-0505",
+    date: "2025-05-05",
+    personIndex: 0,
+    sector: "ICT",
+    subSectorIndex: 0,
+    region: "Region III",
+    province: "Bulacan",
+    documentType: "CS",
+    generated: 7,
+    finalized: 6,
+    uploads: 2,
+    exports: 3,
+    useCase: "TRA",
+  }),
+  makeReportRecord({
+    id: "manager-automotive-tr-0506",
+    date: "2025-05-06",
+    personIndex: 1,
+    sector: "Automotive",
+    subSectorIndex: 0,
+    region: "Region IV-A",
+    province: "Cavite",
+    documentType: "TR",
+    generated: 6,
+    finalized: 5,
+    uploads: 2,
+    exports: 2,
+    useCase: "TRA",
+  }),
+  makeReportRecord({
+    id: "manager-electronics-fm-0507",
+    date: "2025-05-07",
+    personIndex: 2,
+    sector: "Electronics",
+    subSectorIndex: 1,
+    region: "Region III",
+    province: "Bulacan",
+    documentType: "FM",
+    generated: 5,
+    finalized: 5,
+    uploads: 1,
+    exports: 2,
+    useCase: "FA",
+  }),
+  makeReportRecord({
+    id: "manager-construction-cats-0508",
+    date: "2025-05-08",
+    personIndex: 3,
+    sector: "Construction",
+    subSectorIndex: 0,
+    region: "Region IV-A",
+    province: "Laguna",
+    documentType: "CATS",
+    status: "Draft",
+    generated: 4,
+    finalized: 2,
+    uploads: 1,
+    exports: 1,
+    useCase: "SS",
+  }),
+  makeReportRecord({
+    id: "tr-packager-tr-0505",
+    date: "2025-05-05",
+    personIndex: 4,
+    sector: "Automotive",
+    subSectorIndex: 0,
+    region: "Region IV-A",
+    province: "Cavite",
+    documentType: "TR",
+    generated: 5,
+    finalized: 4,
+    uploads: 2,
+    exports: 2,
+  }),
+  makeReportRecord({
+    id: "tr-packager-jat-0509",
+    date: "2025-05-09",
+    personIndex: 5,
+    sector: "Automotive",
+    subSectorIndex: 1,
+    region: "Region IV-A",
+    province: "Laguna",
+    documentType: "JAT",
+    status: "In Progress",
+    generated: 6,
+    finalized: 4,
+    uploads: 1,
+    exports: 1,
+  }),
+  makeReportRecord({
+    id: "tr-packager-qls-0512",
+    date: "2025-05-12",
+    personIndex: 6,
+    sector: "Automotive",
+    subSectorIndex: 0,
+    region: "Region IV-A",
+    province: "Cavite",
+    documentType: "QLS",
+    generated: 4,
+    finalized: 4,
+    kbUploads: 1,
+  }),
+  makeReportRecord({
+    id: "cs-dev-cs-0506",
+    date: "2025-05-06",
+    personIndex: 7,
+    sector: "ICT",
+    subSectorIndex: 0,
+    region: "NCR",
+    province: "Cavite",
+    documentType: "CS",
+    generated: 6,
+    finalized: 5,
+    uploads: 2,
+    exports: 2,
+  }),
+  makeReportRecord({
+    id: "cs-dev-fm-0510",
+    date: "2025-05-10",
+    personIndex: 8,
+    sector: "Electronics",
+    subSectorIndex: 0,
+    region: "Region III",
+    province: "Bulacan",
+    documentType: "FM",
+    generated: 4,
+    finalized: 4,
+    uploads: 1,
+    kbExports: 1,
+    useCase: "FA",
+  }),
+  makeReportRecord({
+    id: "cs-dev-jat-0514",
+    date: "2025-05-14",
+    personIndex: 9,
+    sector: "ICT",
+    subSectorIndex: 2,
+    region: "Region IV-A",
+    province: "Cavite",
+    documentType: "JAT",
+    status: "Failed",
+    generated: 5,
+    finalized: 3,
+    failed: 1,
+    uploads: 1,
+    exports: 0,
+    errorMessage: "Generation failed: source FM competency mapping incomplete",
+  }),
+  makeReportRecord({
+    id: "lam-dev-lam-0505",
+    date: "2025-05-05",
+    personIndex: 0,
+    sector: "ICT",
+    subSectorIndex: 0,
+    region: "NCR",
+    province: "Cavite",
+    documentType: "LAM",
+    generated: 6,
+    finalized: 5,
+    uploads: 2,
+    exports: 2,
+    useCase: "TRA",
+  }),
+  makeReportRecord({
+    id: "lam-dev-lam-0511",
+    date: "2025-05-11",
+    personIndex: 1,
+    sector: "ICT",
+    subSectorIndex: 1,
+    region: "Region IV-A",
+    province: "Cavite",
+    documentType: "LAM",
+    status: "Draft",
+    generated: 4,
+    finalized: 2,
+    uploads: 1,
+    exports: 1,
+  }),
+  makeReportRecord({
+    id: "cats-dev-cats-0506",
+    date: "2025-05-06",
+    personIndex: 2,
+    sector: "Construction",
+    subSectorIndex: 0,
+    region: "Region VII",
+    province: "Cebu",
+    documentType: "CATS",
+    generated: 5,
+    finalized: 4,
+    uploads: 2,
+    exports: 1,
+    useCase: "SS",
+  }),
+  makeReportRecord({
+    id: "cats-dev-evidence-plan-0508",
+    date: "2025-05-08",
+    personIndex: 3,
+    sector: "Construction",
+    subSectorIndex: 1,
+    region: "Region VII",
+    province: "Cebu",
+    documentType: "Evidence Plan",
+    generated: 4,
+    finalized: 4,
+    kbUploads: 1,
+    useCase: "SS",
+  }),
+  makeReportRecord({
+    id: "cats-dev-assessor-guide-0512",
+    date: "2025-05-12",
+    personIndex: 4,
+    sector: "Tourism/HRI",
+    subSectorIndex: 0,
+    region: "Region VII",
+    province: "Cebu",
+    documentType: "Assessor's Guide",
+    status: "In Progress",
+    generated: 4,
+    finalized: 3,
+    uploads: 1,
+    exports: 1,
+    useCase: "SS",
+  }),
+  makeReportRecord({
+    id: "cbc-dev-cbc-0507",
+    date: "2025-05-07",
+    personIndex: 5,
+    sector: "Agri-Fishery",
+    subSectorIndex: 0,
+    region: "Region XI",
+    province: "Davao del Sur",
+    documentType: "CBC",
+    generated: 5,
+    finalized: 4,
+    uploads: 2,
+    exports: 2,
+    useCase: "CBC",
+  }),
+  makeReportRecord({
+    id: "cbc-dev-cbc-0513",
+    date: "2025-05-13",
+    personIndex: 6,
+    sector: "Agri-Fishery",
+    subSectorIndex: 1,
+    region: "Region XI",
+    province: "Davao del Sur",
+    documentType: "CBC",
+    status: "Failed",
+    generated: 4,
+    finalized: 2,
+    failed: 1,
+    exports: 0,
+    errorMessage: "Generation failed: missing CBC performance objective source",
+    useCase: "CBC",
+  }),
+  makeReportRecord({
+    id: "cblm-dev-cblm-0508",
+    date: "2025-05-08",
+    personIndex: 7,
+    sector: "Tourism/HRI",
+    subSectorIndex: 0,
+    region: "Region VII",
+    province: "Cebu",
+    documentType: "CBLM",
+    generated: 6,
+    finalized: 5,
+    uploads: 2,
+    exports: 2,
+    useCase: "CBC",
+  }),
+  makeReportRecord({
+    id: "cblm-dev-cblm-0514",
+    date: "2025-05-14",
+    personIndex: 8,
+    sector: "Tourism/HRI",
+    subSectorIndex: 2,
+    region: "Region VII",
+    province: "Cebu",
+    documentType: "CBLM",
+    status: "Draft",
+    generated: 4,
+    finalized: 3,
+    uploads: 1,
+    kbExports: 1,
+    useCase: "CBC",
+  }),
+  makeReportRecord({
+    id: "micro-dev-mc-0509",
+    date: "2025-05-09",
+    personIndex: 9,
+    sector: "Health & Social",
+    subSectorIndex: 0,
+    region: "Region IV-A",
+    province: "Laguna",
+    documentType: "Micro-Credential",
+    generated: 5,
+    finalized: 4,
+    uploads: 2,
+    exports: 2,
+    useCase: "TRA",
+  }),
+  makeReportRecord({
+    id: "micro-dev-mc-0515",
+    date: "2025-05-15",
+    personIndex: 0,
+    sector: "Health & Social",
+    subSectorIndex: 2,
+    region: "Region IV-A",
+    province: "Laguna",
+    documentType: "Micro-Credential",
+    status: "In Progress",
+    generated: 3,
+    finalized: 2,
+    uploads: 1,
+    exports: 1,
+  }),
+  makeReportRecord({
+    id: "video-dev-script-0507",
+    date: "2025-05-07",
+    personIndex: 1,
+    sector: "ICT",
+    subSectorIndex: 2,
+    region: "NCR",
+    province: "Cavite",
+    documentType: "Video Script",
+    generated: 5,
+    finalized: 5,
+    uploads: 1,
+    exports: 3,
+    useCase: "CBC",
+  }),
+  makeReportRecord({
+    id: "video-dev-script-0512",
+    date: "2025-05-12",
+    personIndex: 2,
+    sector: "Tourism/HRI",
+    subSectorIndex: 1,
+    region: "Region VII",
+    province: "Cebu",
+    documentType: "Video Script",
+    status: "Draft",
+    generated: 4,
+    finalized: 3,
+    uploads: 1,
+    exports: 1,
+    kbUploads: 1,
+    useCase: "CBC",
+  }),
+];
+
+export const REPORT_RECORDS: ReportRecord[] = [
+  ...GENERATED_REPORT_RECORDS,
+  ...ROLE_COVERAGE_RECORDS,
+];
 
 export function getRoleRecords(role: DashboardRole) {
   const access = ROLE_ACCESS[role];
