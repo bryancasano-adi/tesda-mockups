@@ -6,27 +6,23 @@ import {
   CBLMStatusBadge,
   cn,
 } from "./CblmFrontendPrimitives";
+import {
+  getMockSheetRowTitle,
+  MOCK_SHEET_TYPE_ABBR,
+  sheetTypeBadgeClasses,
+} from "./content-utils";
 import { cblmEditorPath } from "@/app/utils/cblmRoutes";
 import type { MockLoGroup, MockSheetRow } from "@/app/data/cblmData";
-import { formatSheetListLabel } from "./sheet-code-utils";
+import { formatSheetNumber } from "./sheet-code-utils";
+import { sheetTypeLabel } from "./sheet-nav";
 
-const SHEET_TYPE_ABBR: Record<string, string> = {
-  IS: "IS",
-  SC: "SC",
-  AK: "AK",
-  TS: "TS",
-  PCC: "PCC",
-  OS: "OS",
-};
-
-function step2SheetListLabel(sheet: MockSheetRow): string {
-  const dashIdx = sheet.label.indexOf(" — ");
-  const title = dashIdx > 0 ? sheet.label.slice(dashIdx + 3) : undefined;
-
-  return formatSheetListLabel(sheet.code, title);
-}
-
-function SheetRow({ sheet }: { sheet: MockSheetRow }) {
+function SheetRow({
+  sheet,
+  loSheets,
+}: {
+  sheet: MockSheetRow;
+  loSheets: MockSheetRow[];
+}) {
   if (sheet.locked) {
     return (
       <div className="flex items-center justify-between rounded border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-500">
@@ -36,18 +32,25 @@ function SheetRow({ sheet }: { sheet: MockSheetRow }) {
     );
   }
 
+  const sheetType = MOCK_SHEET_TYPE_ABBR[sheet.type];
+  const typeLabel = sheetType ? sheetTypeLabel(sheetType) : sheet.type;
+  const badgeClasses = sheetType
+    ? sheetTypeBadgeClasses(sheetType)
+    : "bg-blue-50 border-blue-400 text-blue-700";
+  const sheetTitle = getMockSheetRowTitle(sheet, loSheets);
+
   return (
     <Link
       className="flex items-center justify-between gap-2 rounded border border-gray-200 px-3 py-2 text-xs hover:bg-gray-50 no-underline"
       to={cblmEditorPath(undefined, sheet.editorPage ?? "information-sheet", sheet.code)}
     >
       <span className="flex min-w-0 items-center gap-2">
-        <span className="inline-flex shrink-0 rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-700">
-          {SHEET_TYPE_ABBR[sheet.type] ?? sheet.type}
+        <span
+          className={`inline-flex shrink-0 rounded border px-1.5 py-0.5 text-[10px] font-semibold ${badgeClasses}`}
+        >
+          {typeLabel} {formatSheetNumber(sheet.code)}
         </span>
-        <span className="truncate font-medium text-gray-800">
-          {step2SheetListLabel(sheet)}
-        </span>
+        <span className="truncate font-medium text-gray-800">{sheetTitle}</span>
       </span>
       <CBLMStatusBadge status={sheet.status} />
     </Link>
@@ -142,7 +145,7 @@ export function CblmSheetGenerationView({ loGroups }: { loGroups: MockLoGroup[] 
           ) : (
             <div className="space-y-2">
               {lo.sheets.map((sheet) => (
-                <SheetRow key={sheet.code} sheet={sheet} />
+                <SheetRow key={`${sheet.type}-${sheet.code}`} loSheets={lo.sheets} sheet={sheet} />
               ))}
             </div>
           )}

@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { SparklesIcon } from "@heroicons/react/24/outline";
 
 import { CBLMStatusBadge } from "./CblmFrontendPrimitives";
+import { sheetEditableFieldLabels, sheetTypeBadgeClasses } from "./content-utils";
 import {
   formatSheetNavLabel,
   isSheetNavItemActive,
@@ -11,7 +13,7 @@ import {
   type MockSheetNavItem,
   type MockSheetType,
 } from "./sheet-nav";
-import { formatSheetDisplayLabel } from "./sheet-code-utils";
+import { formatSheetDisplayLabel, formatSheetNumber } from "./sheet-code-utils";
 import { MOCK_CBLM_ID } from "@/app/utils/cblmRoutes";
 import { ucMeta } from "@/app/data/cblmData";
 
@@ -130,12 +132,13 @@ export function SheetEditorShell({
   const selectableNavItems = MOCK_SHEET_NAV.filter(
     (item) => item.sheetType !== "lo-header" && !item.locked && item.editorPage,
   );
+  const editableFieldLabels = sheetEditableFieldLabels(activeSheetType);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#F5F5F5]">
       <div className="flex min-h-0 flex-1 overflow-hidden">
         <aside className="hidden min-h-0 w-56 shrink-0 flex-col overflow-y-auto border-r border-gray-200 bg-[#FAFAFA] lg:flex">
-          <div className="mt-2 shrink-0 border-b border-gray-200 px-3 py-3">
+          <div className="mt-4.5 shrink-0 border-b border-gray-200 px-3 py-3">
             <div className="truncate text-[11px] font-bold uppercase tracking-wide text-blue-700">
               {ucMeta.unitCode}
             </div>
@@ -154,21 +157,16 @@ export function SheetEditorShell({
         </aside>
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-          <div className="mt-2 flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-gray-200 bg-white px-4 py-3 sm:px-5">
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="truncate text-sm font-semibold text-gray-800">
-                  {formatSheetDisplayLabel(
-                    sheetTypeLabel(activeSheetType),
-                    activeSheetCode,
-                  )}
-                </div>
+          <div className="mt-2 flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-gray-200 bg-white px-4 py-2.5 sm:px-5">
+            <div className="w-full min-w-0">
+              <div className="flex flex-wrap items-center justify-between gap-2 mt-2">
+                <span
+                  className={`inline-flex shrink-0 rounded border px-2 py-0.5 text-xs font-semibold ${sheetTypeBadgeClasses(activeSheetType)}`}
+                >
+                  {sheetTypeLabel(activeSheetType)}{" "}
+                  {formatSheetNumber(activeSheetCode)}
+                </span>
                 {sheetStatus ? <CBLMStatusBadge status={sheetStatus} /> : null}
-              </div>
-              <div className="text-xs text-gray-500">
-                {sheetStatus === "finalized"
-                  ? "This sheet is finalized and can no longer be edited."
-                  : "Copied upstream content is read-only. Use Edit in the header to change AI-synthesized fields."}
               </div>
             </div>
           </div>
@@ -201,9 +199,14 @@ export function SheetEditorShell({
             </select>
           </div>
 
-          <div className="shrink-0 border-b border-blue-100 bg-blue-50 px-4 py-2 text-xs text-blue-800 sm:px-5">
-            Phase 1 active — Information Sheet body content uses LLM knowledge
-            plus CS, CBC, and CLM only.
+          <div className="flex shrink-0 gap-1.5 border-b border-blue-100 bg-blue-50 px-4 py-2 text-xs text-blue-800 sm:px-5">
+            <SparklesIcon className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+            <span>
+              AI-Assisted —
+              {editableFieldLabels.length > 0 ? (
+                <> {editableFieldLabels.join(", ")} are editable.</>
+              ) : null}
+            </span>
           </div>
 
           <div className="min-h-0 min-w-0 flex-1 overflow-y-auto px-5 py-5 sm:px-8 sm:py-6">
@@ -212,7 +215,7 @@ export function SheetEditorShell({
         </div>
 
         <aside className="mt-2 hidden min-h-0 w-64 shrink-0 flex-col overflow-y-auto border-l border-gray-200 bg-white 2xl:flex">
-          <div className="shrink-0 border-b border-gray-200 px-3 py-3 text-xs font-semibold text-gray-800">
+          <div className="shrink-0 border-b border-gray-200 px-3 py-3 text-xs font-semibold text-gray-800 mt-2.5">
             Generation Context
           </div>
           <div className="space-y-3 p-3 text-[11px] text-gray-700">
