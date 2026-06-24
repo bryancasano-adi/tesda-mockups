@@ -162,6 +162,7 @@ type DataTableProps<T> = {
   rows: T[];
   keyExtractor: (row: T, i: number) => string | number;
   footer?: React.ReactNode;
+  emptyMessage?: string;
 };
 
 export function DataTable<T>({
@@ -169,6 +170,7 @@ export function DataTable<T>({
   rows,
   keyExtractor,
   footer,
+  emptyMessage = "No data available for the selected filters.",
 }: DataTableProps<T>) {
   const alignClass = {
     left: "text-left",
@@ -192,29 +194,47 @@ export function DataTable<T>({
           </tr>
         </thead>
         <tbody>
-          {rows.map((row, i) => (
-            <tr
-              key={keyExtractor(row, i)}
-              className="group border-b border-[#f8fafc] hover:bg-[#f8fafc] transition-colors"
-            >
-              {columns.map((col) => (
-                <td
-                  key={col.key as string}
-                  className={`py-3 px-3 ${alignClass[col.align ?? "left"]}`}
-                  style={{ color: "#334155" }}
-                >
-                  {col.render
-                    ? col.render(row, i)
-                    : String(
-                        (row as Record<string, unknown>)[col.key as string] ??
-                          "",
-                      )}
-                </td>
-              ))}
+          {rows.length === 0 ? (
+            <tr>
+              <td
+                colSpan={columns.length}
+                className="py-10 px-3 text-center"
+                style={{ color: "#94a3b8" }}
+              >
+                <div className="mx-auto flex max-w-sm flex-col items-center gap-1">
+                  <p className="text-[13px] font-semibold text-[#64748b]">
+                    No data to display
+                  </p>
+                  <p className="text-[12px]">{emptyMessage}</p>
+                </div>
+              </td>
             </tr>
-          ))}
+          ) : (
+            rows.map((row, i) => (
+              <tr
+                key={keyExtractor(row, i)}
+                className="group border-b border-[#f8fafc] hover:bg-[#f8fafc] transition-colors"
+              >
+                {columns.map((col) => (
+                  <td
+                    key={col.key as string}
+                    className={`py-3 px-3 ${alignClass[col.align ?? "left"]}`}
+                    style={{ color: "#334155" }}
+                  >
+                    {col.render
+                      ? col.render(row, i)
+                      : String(
+                          (row as Record<string, unknown>)[
+                            col.key as string
+                          ] ?? "",
+                        )}
+                  </td>
+                ))}
+              </tr>
+            ))
+          )}
         </tbody>
-        {footer && (
+        {footer && rows.length > 0 && (
           <tfoot>
             <tr className="border-t-2 border-[#e2e8f0] bg-[#f8fafc]">
               {footer}
@@ -222,6 +242,30 @@ export function DataTable<T>({
           </tfoot>
         )}
       </table>
+    </div>
+  );
+}
+
+// ─── EmptyChartState ─────────────────────────────────────────────────────────
+
+export function EmptyChartState({
+  message = "No chart data available for the selected filters.",
+  height = 200,
+}: {
+  message?: string;
+  height?: number;
+}) {
+  return (
+    <div
+      className="flex items-center justify-center rounded-lg border border-dashed border-[#e2e8f0] bg-[#f8fafc]"
+      style={{ height }}
+    >
+      <div className="max-w-sm text-center">
+        <p className="text-[13px] font-semibold text-[#64748b]">
+          No data to display
+        </p>
+        <p className="mt-1 text-[12px] text-[#94a3b8]">{message}</p>
+      </div>
     </div>
   );
 }

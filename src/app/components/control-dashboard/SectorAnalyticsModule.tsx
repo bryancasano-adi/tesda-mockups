@@ -30,8 +30,8 @@ import {
 import {
   StatCard,
   ChartCard,
-  SectionDivider,
   DataTable,
+  EmptyChartState,
   StatusBadge,
   ActionButton,
   exportToExcel,
@@ -49,6 +49,7 @@ import {
   ACTIVITY_LEVELS,
   REGIONAL_LEVEL_COLOR,
 } from "./sharedData";
+import type { ReportRecord } from "./reportData";
 
 const SECTOR_ICON_MAP: Record<
   string,
@@ -136,19 +137,103 @@ function SectorBreakdownTooltip({
 
 const SECTOR_SUMMARY_PER_PAGE = 5;
 
+type SectorAnalyticsRow = {
+  sector: string;
+  tbs: number;
+  cs: number;
+  inDev: number;
+  forReview: number;
+  approved: number;
+  finalized: number;
+  activity: string;
+  breakdown: Record<string, number>;
+};
+
 type SectorAnalyticsModuleProps = {
   showAdvancedSearch: boolean;
   onCloseAdvancedSearch: () => void;
+  variant?: "admin" | "regional" | "provincial";
+  records?: ReportRecord[];
 };
 
 export function SectorAnalyticsModule({
   showAdvancedSearch,
   onCloseAdvancedSearch,
+  variant = "admin",
+  records,
 }: SectorAnalyticsModuleProps) {
-  const totalTBs = sectorData.reduce((s, d) => s + d.tbs, 0);
-  const totalCS = sectorData.reduce((s, d) => s + d.cs, 0);
-  const totalApproved = sectorData.reduce((s, d) => s + d.approved, 0);
-  const totalDocs = statusOfDocsData.reduce((s, d) => s + d.value, 0);
+  const visibleRecords = records ?? [];
+  const useFilteredRecords = records !== undefined;
+  const sectorRows = useFilteredRecords
+    ? Object.values(
+        visibleRecords.reduce<Record<string, SectorAnalyticsRow>>(
+          (acc, record) => {
+            acc[record.sector] = acc[record.sector] ?? {
+              sector: record.sector,
+              tbs: 0,
+              cs: 0,
+              inDev: 0,
+              forReview: 0,
+              approved: 0,
+              finalized: 0,
+              activity: "Low",
+              breakdown: {},
+            };
+            if (record.documentType === "TR")
+              acc[record.sector].tbs += record.generated;
+            if (record.documentType === "CS")
+              acc[record.sector].cs += record.generated;
+            if (record.status === "In Progress")
+              acc[record.sector].inDev += record.generated;
+            if (record.status === "Draft")
+              acc[record.sector].forReview += record.generated;
+            if (record.status === "Finalized")
+              acc[record.sector].approved += record.generated;
+            acc[record.sector].finalized += record.finalized;
+            acc[record.sector].breakdown[record.documentType] =
+              (acc[record.sector].breakdown[record.documentType] ?? 0) +
+              record.generated;
+            const total =
+              acc[record.sector].finalized +
+              acc[record.sector].inDev +
+              acc[record.sector].forReview;
+            acc[record.sector].activity =
+              total > 55 ? "High" : total > 25 ? "Medium" : "Low";
+            return acc;
+          },
+          {},
+        ),
+      )
+    : sectorData;
+  const totalTBs = sectorRows.reduce((s, d) => s + d.tbs, 0);
+  const totalCS = sectorRows.reduce((s, d) => s + d.cs, 0);
+  const totalApproved = sectorRows.reduce((s, d) => s + d.approved, 0);
+  const statusRows = useFilteredRecords
+    ? [
+        {
+          name: "Online",
+          value: visibleRecords.filter((r) => r.status === "Finalized").length,
+          color: "#1976d2",
+        },
+        {
+          name: "For Review",
+          value: visibleRecords.filter((r) => r.status === "Draft").length,
+          color: "#f57c00",
+        },
+        {
+          name: "TA: Active",
+          value: visibleRecords.filter((r) => r.status === "In Progress")
+            .length,
+          color: "#2e7d32",
+        },
+        {
+          name: "Failed",
+          value: visibleRecords.filter((r) => r.status === "Failed").length,
+          color: "#f44336",
+        },
+      ]
+    : statusOfDocsData;
+  const totalDocs = statusRows.reduce((s, d) => s + d.value, 0);
 
   const [activeSector, setActiveSector] = useState("All");
   const [showAllSectors, setShowAllSectors] = useState(false);
@@ -164,25 +249,32 @@ export function SectorAnalyticsModule({
   const [summaryPage, setSummaryPage] = useState(1);
 
   const sectorNames = useMemo(
-    () => ["All", ...sectorData.map((d) => d.sector)],
-    [],
+    () => ["All", ...sectorRows.map((d) => d.sector)],
+    [sectorRows],
   );
 
   const filteredSectorData = useMemo(() => {
-    if (activeSector === "All") return sectorData;
-    return sectorData.filter((d) => d.sector === activeSector);
-  }, [activeSector]);
+    if (activeSector === "All") return sectorRows;
+    return sectorRows.filter((d) => d.sector === activeSector);
+  }, [activeSector, sectorRows]);
+  const hasFilteredSectorBarData = filteredSectorData.some(
+    (row) => row.tbs > 0 || row.cs > 0,
+  );
+  const hasFilteredDevelopmentData = filteredSectorData.some(
+    (row) => row.inDev > 0 || row.forReview > 0 || row.approved > 0,
+  );
+  const hasStatusData = statusRows.some((row) => row.value > 0);
 
   const topPrioritySectors = useMemo(
-    () => [...sectorData].sort((a, b) => b.finalized - a.finalized).slice(0, 5),
-    [],
+    () => [...sectorRows].sort((a, b) => b.finalized - a.finalized).slice(0, 5),
+    [sectorRows],
   );
   const allSectorsByFinalized = useMemo(
-    () => [...sectorData].sort((a, b) => b.finalized - a.finalized),
-    [],
+    () => [...sectorRows].sort((a, b) => b.finalized - a.finalized),
+    [sectorRows],
   );
 
-  const filteredSummary = sectorData.filter((r) =>
+  const filteredSummary = sectorRows.filter((r) =>
     r.sector.toLowerCase().includes(summarySearch.toLowerCase()),
   );
   const summaryPageCount = Math.max(
@@ -256,7 +348,7 @@ export function SectorAnalyticsModule({
         "Finalized",
         "Activity",
       ],
-      sectorData.map((r) => [
+      sectorRows.map((r) => [
         r.sector,
         r.tbs,
         r.cs,
@@ -272,6 +364,13 @@ export function SectorAnalyticsModule({
 
   return (
     <div className="flex flex-col gap-5">
+      {variant !== "admin" && (
+        <div className="rounded-md border border-[#dbeafe] bg-[#eff6ff] px-4 py-3 text-[12px] text-[#1d4ed8]">
+          {variant === "regional"
+            ? "Regional dashboard view: same reporting components, scoped to ABDD/regional data and assigned sectors per RBAC-ABDD."
+            : "Provincial dashboard scaffold: cloned regional reporting layout, scoped one level narrower to province/district data. Final metrics are pending client mockup."}
+        </div>
+      )}
       {/* ── Advanced Search Modal ── */}
       {showAdvancedSearch && (
         <div
@@ -700,7 +799,7 @@ export function SectorAnalyticsModule({
           Icon={BookOpen}
         />
         <StatCard
-          label="Total SCs"
+          label="Total CS"
           value={totalCS}
           sub="Competency Standards"
           color="#16a34a"
@@ -742,40 +841,47 @@ export function SectorAnalyticsModule({
               </div>
             }
           >
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart
-                data={filteredSectorData}
-                barCategoryGap="25%"
-                barGap={4}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis
-                  dataKey="sector"
-                  tick={{ fontSize: 9, fill: "#94a3b8" }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  tick={{ fontSize: 10, fill: "#94a3b8" }}
-                  axisLine={false}
-                  tickLine={false}
-                  allowDecimals={false}
-                />
-                <Tooltip content={<SectorBreakdownTooltip />} />
-                <Bar
-                  dataKey="tbs"
-                  fill="#1976d2"
-                  radius={[3, 3, 0, 0]}
-                  name="TRs"
-                />
-                <Bar
-                  dataKey="cs"
-                  fill="#f57c00"
-                  radius={[3, 3, 0, 0]}
-                  name="CS"
-                />
-              </BarChart>
-            </ResponsiveContainer>
+            {hasFilteredSectorBarData ? (
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart
+                  data={filteredSectorData}
+                  barCategoryGap="25%"
+                  barGap={4}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <XAxis
+                    dataKey="sector"
+                    tick={{ fontSize: 9, fill: "#94a3b8" }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 10, fill: "#94a3b8" }}
+                    axisLine={false}
+                    tickLine={false}
+                    allowDecimals={false}
+                  />
+                  <Tooltip content={<SectorBreakdownTooltip />} />
+                  <Bar
+                    dataKey="tbs"
+                    fill="#1976d2"
+                    radius={[3, 3, 0, 0]}
+                    name="TRs"
+                  />
+                  <Bar
+                    dataKey="cs"
+                    fill="#f57c00"
+                    radius={[3, 3, 0, 0]}
+                    name="CS"
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <EmptyChartState
+                height={220}
+                message="No TR or CS records match the selected role and filters."
+              />
+            )}
           </ChartCard>
         </div>
 
@@ -783,57 +889,66 @@ export function SectorAnalyticsModule({
           title="Status of Documents"
           subtitle={`${totalDocs} total documents`}
         >
-          <div className="flex flex-col items-center">
-            <div className="relative">
-              <ResponsiveContainer width={160} height={160}>
-                <PieChart>
-                  <Pie
-                    data={statusOfDocsData}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={70}
-                    innerRadius={45}
-                    dataKey="value"
-                    strokeWidth={0}
-                  >
-                    {statusOfDocsData.map((e, i) => (
-                      <Cell key={i} fill={e.color} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <p
-                  className="text-[22px] font-bold"
-                  style={{ color: "#0f172a" }}
-                >
-                  {totalDocs}
-                </p>
-                <p className="text-[10px]" style={{ color: "#94a3b8" }}>
-                  Total
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col gap-2 mt-2">
-            {statusOfDocsData.map((d, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between text-[12px]"
-              >
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-2.5 h-2.5 rounded-sm"
-                    style={{ background: d.color }}
-                  />
-                  <span style={{ color: "#475569" }}>{d.name}</span>
+          {hasStatusData ? (
+            <>
+              <div className="flex flex-col items-center">
+                <div className="relative">
+                  <ResponsiveContainer width={160} height={160}>
+                    <PieChart>
+                      <Pie
+                        data={statusRows}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={70}
+                        innerRadius={45}
+                        dataKey="value"
+                        strokeWidth={0}
+                      >
+                        {statusRows.map((e, i) => (
+                          <Cell key={i} fill={e.color} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <p
+                      className="text-[22px] font-bold"
+                      style={{ color: "#0f172a" }}
+                    >
+                      {totalDocs}
+                    </p>
+                    <p className="text-[10px]" style={{ color: "#94a3b8" }}>
+                      Total
+                    </p>
+                  </div>
                 </div>
-                <span className="font-bold" style={{ color: "#0f172a" }}>
-                  {d.value}
-                </span>
               </div>
-            ))}
-          </div>
+              <div className="flex flex-col gap-2 mt-2">
+                {statusRows.map((d, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between text-[12px]"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-2.5 h-2.5 rounded-sm"
+                        style={{ background: d.color }}
+                      />
+                      <span style={{ color: "#475569" }}>{d.name}</span>
+                    </div>
+                    <span className="font-bold" style={{ color: "#0f172a" }}>
+                      {d.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <EmptyChartState
+              height={190}
+              message="No document status records match the selected filters."
+            />
+          )}
         </ChartCard>
       </div>
 
@@ -865,7 +980,12 @@ export function SectorAnalyticsModule({
           </button>
         </div>
 
-        {showAllSectors ? (
+        {topPrioritySectors.length === 0 ? (
+          <EmptyChartState
+            height={160}
+            message="No priority sectors match the selected role and filters."
+          />
+        ) : showAllSectors ? (
           <div
             className="rounded-2xl overflow-hidden"
             style={{
@@ -1116,42 +1236,49 @@ export function SectorAnalyticsModule({
           </div>
         }
       >
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={filteredSectorData} barCategoryGap="25%" barGap={3}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-            <XAxis
-              dataKey="sector"
-              tick={{ fontSize: 9, fill: "#94a3b8" }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              tick={{ fontSize: 10, fill: "#94a3b8" }}
-              axisLine={false}
-              tickLine={false}
-              allowDecimals={false}
-            />
-            <Tooltip content={<SectorBreakdownTooltip />} />
-            <Bar
-              dataKey="inDev"
-              fill="#9c27b0"
-              radius={[3, 3, 0, 0]}
-              name="In Development"
-            />
-            <Bar
-              dataKey="forReview"
-              fill="#f57c00"
-              radius={[3, 3, 0, 0]}
-              name="For Review"
-            />
-            <Bar
-              dataKey="approved"
-              fill="#16a34a"
-              radius={[3, 3, 0, 0]}
-              name="Approved"
-            />
-          </BarChart>
-        </ResponsiveContainer>
+        {hasFilteredDevelopmentData ? (
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={filteredSectorData} barCategoryGap="25%" barGap={3}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis
+                dataKey="sector"
+                tick={{ fontSize: 9, fill: "#94a3b8" }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 10, fill: "#94a3b8" }}
+                axisLine={false}
+                tickLine={false}
+                allowDecimals={false}
+              />
+              <Tooltip content={<SectorBreakdownTooltip />} />
+              <Bar
+                dataKey="inDev"
+                fill="#9c27b0"
+                radius={[3, 3, 0, 0]}
+                name="In Development"
+              />
+              <Bar
+                dataKey="forReview"
+                fill="#f57c00"
+                radius={[3, 3, 0, 0]}
+                name="For Review"
+              />
+              <Bar
+                dataKey="approved"
+                fill="#16a34a"
+                radius={[3, 3, 0, 0]}
+                name="Approved"
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <EmptyChartState
+            height={200}
+            message="No development status records match the selected filters."
+          />
+        )}
       </ChartCard>
 
       {/* ── Sector Summary Table ── */}

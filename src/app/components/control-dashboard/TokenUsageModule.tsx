@@ -16,10 +16,12 @@ import {
   ChartCard,
   SectionDivider,
   DataTable,
+  EmptyChartState,
   ActionButton,
   exportToExcel,
 } from "./PagePrimitives";
 import { tokenUsageData, tokenTrendData, tokenBySector } from "./sharedData";
+import type { ReportRecord } from "./reportData";
 
 const sortedTokenData = [...tokenUsageData].sort((a, b) => b.tokens - a.tokens);
 
@@ -35,9 +37,55 @@ const TREND_PERIOD_LABELS: Record<TrendPeriod, string> = {
 const DOC_PER_PAGE = 5;
 const SECTOR_PER_PAGE = 5;
 
-export function TokenUsageModule() {
-  const totalTokens = tokenUsageData.reduce((s, d) => s + d.tokens, 0);
-  const avgTokens = Math.round(totalTokens / tokenUsageData.length);
+export function TokenUsageModule({ records }: { records?: ReportRecord[] }) {
+  const visibleRecords = records ?? [];
+  const useFilteredRecords = records !== undefined;
+  const tokenRows = useFilteredRecords
+    ? visibleRecords.map((record) => ({
+        doc: record.documentTitle,
+        tokens: record.tokens,
+        cost: `$${record.cost.toFixed(2)}`,
+        sector: record.sector,
+        date: record.date,
+      }))
+    : tokenUsageData;
+  const sortedTokenData = [...tokenRows].sort((a, b) => b.tokens - a.tokens);
+  const trendRows = useFilteredRecords
+    ? Object.values(
+        visibleRecords.reduce<Record<string, { date: string; tokens: number }>>(
+          (acc, record) => {
+            acc[record.displayDate] = acc[record.displayDate] ?? {
+              date: record.displayDate,
+              tokens: 0,
+            };
+            acc[record.displayDate].tokens += record.tokens;
+            return acc;
+          },
+          {},
+        ),
+      )
+    : tokenTrendData;
+  const sectorRows = useFilteredRecords
+    ? Object.values(
+        visibleRecords.reduce<Record<string, { sector: string; tokens: number; cost: string }>>(
+          (acc, record) => {
+            acc[record.sector] = acc[record.sector] ?? {
+              sector: record.sector,
+              tokens: 0,
+              cost: "$0.00",
+            };
+            acc[record.sector].tokens += record.tokens;
+            acc[record.sector].cost = `$${((acc[record.sector].tokens / 1000) * 0.003).toFixed(2)}`;
+            return acc;
+          },
+          {},
+        ),
+      )
+    : tokenBySector;
+  const totalTokens = tokenRows.reduce((s, d) => s + d.tokens, 0);
+  const avgTokens = Math.round(totalTokens / Math.max(1, tokenRows.length));
+  const hasDocumentChartData = sortedTokenData.some((row) => row.tokens > 0);
+  const hasSectorChartData = sectorRows.some((row) => row.tokens > 0);
 
   const [trendPeriod, setTrendPeriod] = useState<TrendPeriod>("monthly");
   const [docSearch, setDocSearch] = useState("");
@@ -46,10 +94,11 @@ export function TokenUsageModule() {
   const [sectorPage, setSectorPage] = useState(1);
 
   const filteredTrendData = useMemo(() => {
-    if (trendPeriod === "daily") return tokenTrendData.slice(-1);
-    if (trendPeriod === "weekly") return tokenTrendData.slice(-7);
-    return tokenTrendData;
-  }, [trendPeriod]);
+    if (trendPeriod === "daily") return trendRows.slice(-1);
+    if (trendPeriod === "weekly") return trendRows.slice(-7);
+    return trendRows;
+  }, [trendPeriod, trendRows]);
+  const hasTrendChartData = filteredTrendData.some((row) => row.tokens > 0);
 
   const filteredDocs = sortedTokenData.filter((r) =>
     r.doc.toLowerCase().includes(docSearch.toLowerCase()),
@@ -60,7 +109,7 @@ export function TokenUsageModule() {
     docPage * DOC_PER_PAGE,
   );
 
-  const filteredSectors = tokenBySector.filter((r) =>
+  const filteredSectors = sectorRows.filter((r) =>
     r.sector.toLowerCase().includes(sectorSearch.toLowerCase()),
   );
   const sectorPageCount = Math.max(
@@ -99,14 +148,14 @@ export function TokenUsageModule() {
         />
         <StatCard
           label="Est. Total Cost"
-          value="$1.30"
+          value={`$${((totalTokens / 1000) * 0.003).toFixed(2)}`}
           sub="Approximate USD"
           color="#f57c00"
           Icon={DollarSign}
         />
         <StatCard
           label="Docs Tracked"
-          value={tokenUsageData.length}
+          value={tokenRows.length}
           sub="With token records"
           color="#16a34a"
           Icon={FileText}
@@ -122,8 +171,9 @@ export function TokenUsageModule() {
           </ActionButton>
         }
       >
-        <ResponsiveContainer width="100%" height={220}>
-          <BarChart data={sortedTokenData} layout="vertical" barSize={18}>
+        {hasDocumentChartData ? (
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={sortedTokenData} layout="vertical" barSize={18}>
             <CartesianGrid
               strokeDasharray="3 3"
               stroke="#f1f5f9"
@@ -160,8 +210,14 @@ export function TokenUsageModule() {
               radius={[0, 4, 4, 0]}
               name="Tokens Used"
             />
-          </BarChart>
-        </ResponsiveContainer>
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <EmptyChartState
+            height={220}
+            message="No token records match the selected role and filters."
+          />
+        )}
       </ChartCard>
 
       <ChartCard
@@ -181,8 +237,9 @@ export function TokenUsageModule() {
           </select>
         }
       >
-        <ResponsiveContainer width="100%" height={200}>
-          <LineChart data={filteredTrendData}>
+        {hasTrendChartData ? (
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={filteredTrendData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
             <XAxis
               dataKey="date"
@@ -212,8 +269,11 @@ export function TokenUsageModule() {
               dot={{ fill: "#7b1fa2", r: 4 }}
               name="Tokens"
             />
-          </LineChart>
-        </ResponsiveContainer>
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <EmptyChartState message="No token trend data matches the selected filters." />
+        )}
       </ChartCard>
 
       <ChartCard
@@ -305,7 +365,7 @@ export function TokenUsageModule() {
                 className="py-3 px-3 text-right font-bold"
                 style={{ color: "#0f172a" }}
               >
-                ~$1.30
+                {`$${((totalTokens / 1000) * 0.003).toFixed(2)}`}
               </td>
             </>
           }
@@ -357,8 +417,9 @@ export function TokenUsageModule() {
           title="Token Consumption by Sector"
           subtitle="Horizontal comparison of tokens consumed per sector"
         >
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={tokenBySector} layout="vertical" barSize={18}>
+          {hasSectorChartData ? (
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={sectorRows} layout="vertical" barSize={18}>
               <CartesianGrid
                 strokeDasharray="3 3"
                 stroke="#f1f5f9"
@@ -396,8 +457,11 @@ export function TokenUsageModule() {
                 radius={[0, 4, 4, 0]}
                 name="Tokens Used"
               />
-            </BarChart>
-          </ResponsiveContainer>
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <EmptyChartState message="No sector token data matches the selected filters." />
+          )}
         </ChartCard>
 
         <ChartCard

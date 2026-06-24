@@ -17,10 +17,12 @@ import {
   ChartCard,
   SectionDivider,
   DataTable,
+  EmptyChartState,
   ActionButton,
   exportToExcel,
 } from "./PagePrimitives";
 import { genPipelineData, genStatusTotals, genBySector } from "./sharedData";
+import type { ReportRecord } from "./reportData";
 
 const LEGEND = [
   { c: "#2196f3", l: "Generated" },
@@ -29,17 +31,105 @@ const LEGEND = [
 ];
 
 const PIPELINE_PER_PAGE = 5;
+const failedGenerationRows = [
+  {
+    document: "Automotive Servicing NC II JAT",
+    sector: "Automotive",
+    model: "gpt-4.1",
+    error: "Validation failed: missing performance criteria coverage",
+    timestamp: "2025-05-11 10:42",
+  },
+  {
+    document: "Green Building Maintenance CS",
+    sector: "Construction",
+    model: "claude-sonnet-4-6",
+    error: "Timeout: AI generation exceeded 120s",
+    timestamp: "2025-05-11 14:18",
+  },
+  {
+    document: "Computer Systems Servicing FM",
+    sector: "ICT & Animation",
+    model: "gemini-2.5-pro",
+    error: "Template mismatch: section 3 schema error",
+    timestamp: "2025-05-12 09:07",
+  },
+];
 
-export function GenPipelineModule() {
-  const totalGenerated = genPipelineData.reduce((s, d) => s + d.generated, 0);
-  const totalFinalized = genPipelineData.reduce((s, d) => s + d.finalized, 0);
-  const totalFailed = genPipelineData.reduce((s, d) => s + d.failed, 0);
-  const grandTotal = genStatusTotals.reduce((s, d) => s + d.value, 0);
+export function GenPipelineModule({ records }: { records?: ReportRecord[] }) {
+  const visibleRecords = records ?? [];
+  const useFilteredRecords = records !== undefined;
+  const dailyData = useFilteredRecords
+    ? Object.values(
+        visibleRecords.reduce<Record<string, { date: string; generated: number; finalized: number; failed: number }>>(
+          (acc, record) => {
+            acc[record.displayDate] = acc[record.displayDate] ?? {
+              date: record.displayDate,
+              generated: 0,
+              finalized: 0,
+              failed: 0,
+            };
+            acc[record.displayDate].generated += record.generated;
+            acc[record.displayDate].finalized += record.finalized;
+            acc[record.displayDate].failed += record.failed;
+            return acc;
+          },
+          {},
+        ),
+      )
+    : genPipelineData;
+  const statusTotals = useFilteredRecords
+    ? [
+        { name: "Generated", value: dailyData.reduce((s, d) => s + d.generated, 0), color: "#2196f3", pct: "" },
+        { name: "Finalized", value: dailyData.reduce((s, d) => s + d.finalized, 0), color: "#16a34a", pct: "" },
+        { name: "Failed", value: dailyData.reduce((s, d) => s + d.failed, 0), color: "#f44336", pct: "" },
+      ].map((row, _, all) => ({
+        ...row,
+        pct: `${((row.value / Math.max(1, all.reduce((s, d) => s + d.value, 0))) * 100).toFixed(0)}%`,
+      }))
+    : genStatusTotals;
+  const sectorData = useFilteredRecords
+    ? Object.values(
+        visibleRecords.reduce<Record<string, { sector: string; generated: number; finalized: number; failed: number }>>(
+          (acc, record) => {
+            acc[record.sector] = acc[record.sector] ?? {
+              sector: record.sector,
+              generated: 0,
+              finalized: 0,
+              failed: 0,
+            };
+            acc[record.sector].generated += record.generated;
+            acc[record.sector].finalized += record.finalized;
+            acc[record.sector].failed += record.failed;
+            return acc;
+          },
+          {},
+        ),
+      )
+    : genBySector;
+  const failedRows = useFilteredRecords
+    ? visibleRecords
+        .filter((record) => record.failed > 0)
+        .slice(0, 12)
+        .map((record) => ({
+          document: record.documentTitle,
+          sector: record.sector,
+          model: record.model,
+          error: record.errorMessage ?? "Generation failed",
+          timestamp: `${record.date} 09:${String(record.generated + 10).padStart(2, "0")}`,
+        }))
+    : failedGenerationRows;
+  const totalGenerated = dailyData.reduce((s, d) => s + d.generated, 0);
+  const totalFinalized = dailyData.reduce((s, d) => s + d.finalized, 0);
+  const totalFailed = dailyData.reduce((s, d) => s + d.failed, 0);
+  const grandTotal = statusTotals.reduce((s, d) => s + d.value, 0);
+  const hasDailyChartData = dailyData.some((row) => row.generated > 0);
+  const hasStatusChartData = statusTotals.some((row) => row.value > 0);
+  const hasSectorChartData = sectorData.some((row) => row.generated > 0);
 
   const [pipelineSearch, setPipelineSearch] = useState("");
   const [pipelinePage, setPipelinePage] = useState(1);
 
-  const filteredPipeline = genPipelineData.filter((r) =>
+  const filteredPipeline = dailyData.filter((r) =>
     r.date.toLowerCase().includes(pipelineSearch.toLowerCase()),
   );
   const pipelinePageCount = Math.max(
@@ -54,7 +144,7 @@ export function GenPipelineModule() {
   function handleExport() {
     exportToExcel(
       ["Date", "Generated", "Finalized", "Failed", "Success %"],
-      genPipelineData.map((r) => [
+      dailyData.map((r) => [
         r.date,
         r.generated,
         r.finalized,
@@ -99,7 +189,11 @@ export function GenPipelineModule() {
           />
           <StatCard
             label="Success Rate"
-            value={`${((totalFinalized / totalGenerated) * 100).toFixed(1)}%`}
+            value={
+              totalGenerated > 0
+                ? `${((totalFinalized / totalGenerated) * 100).toFixed(1)}%`
+                : "0.0%"
+            }
             sub="Finalization rate"
             color="#9c27b0"
             Icon={Target}
@@ -110,7 +204,7 @@ export function GenPipelineModule() {
           title="Generation Pipeline Per Day"
           subtitle="Generated vs Finalized vs Failed"
           action={
-            <div className="flex gap-4">
+            <div className="flex items-center gap-4">
               {LEGEND.map((d, i) => (
                 <div
                   key={i}
@@ -124,50 +218,60 @@ export function GenPipelineModule() {
                   {d.l}
                 </div>
               ))}
+              <ActionButton onClick={handleExport} variant="outline" size="sm">
+                <FileDown size={13} /> Export Excel
+              </ActionButton>
             </div>
           }
         >
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={genPipelineData} barCategoryGap="30%" barGap={3}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis
-                dataKey="date"
-                tick={{ fontSize: 10, fill: "#94a3b8" }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fontSize: 10, fill: "#94a3b8" }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip
-                contentStyle={{
-                  borderRadius: 10,
-                  border: "none",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                }}
-              />
-              <Bar
-                dataKey="generated"
-                fill="#2196f3"
-                radius={[3, 3, 0, 0]}
-                name="Generated"
-              />
-              <Bar
-                dataKey="finalized"
-                fill="#16a34a"
-                radius={[3, 3, 0, 0]}
-                name="Finalized"
-              />
-              <Bar
-                dataKey="failed"
-                fill="#f44336"
-                radius={[3, 3, 0, 0]}
-                name="Failed"
-              />
-            </BarChart>
-          </ResponsiveContainer>
+          {hasDailyChartData ? (
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={dailyData} barCategoryGap="30%" barGap={3}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fontSize: 10, fill: "#94a3b8" }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  tick={{ fontSize: 10, fill: "#94a3b8" }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  contentStyle={{
+                    borderRadius: 10,
+                    border: "none",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  }}
+                />
+                <Bar
+                  dataKey="generated"
+                  fill="#2196f3"
+                  radius={[3, 3, 0, 0]}
+                  name="Generated"
+                />
+                <Bar
+                  dataKey="finalized"
+                  fill="#16a34a"
+                  radius={[3, 3, 0, 0]}
+                  name="Finalized"
+                />
+                <Bar
+                  dataKey="failed"
+                  fill="#f44336"
+                  radius={[3, 3, 0, 0]}
+                  name="Failed"
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <EmptyChartState
+              height={220}
+              message="No generation jobs match the selected role and filters."
+            />
+          )}
         </ChartCard>
 
         <ChartCard
@@ -304,7 +408,7 @@ export function GenPipelineModule() {
           subtitle="Aggregate job totals by KGALING status"
         />
         <div className="flex gap-4">
-          {genStatusTotals.map((s, i) => (
+          {statusTotals.map((s, i) => (
             <StatCard
               key={i}
               label={s.name}
@@ -325,11 +429,27 @@ export function GenPipelineModule() {
           <ChartCard
             title="Generation Totals"
             subtitle="Generated vs Finalized vs Failed"
+            action={
+              <ActionButton
+                onClick={() =>
+                  exportToExcel(
+                    ["Status", "Jobs", "Share"],
+                    statusTotals.map((r) => [r.name, r.value, r.pct]),
+                    "generation_status_totals",
+                  )
+                }
+                variant="outline"
+                size="sm"
+              >
+                <FileDown size={13} /> Export Excel
+              </ActionButton>
+            }
           >
-            <ResponsiveContainer width="100%" height={240}>
+            {hasStatusChartData ? (
+              <ResponsiveContainer width="100%" height={240}>
               <PieChart>
                 <Pie
-                  data={genStatusTotals}
+                  data={statusTotals}
                   cx="50%"
                   cy="50%"
                   outerRadius={90}
@@ -338,7 +458,7 @@ export function GenPipelineModule() {
                   label={({ name, pct }) => `${name} ${pct}`}
                   labelLine
                 >
-                  {genStatusTotals.map((e, i) => (
+                  {statusTotals.map((e, i) => (
                     <Cell key={i} fill={e.color} />
                   ))}
                 </Pie>
@@ -351,12 +471,33 @@ export function GenPipelineModule() {
                   }}
                 />
               </PieChart>
-            </ResponsiveContainer>
+              </ResponsiveContainer>
+            ) : (
+              <EmptyChartState
+                height={240}
+                message="No generation status data matches the selected filters."
+              />
+            )}
           </ChartCard>
 
           <ChartCard
             title="Status Breakdown"
             subtitle="Jobs and share per KGALING status"
+            action={
+              <ActionButton
+                onClick={() =>
+                  exportToExcel(
+                    ["Status", "Jobs", "Share"],
+                    statusTotals.map((r) => [r.name, r.value, r.pct]),
+                    "generation_status_breakdown",
+                  )
+                }
+                variant="outline"
+                size="sm"
+              >
+                <FileDown size={13} /> Export Excel
+              </ActionButton>
+            }
           >
             <DataTable
               columns={[
@@ -397,7 +538,7 @@ export function GenPipelineModule() {
                   ),
                 },
               ]}
-              rows={genStatusTotals}
+              rows={statusTotals}
               keyExtractor={(_, i) => i}
               footer={
                 <>
@@ -436,7 +577,7 @@ export function GenPipelineModule() {
           title="Generation Pipeline by Sector"
           subtitle="KGALING status breakdown across sectors"
           action={
-            <div className="flex gap-4">
+            <div className="flex items-center gap-4">
               {LEGEND.map((d, i) => (
                 <div
                   key={i}
@@ -450,11 +591,30 @@ export function GenPipelineModule() {
                   {d.l}
                 </div>
               ))}
+              <ActionButton
+                onClick={() =>
+                  exportToExcel(
+                    ["Sector", "Generated", "Finalized", "Failed"],
+                    sectorData.map((r) => [
+                      r.sector,
+                      r.generated,
+                      r.finalized,
+                      r.failed,
+                    ]),
+                    "generation_by_sector",
+                  )
+                }
+                variant="outline"
+                size="sm"
+              >
+                <FileDown size={13} /> Export Excel
+              </ActionButton>
             </div>
           }
         >
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={genBySector} barCategoryGap="25%" barGap={3}>
+          {hasSectorChartData ? (
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={sectorData} barCategoryGap="25%" barGap={3}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
               <XAxis
                 dataKey="sector"
@@ -493,8 +653,51 @@ export function GenPipelineModule() {
                 radius={[3, 3, 0, 0]}
                 name="Failed"
               />
-            </BarChart>
-          </ResponsiveContainer>
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <EmptyChartState
+              height={220}
+              message="No sector generation data matches the selected filters."
+            />
+          )}
+        </ChartCard>
+        <ChartCard
+          title="Failed Generation Items"
+          subtitle="Clickable/hover detail stand-in for failed status segments"
+          action={
+            <ActionButton
+              onClick={() =>
+                exportToExcel(
+                  ["Document", "Sector", "Model", "Error Message", "Timestamp"],
+                  failedRows.map((r) => [
+                    r.document,
+                    r.sector,
+                    r.model,
+                    r.error,
+                    r.timestamp,
+                  ]),
+                  "failed_generation_items",
+                )
+              }
+              variant="outline"
+              size="sm"
+            >
+              <FileDown size={13} /> Export Excel
+            </ActionButton>
+          }
+        >
+          <DataTable
+            columns={[
+              { key: "document", header: "Document" },
+              { key: "sector", header: "Sector" },
+              { key: "model", header: "Model" },
+              { key: "error", header: "Error Message" },
+              { key: "timestamp", header: "Timestamp", align: "right" },
+            ]}
+            rows={failedRows}
+            keyExtractor={(row) => row.document}
+          />
         </ChartCard>
       </div>
     </div>

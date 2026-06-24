@@ -60,6 +60,21 @@ export function UserActivityModule() {
         <ChartCard
           title="User Logins Per Day"
           subtitle="Login count by calendar day"
+          action={
+            <ActionButton
+              onClick={() =>
+                exportToExcel(
+                  ["Date", "Logins"],
+                  loginsByDay.map((r) => [r.date, r.logins]),
+                  "user_logins_per_day",
+                )
+              }
+              variant="outline"
+              size="sm"
+            >
+              <FileDown size={13} /> Export Excel
+            </ActionButton>
+          }
         >
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={loginsByDay} barSize={22}>
@@ -93,7 +108,25 @@ export function UserActivityModule() {
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Daily Active Users" subtitle="Unique users per day">
+        <ChartCard
+          title="Daily Active Users"
+          subtitle="Unique users per day"
+          action={
+            <ActionButton
+              onClick={() =>
+                exportToExcel(
+                  ["Date", "Unique Users"],
+                  dailyActiveUsers.map((r) => [r.date, r.users]),
+                  "daily_active_users",
+                )
+              }
+              variant="outline"
+              size="sm"
+            >
+              <FileDown size={13} /> Export Excel
+            </ActionButton>
+          }
+        >
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={dailyActiveUsers} barSize={22}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
