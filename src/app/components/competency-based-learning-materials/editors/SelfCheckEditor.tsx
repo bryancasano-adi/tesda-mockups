@@ -3,8 +3,18 @@ import { useState } from "react";
 import {
   FieldReadOnly,
   SectionDivider,
+  fieldLabelClass,
   fieldTextareaClass,
+  fieldValueViewClass,
 } from "../CblmFieldPrimitives";
+import { MOCK_SELF_CHECK_QUESTIONS } from "../self-check-mock-data";
+import {
+  createMockSelfCheckQuestion,
+  normalizeSelfCheckQuestion,
+  PAIRED_INFORMATION_SHEET_TITLE,
+  SELF_CHECK_DIRECTION,
+} from "../self-check-utils";
+import type { SelfCheckOptionLetter, SelfCheckQuestion } from "../self-check-types";
 import { MetaHeader } from "../sheet-editor-shared";
 
 function SelfCheckQuestionCard({
@@ -14,10 +24,21 @@ function SelfCheckQuestionCard({
   onRemove,
 }: {
   index: number;
-  question: string;
-  onChange: (next: string) => void;
+  question: SelfCheckQuestion;
+  onChange: (next: SelfCheckQuestion) => void;
   onRemove: () => void;
 }) {
+  const normalized = normalizeSelfCheckQuestion(question);
+
+  const updateOption = (letter: SelfCheckOptionLetter, text: string) => {
+    onChange({
+      ...normalized,
+      options: normalized.options.map((option) =>
+        option.letter === letter ? { ...option, text } : option,
+      ),
+    });
+  };
+
   return (
     <div className="mb-3 overflow-hidden rounded-md border border-gray-200 bg-white">
       <div className="flex items-center gap-3 border-b border-gray-200 bg-gray-50 px-3 py-2">
@@ -35,13 +56,31 @@ function SelfCheckQuestionCard({
           ✕
         </button>
       </div>
-      <div className="p-3">
-        <textarea
-          className={fieldTextareaClass}
-          rows={3}
-          value={question}
-          onChange={(event) => onChange(event.target.value)}
-        />
+      <div className="space-y-3 p-3">
+        <div>
+          <div className={fieldLabelClass}>Question</div>
+          <textarea
+            className={fieldTextareaClass}
+            rows={3}
+            value={normalized.questionText}
+            onChange={(event) =>
+              onChange({ ...normalized, questionText: event.target.value })
+            }
+          />
+        </div>
+        <div className="space-y-2">
+          {normalized.options.map((option) => (
+            <div key={option.letter}>
+              <div className={fieldLabelClass}>Choice {option.letter}</div>
+              <textarea
+                className={fieldTextareaClass}
+                rows={2}
+                value={option.text}
+                onChange={(event) => updateOption(option.letter, event.target.value)}
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -49,13 +88,11 @@ function SelfCheckQuestionCard({
 
 export function SelfCheckEditor() {
   const sheetCode = "SC 1.1.1";
-  const [questions, setQuestions] = useState([
-    "What is the minimum wait time after turning off the ignition before commencing high-voltage inspection work on a BEV?",
-    "Which personal protective equipment is mandatory when working within 2 metres of an energized HV battery pack?",
-    "What is the correct sequence for applying Lockout/Tagout (LOTO) before EV inspection?",
-  ]);
+  const [questions, setQuestions] = useState<SelfCheckQuestion[]>(
+    MOCK_SELF_CHECK_QUESTIONS,
+  );
 
-  const updateQuestion = (index: number, next: string) => {
+  const updateQuestion = (index: number, next: SelfCheckQuestion) => {
     setQuestions(questions.map((item, i) => (i === index ? next : item)));
   };
 
@@ -63,16 +100,28 @@ export function SelfCheckEditor() {
     setQuestions(questions.filter((_, i) => i !== index));
   };
 
+  const addQuestion = () => {
+    setQuestions([
+      ...questions,
+      createMockSelfCheckQuestion({
+        contentTitle: PAIRED_INFORMATION_SHEET_TITLE,
+        loTitle: PAIRED_INFORMATION_SHEET_TITLE,
+      }),
+    ]);
+  };
+
   return (
     <>
       <MetaHeader code={sheetCode} type="Self-Check" />
       <FieldReadOnly label="Paired Information Sheet" value="IS 1.1.1" />
+      <SectionDivider label="Direction" />
+      <div className={fieldValueViewClass}>{SELF_CHECK_DIRECTION}</div>
       <SectionDivider label="Questions" />
       <div className="mb-3 flex justify-end">
         <button
           className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50"
           type="button"
-          onClick={() => setQuestions([...questions, ""])}
+          onClick={addQuestion}
         >
           + Add Question
         </button>
@@ -86,6 +135,7 @@ export function SelfCheckEditor() {
           onRemove={() => removeQuestion(index)}
         />
       ))}
+      {questions.length === 0 && <div className={fieldValueViewClass}>—</div>}
     </>
   );
 }

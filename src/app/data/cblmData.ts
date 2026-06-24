@@ -11,7 +11,7 @@ export type CblmDashboardModule = {
   unitTitle: string;
   unitCode: string;
   competencyType: "basic" | "common" | "core";
-  status: "not_started" | "draft" | "finalized";
+  status: "not_started" | "draft" | "finalized" | "fetched";
   cblmId?: string;
   moiReady?: boolean;
 };
@@ -21,7 +21,7 @@ export const cblmDashboardModules: CblmDashboardModule[] = [
     unitTitle: "Receive and store kitchen supplies",
     unitCode: "AUTBEV311101",
     competencyType: "basic",
-    status: "not_started",
+    status: "fetched",
   },
   {
     unitTitle: "Work in a team environment",
