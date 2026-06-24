@@ -8,6 +8,7 @@ import {
 } from "./CblmFrontendPrimitives";
 import { cblmEditorPath } from "@/app/utils/cblmRoutes";
 import type { MockLoGroup, MockSheetRow } from "@/app/data/cblmData";
+import { formatSheetListLabel } from "./sheet-code-utils";
 
 const SHEET_TYPE_ABBR: Record<string, string> = {
   IS: "IS",
@@ -17,6 +18,13 @@ const SHEET_TYPE_ABBR: Record<string, string> = {
   PCC: "PCC",
   OS: "OS",
 };
+
+function step2SheetListLabel(sheet: MockSheetRow): string {
+  const dashIdx = sheet.label.indexOf(" — ");
+  const title = dashIdx > 0 ? sheet.label.slice(dashIdx + 3) : undefined;
+
+  return formatSheetListLabel(sheet.code, title);
+}
 
 function SheetRow({ sheet }: { sheet: MockSheetRow }) {
   if (sheet.locked) {
@@ -31,13 +39,15 @@ function SheetRow({ sheet }: { sheet: MockSheetRow }) {
   return (
     <Link
       className="flex items-center justify-between gap-2 rounded border border-gray-200 px-3 py-2 text-xs hover:bg-gray-50 no-underline"
-      to={cblmEditorPath(undefined, sheet.editorPage ?? "information-sheet")}
+      to={cblmEditorPath(undefined, sheet.editorPage ?? "information-sheet", sheet.code)}
     >
       <span className="flex min-w-0 items-center gap-2">
         <span className="inline-flex shrink-0 rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-700">
           {SHEET_TYPE_ABBR[sheet.type] ?? sheet.type}
         </span>
-        <span className="truncate font-medium text-gray-800">{sheet.label}</span>
+        <span className="truncate font-medium text-gray-800">
+          {step2SheetListLabel(sheet)}
+        </span>
       </span>
       <CBLMStatusBadge status={sheet.status} />
     </Link>

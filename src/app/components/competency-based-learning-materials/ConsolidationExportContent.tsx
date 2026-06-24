@@ -45,7 +45,7 @@ const INCLUDE_SECTIONS: { key: IncludeSectionKey; label: string }[] = [
   { key: "taskSheets", label: "All Task Sheets" },
   { key: "pccSheets", label: "All PCC Sheets" },
   { key: "operationSheets", label: "All Operation Sheets" },
-  { key: "jobSheet", label: "Job Sheet (JS 1)" },
+  { key: "jobSheet", label: "Job Sheet (1.1-3)" },
 ];
 
 const EXPORT_SETTINGS: { key: ExportSettingKey; label: string }[] = [

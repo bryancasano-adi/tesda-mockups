@@ -26,19 +26,19 @@ const INITIAL_EPISODES: Episode[] = [
   },
   {
     label: "Perform LOTO and PPE donning",
-    instruction: "Execute full LOTO procedure per TS 1.1.1.",
-    sourceTsCode: "TS 1.1.1",
+    instruction: "Execute full LOTO procedure per Task Sheet 1.1-3.",
+    sourceTsCode: "1.1-3",
   },
   {
     label: "Carry out visual inspection of EV exterior",
     instruction:
-      "Systematically inspect body panels, tyres, undercarriage per TS 1.2.1.",
-    sourceTsCode: "TS 1.2.1",
+      "Systematically inspect body panels, tyres, undercarriage per Task Sheet 1.2-1.",
+    sourceTsCode: "1.2-1",
   },
   {
     label: "Connect and operate EV diagnostic scanner",
-    instruction: "Connect diagnostic scanner per OS 1.2.1 procedure.",
-    sourceTsCode: "TS 1.2.2",
+    instruction: "Connect diagnostic scanner per Operation Sheet 1.2-1A procedure.",
+    sourceTsCode: "1.2-1A",
   },
   {
     label: "Complete and submit inspection report",
@@ -51,7 +51,7 @@ const PCC_CRITERIA = [
   "Execute LOTO procedure correctly before any HV inspection work",
   "Don PPE correctly and maintain throughout the session",
   "Complete visual inspection without missing critical safety items",
-  "Operate diagnostic scanner per OS 1.2.1 without trainer intervention",
+  "Operate diagnostic scanner per Operation Sheet 1.2-1A without trainer intervention",
   "Submit complete inspection report using fleet form AUT-F-001",
 ];
 
@@ -79,7 +79,7 @@ function JobSheetEpisodeCard({
         />
         {episode.sourceTsCode ? (
           <span className="shrink-0 rounded bg-blue-50 px-1.5 py-px text-[10px] font-bold text-blue-700">
-            {episode.sourceTsCode}
+            Task Sheet {episode.sourceTsCode}
           </span>
         ) : null}
       </div>
@@ -122,14 +122,14 @@ export function JobSheetEditor({
   return (
     <>
       <ConsolidationMetaHeader
-        code="JS 1"
+        code="1.1-3"
         extra={[
           {
             label: "Integrates",
-            value: "TS 1.1.1 · TS 1.2.1 · TS 1.2.2",
+            value: "Task Sheet 1.1-3 · Task Sheet 1.2-1 · Task Sheet 1.2-1A",
           },
         ]}
-        type="Job Sheet — Capstone"
+        type="Job Sheet"
       />
 
       <FieldEditableInput

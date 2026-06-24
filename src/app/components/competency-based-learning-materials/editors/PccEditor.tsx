@@ -47,8 +47,7 @@ function PccChecklistItemCard({
   );
 }
 
-export function PccEditor() {
-  const sheetCode = "PCC 1.1.1";
+export function PccEditor({ sheetCode = "1.1-3" }: { sheetCode?: string }) {
   const [items, setItems] = useState([
     "PPE donned correctly — insulating gloves inspected, EH footwear and high-visibility vest worn before approaching vehicle.",
     "LOTO applied — ignition off, key fob removed, MSD disengaged, lockout tag applied, and zero-voltage verified with approved meter.",
@@ -67,7 +66,7 @@ export function PccEditor() {
   return (
     <>
       <MetaHeader code={sheetCode} type="Performance Criteria Checklist" />
-      <FieldReadOnly label="Paired Task Sheet" value="TS 1.1.1" />
+      <FieldReadOnly label="Paired Task Sheet" value="Task Sheet 1.1-3" />
       <SectionDivider label="Checklist Items" />
       <div className="mb-3 flex justify-end">
         <button

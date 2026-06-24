@@ -73,8 +73,7 @@ function AnswerKeyAnswerCard({
   );
 }
 
-export function AnswerKeyEditor() {
-  const sheetCode = "AK 1.1.1";
+export function AnswerKeyEditor({ sheetCode = "1.1-1" }: { sheetCode?: string }) {
   const pairedQuestions = MOCK_SELF_CHECK_QUESTIONS.map(normalizeSelfCheckQuestion);
   const [answers, setAnswers] = useState(MOCK_ANSWER_KEY_ANSWERS);
 
@@ -100,7 +99,7 @@ export function AnswerKeyEditor() {
   return (
     <>
       <MetaHeader code={sheetCode} type="Answer Key" />
-      <FieldReadOnly label="Paired Self-Check" value="SC 1.1.1" />
+      <FieldReadOnly label="Paired Self-Check" value="Self-Check 1.1-1" />
       <SectionDivider label="Answers" />
       <div className="mb-3 flex justify-end">
         <button

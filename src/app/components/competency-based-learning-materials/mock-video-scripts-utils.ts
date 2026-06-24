@@ -1,6 +1,7 @@
 import type { VideoScriptRow } from "@/app/data/cblmData";
 import { ucMeta } from "@/app/data/cblmData";
 import { cblmVideoScriptEditorPath } from "@/app/utils/cblmRoutes";
+import { formatSheetNumber } from "./sheet-code-utils";
 
 export type VideoScriptGenerationMode = "selected" | "all_eligible";
 
@@ -32,7 +33,7 @@ export function toVideoScriptCode(
   sheetCode: string,
   sheetType: VideoScriptRow["sheetType"],
 ): string {
-  const suffix = sheetCode.replace(/^(TS|JS)\s+/, "");
+  const suffix = formatSheetNumber(sheetCode);
 
   return sheetType === "task-sheet" ? `VS-TS ${suffix}` : `VS-JS ${suffix}`;
 }
@@ -161,7 +162,7 @@ export function buildMockVideoScriptDocument(
   }
 
   const scriptCode = toVideoScriptCode(row.code, row.sheetType);
-  const sourcePccCode = row.sheetType === "task-sheet" ? "PCC 1.1.1" : null;
+  const sourcePccCode = row.sheetType === "task-sheet" ? "1.1-3" : null;
 
   return {
     scriptCode,

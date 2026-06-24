@@ -20,7 +20,7 @@ export function PlaceholderSheetEditor({
         className="inline-flex rounded-md bg-blue-700 px-3 py-1.5 text-xs font-semibold text-white no-underline hover:bg-blue-800"
         to={cblmEditorPath(undefined, "information-sheet")}
       >
-        Open IS 1.1.1 Editor
+        Open Information Sheet 1.1-1 Editor
       </Link>
     </div>
   );

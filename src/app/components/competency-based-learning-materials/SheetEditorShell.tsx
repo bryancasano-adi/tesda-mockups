@@ -4,12 +4,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { CBLMStatusBadge } from "./CblmFrontendPrimitives";
 import {
   formatSheetNavLabel,
+  isSheetNavItemActive,
   MOCK_SHEET_NAV,
   sheetEditorNavHref,
   sheetTypeLabel,
   type MockSheetNavItem,
   type MockSheetType,
 } from "./sheet-nav";
+import { formatSheetDisplayLabel } from "./sheet-code-utils";
 import { MOCK_CBLM_ID } from "@/app/utils/cblmRoutes";
 import { ucMeta } from "@/app/data/cblmData";
 
@@ -38,10 +40,12 @@ function ContextBlock({
 function SheetNavEntry({
   item,
   activeSheetCode,
+  activeSheetType,
   cblmId,
 }: {
   item: MockSheetNavItem;
   activeSheetCode: string;
+  activeSheetType: MockSheetType;
   cblmId: string;
 }) {
   const { primary, secondary } = formatSheetNavLabel(item);
@@ -66,7 +70,7 @@ function SheetNavEntry({
   }
 
   const href = sheetEditorNavHref(item, cblmId);
-  const active = item.code === activeSheetCode;
+  const active = isSheetNavItemActive(item, activeSheetCode, activeSheetType);
 
   if (item.locked || !href) {
     return (
@@ -141,6 +145,7 @@ export function SheetEditorShell({
               <SheetNavEntry
                 key={item.id}
                 activeSheetCode={activeSheetCode}
+                activeSheetType={activeSheetType}
                 cblmId={cblmId}
                 item={item}
               />
@@ -153,7 +158,10 @@ export function SheetEditorShell({
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <div className="truncate text-sm font-semibold text-gray-800">
-                  {sheetTypeLabel(activeSheetType)} · {activeSheetCode}
+                  {formatSheetDisplayLabel(
+                    sheetTypeLabel(activeSheetType),
+                    activeSheetCode,
+                  )}
                 </div>
                 {sheetStatus ? <CBLMStatusBadge status={sheetStatus} /> : null}
               </div>
@@ -172,17 +180,21 @@ export function SheetEditorShell({
             <select
               className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-xs text-gray-800"
               id="sheet-nav-select"
-              value={activeSheetCode}
+              value={`${activeSheetCode}:${activeSheetType}`}
               onChange={(event) => {
+                const [code, type] = event.target.value.split(":");
                 const item = selectableNavItems.find(
-                  (entry) => entry.code === event.target.value,
+                  (entry) => entry.code === code && entry.sheetType === type,
                 );
                 const href = item ? sheetEditorNavHref(item, cblmId) : undefined;
                 if (href) navigate(href);
               }}
             >
               {selectableNavItems.map((item) => (
-                <option key={item.id} value={item.code}>
+                <option
+                  key={item.id}
+                  value={`${item.code}:${item.sheetType}`}
+                >
                   {item.label}
                 </option>
               ))}
@@ -220,7 +232,10 @@ export function SheetEditorShell({
             <ContextBlock
               label="Current sheet"
               source="CBLM"
-              value={activeSheetCode}
+              value={formatSheetDisplayLabel(
+                sheetTypeLabel(activeSheetType),
+                activeSheetCode,
+              )}
             />
           </div>
         </aside>

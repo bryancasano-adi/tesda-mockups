@@ -86,8 +86,7 @@ function SelfCheckQuestionCard({
   );
 }
 
-export function SelfCheckEditor() {
-  const sheetCode = "SC 1.1.1";
+export function SelfCheckEditor({ sheetCode = "1.1-1" }: { sheetCode?: string }) {
   const [questions, setQuestions] = useState<SelfCheckQuestion[]>(
     MOCK_SELF_CHECK_QUESTIONS,
   );
@@ -113,7 +112,7 @@ export function SelfCheckEditor() {
   return (
     <>
       <MetaHeader code={sheetCode} type="Self-Check" />
-      <FieldReadOnly label="Paired Information Sheet" value="IS 1.1.1" />
+      <FieldReadOnly label="Paired Information Sheet" value="Information Sheet 1.1-1" />
       <SectionDivider label="Direction" />
       <div className={fieldValueViewClass}>{SELF_CHECK_DIRECTION}</div>
       <SectionDivider label="Questions" />

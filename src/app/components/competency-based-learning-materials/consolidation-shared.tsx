@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
 import { cn } from "./CblmFrontendPrimitives";
+import { formatSheetDisplayLabel } from "./sheet-code-utils";
 import {
   fieldLabelClass,
   fieldLabelRowClass,
@@ -22,8 +23,10 @@ export function ConsolidationMetaHeader({
   return (
     <div className="mb-5 grid gap-3 rounded-md border border-gray-200 bg-gray-50 p-4 text-xs sm:grid-cols-2 lg:grid-cols-4">
       <div>
-        <div className="text-gray-500">Code</div>
-        <div className="font-mono font-semibold text-blue-700">{code}</div>
+        <div className="text-gray-500">Sheet Code</div>
+        <div className="font-mono font-semibold text-blue-700">
+          {formatSheetDisplayLabel(type, code)}
+        </div>
       </div>
       <div>
         <div className="text-gray-500">Type</div>

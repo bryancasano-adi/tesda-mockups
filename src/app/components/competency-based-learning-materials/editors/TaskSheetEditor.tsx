@@ -104,8 +104,7 @@ function TaskSheetStepCard({
   );
 }
 
-export function TaskSheetEditor() {
-  const sheetCode = "TS 1.1.1";
+export function TaskSheetEditor({ sheetCode = "1.1-3" }: { sheetCode?: string }) {
   const [objective, setObjective] = useState(
     "Given a stationary BEV unit in a fleet yard, perform the mandatory LOTO procedure and PPE donning sequence to achieve a verified zero-voltage, safe-to-inspect state within 10 minutes and to TESDA safety standard.",
   );
@@ -143,7 +142,7 @@ export function TaskSheetEditor() {
         code={sheetCode}
         extra={[
           { label: "Learning Outcome", value: "1.1 — Prepare for inspection" },
-          { label: "Paired PCC", value: "PCC 1.1.1" },
+          { label: "Paired PCC", value: "Performance Criteria Checklist 1.1-3" },
         ]}
         type="Task Sheet"
       />
@@ -177,7 +176,7 @@ export function TaskSheetEditor() {
       <FieldReadOnly
         hint="Derived from CBC learning outcome assessment methods."
         label="Assessment Method(s)"
-        value="Direct observation by trainer using PCC 1.1.1. Trainee must achieve all YES responses."
+        value="Direct observation by trainer using Performance Criteria Checklist 1.1-3. Trainee must achieve all YES responses."
       />
 
       <SectionDivider label="Steps/Procedure" />

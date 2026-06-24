@@ -23,7 +23,7 @@ import {
 function pageNotice(page: ConsolidationPageId) {
   switch (page) {
     case "job-sheet":
-      return "JS 1 — Job Sheet. Consolidates all Task Sheets from Module 1. Synthesized content is editable. Generated after Step 2 is finalized.";
+      return "Job Sheet 1.1-3 — Job Sheet. Consolidates all Task Sheets from Module 1. Synthesized content is editable. Generated after Step 2 is finalized.";
     case "learning-experiences":
       return "LET — Auto-generated from finalized Step 2 sheets. Editable activities and special instructions per LO.";
     case "references":
@@ -68,7 +68,7 @@ export function CBLMConsolidation() {
           activePage={page}
           notice={pageNotice(page)}
           pageStatus={page === "export" ? undefined : pageStatus}
-          taskSheetCodes="TS 1.1.1"
+          taskSheetCodes="Task Sheet 1.1-3"
         >
           {renderPage()}
         </ConsolidationShell>

@@ -20,11 +20,11 @@ const INITIAL_SECTIONS: LetSection[] = [
     loNumber: 1,
     title: "Prepare for EV inspection",
     activities: [
-      "Read Information Sheet IS 1.1.1 on Safety Protocols for HV EV Inspection",
-      "Answer Self-Check SC 1.1.1",
-      "Compare your answers with Answer Key AK 1.1.1",
-      "Read Information Sheet IS 1.1.2 on PPE Requirements for HV Work",
-      "Perform Task Sheet TS 1.1.1 — EV Safety Preparation and LOTO [TS]",
+      "Read Information Sheet 1.1-1 on Safety Protocols for HV EV Inspection",
+      "Answer Self-Check 1.1-1",
+      "Compare your answers with Answer Key 1.1-1",
+      "Read Information Sheet 1.1-2 on PPE Requirements for HV Work",
+      "Perform Task Sheet 1.1-3 — EV Safety Preparation and LOTO [TS]",
     ],
     instructions:
       "Complete all self-checks without referring back to the Information Sheet. If you score below 80%, re-read the IS and re-attempt.",
@@ -33,20 +33,20 @@ const INITIAL_SECTIONS: LetSection[] = [
     loNumber: 2,
     title: "Carry out visual inspection of EV components",
     activities: [
-      "Read IS 1.2.1 on EV Exterior and Undercarriage Inspection",
-      "Read Operation Sheet OS 1.2.1 on EV Diagnostic Scanner before the task [OS]",
-      "Perform Task Sheet TS 1.2.1 — Visual Inspection of EV Exterior [TS]",
-      "Perform Task Sheet TS 1.2.2 — EV Diagnostic System Scan [TS]",
+      "Read Information Sheet 1.2-1 on EV Exterior and Undercarriage Inspection",
+      "Read Operation Sheet 1.2-1A on EV Diagnostic Scanner before the task [OS]",
+      "Perform Task Sheet 1.2-1 — Visual Inspection of EV Exterior [TS]",
+      "Perform Task Sheet 1.2-1A — EV Diagnostic System Scan [TS]",
     ],
     instructions:
-      "Read OS 1.2.1 in full BEFORE operating the diagnostic scanner. Equipment must not be operated without trainer supervision.",
+      "Read Operation Sheet 1.2-1A in full BEFORE operating the diagnostic scanner. Equipment must not be operated without trainer supervision.",
   },
   {
     loNumber: 3,
     title: "Complete inspection report and documentation",
     activities: [
-      "Read IS 1.3.1 on Inspection Report Documentation Standards",
-      "Answer SC 1.3.1 and compare with AK 1.3.1",
+      "Read Information Sheet 1.3-1 on Inspection Report Documentation Standards",
+      "Answer Self-Check 1.3-1 and compare with Answer Key 1.3-1",
       "Complete and submit your inspection report using fleet form AUT-F-001",
     ],
     instructions:

@@ -26,8 +26,13 @@ export function cblmFrontMatterPath(
 export function cblmEditorPath(
   cblmId = MOCK_CBLM_ID,
   page = "information-sheet",
+  sheet?: string,
 ) {
-  return `${CBLM_BASE}/${cblmId}/editor?page=${page}`;
+  const params = new URLSearchParams({ page });
+  if (sheet) {
+    params.set("sheet", sheet);
+  }
+  return `${CBLM_BASE}/${cblmId}/editor?${params.toString()}`;
 }
 
 export function consolidationNavHref(

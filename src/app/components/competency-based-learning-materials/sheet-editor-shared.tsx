@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { SectionDivider } from "./CblmFieldPrimitives";
+import { formatSheetDisplayLabel } from "./sheet-code-utils";
 
 export function MetaHeader({
   code,
@@ -19,7 +20,9 @@ export function MetaHeader({
     >
       <div>
         <div className="text-gray-500">Sheet Code</div>
-        <div className="font-mono font-semibold text-blue-700">{code}</div>
+        <div className="font-mono font-semibold text-blue-700">
+          {formatSheetDisplayLabel(type, code)}
+        </div>
       </div>
       <div>
         <div className="text-gray-500">Type</div>

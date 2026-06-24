@@ -3,6 +3,7 @@ import { SheetKind, sheetMeta } from "./Dashboard";
 import { CblmEditorLayout } from "@/app/components/competency-based-learning-materials/CblmEditorLayout";
 import { SheetEditorShell } from "@/app/components/competency-based-learning-materials/SheetEditorShell";
 import {
+  resolveEditorNavItem,
   SHEET_PAGE_CONFIG,
   type SheetEditorPage,
 } from "@/app/components/competency-based-learning-materials/sheet-nav";
@@ -30,6 +31,7 @@ export function CBLMEditor() {
   const { toast } = useCblmToast();
 
   const page = searchParams.get("page") as SheetKind | null;
+  const sheetParam = searchParams.get("sheet");
   const validKinds = Object.keys(sheetMeta) as SheetKind[];
   const kind: SheetKind =
     page && validKinds.includes(page) ? page : "information-sheet";
@@ -44,19 +46,31 @@ export function CBLMEditor() {
     kind in SHEET_PAGE_CONFIG
       ? SHEET_PAGE_CONFIG[kind as SheetEditorPage]
       : undefined;
+  const navItem =
+    kind in SHEET_PAGE_CONFIG
+      ? resolveEditorNavItem(kind as SheetEditorPage, sheetParam)
+      : undefined;
+  const activeSheetCode = navItem?.code ?? pageConfig?.sheetCode ?? meta.code;
+  const activeSheetType =
+    navItem?.sheetType ?? pageConfig?.sheetType ?? "information-sheet";
+  const sheetStatus = navItem?.status ?? pageConfig?.status;
 
   const renderEditor = () => {
+    const editorKey = `${kind}:${activeSheetCode}`;
+
     switch (kind) {
       case "information-sheet":
-        return <InformationSheetEditor />;
+        return (
+          <InformationSheetEditor key={editorKey} sheetCode={activeSheetCode} />
+        );
       case "self-check":
-        return <SelfCheckEditor />;
+        return <SelfCheckEditor key={editorKey} sheetCode={activeSheetCode} />;
       case "answer-key":
-        return <AnswerKeyEditor />;
+        return <AnswerKeyEditor key={editorKey} sheetCode={activeSheetCode} />;
       case "task-sheet":
-        return <TaskSheetEditor />;
+        return <TaskSheetEditor key={editorKey} sheetCode={activeSheetCode} />;
       case "performance-criterion":
-        return <PccEditor />;
+        return <PccEditor key={editorKey} sheetCode={activeSheetCode} />;
       default:
         return <PlaceholderSheetEditor kind={kind} meta={meta} />;
     }
@@ -67,9 +81,9 @@ export function CBLMEditor() {
       <>
         <CblmEditorLayout sheetNav={null} sourcePanel={null} notice={null} toolbar={null}>
           <SheetEditorShell
-            activeSheetCode={meta.code}
-            activeSheetType="information-sheet"
-            sheetStatus="draft"
+            activeSheetCode={activeSheetCode}
+            activeSheetType={activeSheetType}
+            sheetStatus={sheetStatus ?? "draft"}
           >
             {renderEditor()}
           </SheetEditorShell>
@@ -83,9 +97,9 @@ export function CBLMEditor() {
     <>
       <CblmEditorLayout sheetNav={null} sourcePanel={null} notice={null} toolbar={null}>
         <SheetEditorShell
-          activeSheetCode={pageConfig.sheetCode}
-          activeSheetType={pageConfig.sheetType}
-          sheetStatus={pageConfig.status}
+          activeSheetCode={activeSheetCode}
+          activeSheetType={activeSheetType}
+          sheetStatus={sheetStatus}
         >
           {renderEditor()}
         </SheetEditorShell>
