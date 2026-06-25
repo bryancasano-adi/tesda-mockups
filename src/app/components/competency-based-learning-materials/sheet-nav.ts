@@ -8,14 +8,16 @@ export type MockSheetType =
   | "self-check"
   | "answer-key"
   | "task-sheet"
-  | "performance-criterion";
+  | "performance-criterion"
+  | "operation-sheet";
 
 export type SheetEditorPage =
   | "information-sheet"
   | "self-check"
   | "answer-key"
   | "task-sheet"
-  | "performance-criterion";
+  | "performance-criterion"
+  | "operation-sheet";
 
 export type MockSheetNavItem = {
   id: string;
@@ -99,6 +101,22 @@ export const MOCK_SHEET_NAV: MockSheetNavItem[] = [
     sheetType: "lo-header",
   },
   {
+    id: "is-1-2-1",
+    label: "1.2-1 — EV Exterior and Undercarriage Inspection",
+    sheetType: "information-sheet",
+    code: "1.2-1",
+    editorPage: "information-sheet",
+    status: "draft",
+  },
+  {
+    id: "os-1-2-1a",
+    label: "1.2-1A — EV Diagnostic Scanner Operation",
+    sheetType: "operation-sheet",
+    code: "1.2-1A",
+    editorPage: "operation-sheet",
+    status: "draft",
+  },
+  {
     id: "lo3-h",
     label: "LO 3 — Documentation — None",
     sheetType: "lo-header",
@@ -144,6 +162,12 @@ export const SHEET_PAGE_CONFIG: Record<
     sheetTypeLabel: "Performance Criteria Checklist",
     status: "draft",
   },
+  "operation-sheet": {
+    sheetCode: "1.2-1A",
+    sheetType: "operation-sheet",
+    sheetTypeLabel: "Operation Sheet",
+    status: "draft",
+  },
 };
 
 export function sheetTypeLabel(type: MockSheetType): string {
@@ -158,6 +182,8 @@ export function sheetTypeLabel(type: MockSheetType): string {
       return "Task Sheet";
     case "performance-criterion":
       return "Performance Criteria Checklist";
+    case "operation-sheet":
+      return "Operation Sheet";
     default:
       return "Sheet";
   }

@@ -131,6 +131,13 @@ export const mockLoGroups: MockLoGroup[] = [
         type: "IS",
         status: "not_started",
       },
+      {
+        code: "1.2-1A",
+        label: sheetListLabel("1.2-1A", "EV Diagnostic Scanner Operation"),
+        type: "OS",
+        status: "draft",
+        editorPage: "operation-sheet",
+      },
     ],
   },
   {
@@ -184,6 +191,8 @@ export const moduleSheetNavItems: SheetNavItem[] = [
   { id: "ts-1-1-3", label: sheetListLabel("1.1-3", "Prepare EV Safety Check"), badge: "Draft", badgeClass: "b-draft", dotColor: "#F57C00", href: cblmEditorPath(MOCK_CBLM_ID, "task-sheet", "1.1-3") },
   { id: "pcc-1-1-3", label: sheetListLabel("1.1-3", "EV Safety Preparation Criteria"), badge: "Draft", badgeClass: "b-draft", dotColor: "#C62828", href: cblmEditorPath(MOCK_CBLM_ID, "performance-criterion", "1.1-3") },
   { id: "lo2-h", label: "LO 2 — Visual inspection — None", badge: "--", badgeClass: "snb-pend", dotColor: "#BDBDBD" },
+  { id: "is-1-2-1", label: sheetListLabel("1.2-1", "Exterior Inspection Procedures"), badge: "Not Started", badgeClass: "b-pending", dotColor: "#1565C0", href: cblmEditorPath(MOCK_CBLM_ID, "information-sheet", "1.2-1") },
+  { id: "os-1-2-1a", label: sheetListLabel("1.2-1A", "EV Diagnostic Scanner Operation"), badge: "Draft", badgeClass: "b-draft", dotColor: "#00897B", href: cblmEditorPath(MOCK_CBLM_ID, "operation-sheet", "1.2-1A") },
   { id: "lo3-h", label: "LO 3 — Documentation — None", badge: "--", badgeClass: "snb-pend", dotColor: "#BDBDBD" },
 ];
 
@@ -251,7 +260,8 @@ export const moduleLearningOutcomes: ModuleLo[] = [
     badge: "Not Started",
     badgeClass: "b-pending",
     sheets: [
-      { type: "IS", typeColor: "#1565C0", typeBg: "#1565C022", code: "1.2-1", title: "Exterior Inspection Procedures", status: "Not Started", badgeClass: "b-pending" },
+      { type: "IS", typeColor: "#1565C0", typeBg: "#1565C022", code: "1.2-1", title: "Exterior Inspection Procedures", status: "Not Started", badgeClass: "b-pending", editorHref: cblmEditorPath(MOCK_CBLM_ID, "information-sheet", "1.2-1") },
+      { type: "OS", typeColor: "#00897B", typeBg: "#00897B22", code: "1.2-1A", title: "EV Diagnostic Scanner Operation", status: "Draft", badgeClass: "b-draft", editorHref: cblmEditorPath(MOCK_CBLM_ID, "operation-sheet", "1.2-1A") },
     ],
   },
   {
@@ -347,7 +357,7 @@ export const modules = [
         code: "AUTBEV311201",
         duration: "24 hrs",
         status: "review" as Status,
-        los: "3 LOs · 21 sheets",
+        los: "3 LOs · 22 sheets",
         current: true,
       },
     ],

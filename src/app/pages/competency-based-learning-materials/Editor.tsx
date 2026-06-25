@@ -15,6 +15,7 @@ import { InformationSheetEditor } from "@/app/components/competency-based-learni
 import { SelfCheckEditor } from "@/app/components/competency-based-learning-materials/editors/SelfCheckEditor";
 import { AnswerKeyEditor } from "@/app/components/competency-based-learning-materials/editors/AnswerKeyEditor";
 import { TaskSheetEditor } from "@/app/components/competency-based-learning-materials/editors/TaskSheetEditor";
+import { OperationSheetEditor } from "@/app/components/competency-based-learning-materials/editors/OperationSheetEditor";
 import { PccEditor } from "@/app/components/competency-based-learning-materials/editors/PccEditor";
 import { consolidationNavHref } from "@/app/utils/cblmRoutes";
 import { PlaceholderSheetEditor } from "@/app/components/competency-based-learning-materials/editors/PlaceholderSheetEditor";
@@ -71,6 +72,10 @@ export function CBLMEditor() {
         return <TaskSheetEditor key={editorKey} sheetCode={activeSheetCode} />;
       case "performance-criterion":
         return <PccEditor key={editorKey} sheetCode={activeSheetCode} />;
+      case "operation-sheet":
+        return (
+          <OperationSheetEditor key={editorKey} sheetCode={activeSheetCode} />
+        );
       default:
         return <PlaceholderSheetEditor kind={kind} meta={meta} />;
     }

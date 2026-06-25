@@ -31,6 +31,7 @@ export type SheetKind =
   | "answer-key"
   | "task-sheet"
   | "performance-criterion"
+  | "operation-sheet"
   | "outcome-statement"
   | "job-sheet"
   | "learning-experiences-table";
@@ -81,6 +82,13 @@ export const sheetMeta: Record<
     title: "Complaint Handling Performance Criteria",
     color: "text-red-700",
     bg: "bg-red-600",
+  },
+  "operation-sheet": {
+    label: "Operation Sheet",
+    code: "1.2-1A",
+    title: "EV Diagnostic Scanner Operation",
+    color: "text-teal-700",
+    bg: "bg-teal-600",
   },
   "outcome-statement": {
     label: "Outcome Statement",
