@@ -19,7 +19,6 @@ import {
   resolveLegacyAnswerLetter,
 } from "../self-check-utils";
 import type { SelfCheckQuestion } from "../self-check-types";
-import { MetaHeader } from "../sheet-editor-shared";
 
 function AnswerKeyAnswerCard({
   index,
@@ -98,8 +97,7 @@ export function AnswerKeyEditor({ sheetCode = "1.1-1" }: { sheetCode?: string })
 
   return (
     <>
-      <MetaHeader code={sheetCode} type="Answer Key" />
-      <FieldReadOnly label="Paired Self-Check" value="Self-Check 1.1-1" />
+      <FieldReadOnly label="Paired Sheet" value="Self-Check 1.1-1" />
       <SectionDivider label="Answers" />
       <div className="mb-3 flex justify-end">
         <button

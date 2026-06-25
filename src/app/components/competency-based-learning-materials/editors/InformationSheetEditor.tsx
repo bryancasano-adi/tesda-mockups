@@ -6,7 +6,6 @@ import {
 } from "../CblmFieldPrimitives";
 import {
   InlineReferencesSection,
-  MetaHeader,
 } from "../sheet-editor-shared";
 
 type InformationSheetMock = {
@@ -101,7 +100,6 @@ export function InformationSheetEditor({
 
   return (
     <>
-      <MetaHeader code={sheetCode} type="Information Sheet" />
       <FieldReadOnly label="IS Title" value={mock.title} />
       <FieldEditable
         editing

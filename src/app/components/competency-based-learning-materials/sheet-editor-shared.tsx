@@ -1,46 +1,6 @@
 import { useState } from "react";
 
 import { SectionDivider } from "./CblmFieldPrimitives";
-import { formatSheetDisplayLabel } from "./sheet-code-utils";
-
-export function MetaHeader({
-  code,
-  type,
-  extra,
-}: {
-  code: string;
-  type: string;
-  extra?: { label: string; value: string }[];
-}) {
-  return (
-    <div
-      className={`mb-5 grid gap-3 rounded-md border border-gray-200 bg-gray-50 p-4 text-xs sm:grid-cols-2 ${
-        extra?.length ? "lg:grid-cols-4" : "lg:grid-cols-3"
-      }`}
-    >
-      <div>
-        <div className="text-gray-500">Sheet Code</div>
-        <div className="font-mono font-semibold text-blue-700">
-          {formatSheetDisplayLabel(type, code)}
-        </div>
-      </div>
-      <div>
-        <div className="text-gray-500">Type</div>
-        <div className="font-semibold text-gray-800">{type}</div>
-      </div>
-      {extra?.map((item) => (
-        <div key={item.label}>
-          <div className="text-gray-500">{item.label}</div>
-          <div className="font-semibold text-gray-800">{item.value}</div>
-        </div>
-      ))}
-      <div>
-        <div className="text-gray-500">Phase</div>
-        <div className="text-blue-700">Phase 1 (LLM + CS/CBC/CLM)</div>
-      </div>
-    </div>
-  );
-}
 
 function ReferenceTypeBadge({ type }: { type: string }) {
   const styles: Record<string, string> = {

@@ -15,7 +15,6 @@ import {
   SELF_CHECK_DIRECTION,
 } from "../self-check-utils";
 import type { SelfCheckOptionLetter, SelfCheckQuestion } from "../self-check-types";
-import { MetaHeader } from "../sheet-editor-shared";
 
 function SelfCheckQuestionCard({
   index,
@@ -111,8 +110,7 @@ export function SelfCheckEditor({ sheetCode = "1.1-1" }: { sheetCode?: string })
 
   return (
     <>
-      <MetaHeader code={sheetCode} type="Self-Check" />
-      <FieldReadOnly label="Paired Information Sheet" value="Information Sheet 1.1-1" />
+      <FieldReadOnly label="Paired Sheet" value="Information Sheet 1.1-1" />
       <SectionDivider label="Direction" />
       <div className={fieldValueViewClass}>{SELF_CHECK_DIRECTION}</div>
       <SectionDivider label="Questions" />

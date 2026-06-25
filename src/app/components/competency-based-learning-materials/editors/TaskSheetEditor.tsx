@@ -9,7 +9,6 @@ import {
   fieldLabelClass,
   fieldLabelRowClass,
 } from "../CblmFieldPrimitives";
-import { MetaHeader } from "../sheet-editor-shared";
 
 type TaskStep = { label: string; instruction: string };
 
@@ -138,13 +137,9 @@ export function TaskSheetEditor({ sheetCode = "1.1-3" }: { sheetCode?: string })
 
   return (
     <>
-      <MetaHeader
-        code={sheetCode}
-        extra={[
-          { label: "Learning Outcome", value: "1.1 — Prepare for inspection" },
-          { label: "Paired PCC", value: "Performance Criteria Checklist 1.1-3" },
-        ]}
-        type="Task Sheet"
+      <FieldReadOnly
+        label="Paired Sheet"
+        value="Performance Criteria Checklist 1.1-3"
       />
 
       <FieldReadOnly

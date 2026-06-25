@@ -5,7 +5,6 @@ import {
   SectionDivider,
   fieldTextareaClass,
 } from "../CblmFieldPrimitives";
-import { MetaHeader } from "../sheet-editor-shared";
 
 function PccChecklistItemCard({
   index,
@@ -65,8 +64,7 @@ export function PccEditor({ sheetCode = "1.1-3" }: { sheetCode?: string }) {
 
   return (
     <>
-      <MetaHeader code={sheetCode} type="Performance Criteria Checklist" />
-      <FieldReadOnly label="Paired Task Sheet" value="Task Sheet 1.1-3" />
+      <FieldReadOnly label="Paired Sheet" value="Task Sheet 1.1-3" />
       <SectionDivider label="Checklist Items" />
       <div className="mb-3 flex justify-end">
         <button
