@@ -41,7 +41,7 @@ const SHEET_EDITABLE_FIELD_LABELS: Partial<
     "Steps/Procedure",
   ],
   "performance-criterion": ["Checklist items"],
-  "operation-sheet": ["Equipment", "Steps/Procedure"],
+  "operation-sheet": ["Steps/Procedure"],
 };
 
 export function sheetTypeBadgeClasses(type: MockSheetType): string {
