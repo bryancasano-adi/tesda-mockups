@@ -10,7 +10,16 @@ import {
   LineChart,
   Line,
 } from "recharts";
-import { Cpu, Activity, DollarSign, FileText, FileDown, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Cpu,
+  Activity,
+  DollarSign,
+  FileText,
+  FileDown,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import {
   StatCard,
   ChartCard,
@@ -22,8 +31,6 @@ import {
 } from "./PagePrimitives";
 import { tokenUsageData, tokenTrendData, tokenBySector } from "./sharedData";
 import type { ReportRecord } from "./reportData";
-
-const sortedTokenData = [...tokenUsageData].sort((a, b) => b.tokens - a.tokens);
 
 type TrendPeriod = "quarterly" | "monthly" | "weekly" | "daily";
 
@@ -67,19 +74,19 @@ export function TokenUsageModule({ records }: { records?: ReportRecord[] }) {
     : tokenTrendData;
   const sectorRows = useFilteredRecords
     ? Object.values(
-        visibleRecords.reduce<Record<string, { sector: string; tokens: number; cost: string }>>(
-          (acc, record) => {
-            acc[record.sector] = acc[record.sector] ?? {
-              sector: record.sector,
-              tokens: 0,
-              cost: "$0.00",
-            };
-            acc[record.sector].tokens += record.tokens;
-            acc[record.sector].cost = `$${((acc[record.sector].tokens / 1000) * 0.003).toFixed(2)}`;
-            return acc;
-          },
-          {},
-        ),
+        visibleRecords.reduce<
+          Record<string, { sector: string; tokens: number; cost: string }>
+        >((acc, record) => {
+          acc[record.sector] = acc[record.sector] ?? {
+            sector: record.sector,
+            tokens: 0,
+            cost: "$0.00",
+          };
+          acc[record.sector].tokens += record.tokens;
+          acc[record.sector].cost =
+            `$${((acc[record.sector].tokens / 1000) * 0.003).toFixed(2)}`;
+          return acc;
+        }, {}),
       )
     : tokenBySector;
   const totalTokens = tokenRows.reduce((s, d) => s + d.tokens, 0);
@@ -103,7 +110,10 @@ export function TokenUsageModule({ records }: { records?: ReportRecord[] }) {
   const filteredDocs = sortedTokenData.filter((r) =>
     r.doc.toLowerCase().includes(docSearch.toLowerCase()),
   );
-  const docPageCount = Math.max(1, Math.ceil(filteredDocs.length / DOC_PER_PAGE));
+  const docPageCount = Math.max(
+    1,
+    Math.ceil(filteredDocs.length / DOC_PER_PAGE),
+  );
   const pagedDocs = filteredDocs.slice(
     (docPage - 1) * DOC_PER_PAGE,
     docPage * DOC_PER_PAGE,
@@ -174,42 +184,42 @@ export function TokenUsageModule({ records }: { records?: ReportRecord[] }) {
         {hasDocumentChartData ? (
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={sortedTokenData} layout="vertical" barSize={18}>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke="#f1f5f9"
-              horizontal={false}
-            />
-            <XAxis
-              type="number"
-              tick={{ fontSize: 10, fill: "#94a3b8" }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              dataKey="doc"
-              type="category"
-              tick={{ fontSize: 10, fill: "#64748b" }}
-              width={160}
-              axisLine={false}
-              tickLine={false}
-            />
-            <Tooltip
-              formatter={(v: number) => [
-                `${v.toLocaleString()} tokens`,
-                "Tokens",
-              ]}
-              contentStyle={{
-                borderRadius: 10,
-                border: "none",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-              }}
-            />
-            <Bar
-              dataKey="tokens"
-              fill="#7b1fa2"
-              radius={[0, 4, 4, 0]}
-              name="Tokens Used"
-            />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="#f1f5f9"
+                horizontal={false}
+              />
+              <XAxis
+                type="number"
+                tick={{ fontSize: 10, fill: "#94a3b8" }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                dataKey="doc"
+                type="category"
+                tick={{ fontSize: 10, fill: "#64748b" }}
+                width={160}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip
+                formatter={(v: number) => [
+                  `${v.toLocaleString()} tokens`,
+                  "Tokens",
+                ]}
+                contentStyle={{
+                  borderRadius: 10,
+                  border: "none",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                }}
+              />
+              <Bar
+                dataKey="tokens"
+                fill="#7b1fa2"
+                radius={[0, 4, 4, 0]}
+                name="Tokens Used"
+              />
             </BarChart>
           </ResponsiveContainer>
         ) : (
@@ -240,35 +250,35 @@ export function TokenUsageModule({ records }: { records?: ReportRecord[] }) {
         {hasTrendChartData ? (
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={filteredTrendData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-            <XAxis
-              dataKey="date"
-              tick={{ fontSize: 10, fill: "#94a3b8" }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              tick={{ fontSize: 10, fill: "#94a3b8" }}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
-            />
-            <Tooltip
-              formatter={(v: number) => [`${v.toLocaleString()} tokens`, ""]}
-              contentStyle={{
-                borderRadius: 10,
-                border: "none",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-              }}
-            />
-            <Line
-              type="monotone"
-              dataKey="tokens"
-              stroke="#7b1fa2"
-              strokeWidth={2}
-              dot={{ fill: "#7b1fa2", r: 4 }}
-              name="Tokens"
-            />
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis
+                dataKey="date"
+                tick={{ fontSize: 10, fill: "#94a3b8" }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 10, fill: "#94a3b8" }}
+                axisLine={false}
+                tickLine={false}
+                tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
+              />
+              <Tooltip
+                formatter={(v: number) => [`${v.toLocaleString()} tokens`, ""]}
+                contentStyle={{
+                  borderRadius: 10,
+                  border: "none",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="tokens"
+                stroke="#7b1fa2"
+                strokeWidth={2}
+                dot={{ fill: "#7b1fa2", r: 4 }}
+                name="Tokens"
+              />
             </LineChart>
           </ResponsiveContainer>
         ) : (
@@ -376,9 +386,7 @@ export function TokenUsageModule({ records }: { records?: ReportRecord[] }) {
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#f1f5f9]">
             <p className="text-[12px]" style={{ color: "#94a3b8" }}>
               Showing{" "}
-              {filteredDocs.length === 0
-                ? 0
-                : (docPage - 1) * DOC_PER_PAGE + 1}
+              {filteredDocs.length === 0 ? 0 : (docPage - 1) * DOC_PER_PAGE + 1}
               –{Math.min(docPage * DOC_PER_PAGE, filteredDocs.length)} of{" "}
               {filteredDocs.length}
             </p>
@@ -394,9 +402,7 @@ export function TokenUsageModule({ records }: { records?: ReportRecord[] }) {
                 {docPage} / {docPageCount}
               </span>
               <button
-                onClick={() =>
-                  setDocPage((p) => Math.min(docPageCount, p + 1))
-                }
+                onClick={() => setDocPage((p) => Math.min(docPageCount, p + 1))}
                 disabled={docPage === docPageCount}
                 className="w-7 h-7 flex items-center justify-center rounded-lg border border-[#e2e8f0] bg-white disabled:opacity-40 hover:bg-[#f8fafc] transition-colors cursor-pointer disabled:cursor-default"
               >
@@ -420,43 +426,43 @@ export function TokenUsageModule({ records }: { records?: ReportRecord[] }) {
           {hasSectorChartData ? (
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={sectorRows} layout="vertical" barSize={18}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="#f1f5f9"
-                horizontal={false}
-              />
-              <XAxis
-                type="number"
-                tick={{ fontSize: 10, fill: "#94a3b8" }}
-                axisLine={false}
-                tickLine={false}
-                tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
-              />
-              <YAxis
-                dataKey="sector"
-                type="category"
-                tick={{ fontSize: 10, fill: "#64748b" }}
-                width={120}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip
-                formatter={(v: number) => [
-                  `${v.toLocaleString()} tokens`,
-                  "Tokens",
-                ]}
-                contentStyle={{
-                  borderRadius: 10,
-                  border: "none",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                }}
-              />
-              <Bar
-                dataKey="tokens"
-                fill="#7b1fa2"
-                radius={[0, 4, 4, 0]}
-                name="Tokens Used"
-              />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#f1f5f9"
+                  horizontal={false}
+                />
+                <XAxis
+                  type="number"
+                  tick={{ fontSize: 10, fill: "#94a3b8" }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
+                />
+                <YAxis
+                  dataKey="sector"
+                  type="category"
+                  tick={{ fontSize: 10, fill: "#64748b" }}
+                  width={120}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  formatter={(v: number) => [
+                    `${v.toLocaleString()} tokens`,
+                    "Tokens",
+                  ]}
+                  contentStyle={{
+                    borderRadius: 10,
+                    border: "none",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  }}
+                />
+                <Bar
+                  dataKey="tokens"
+                  fill="#7b1fa2"
+                  radius={[0, 4, 4, 0]}
+                  name="Tokens Used"
+                />
               </BarChart>
             </ResponsiveContainer>
           ) : (
@@ -539,7 +545,8 @@ export function TokenUsageModule({ records }: { records?: ReportRecord[] }) {
                 {filteredSectors.length === 0
                   ? 0
                   : (sectorPage - 1) * SECTOR_PER_PAGE + 1}
-                –{Math.min(sectorPage * SECTOR_PER_PAGE, filteredSectors.length)}{" "}
+                –
+                {Math.min(sectorPage * SECTOR_PER_PAGE, filteredSectors.length)}{" "}
                 of {filteredSectors.length}
               </p>
               <div className="flex items-center gap-1">
@@ -579,29 +586,41 @@ export function TokenUsageModule({ records }: { records?: ReportRecord[] }) {
         >
           How to Interpret Token Usage vs. Estimated Cost
         </p>
-        <div className="grid grid-cols-3 gap-4 text-[12px]" style={{ color: "#64748b" }}>
+        <div
+          className="grid grid-cols-3 gap-4 text-[12px]"
+          style={{ color: "#64748b" }}
+        >
           <div className="flex flex-col gap-1.5">
-            <p className="font-semibold text-[11px] uppercase tracking-wider" style={{ color: "#94a3b8" }}>
+            <p
+              className="font-semibold text-[11px] uppercase tracking-wider"
+              style={{ color: "#94a3b8" }}
+            >
               What is a Token?
             </p>
             <p>
-              A token is roughly 4 characters or ¾ of a word. The AI model
-              reads your document as a sequence of tokens to understand context
-              and generate content.
+              A token is roughly 4 characters or ¾ of a word. The AI model reads
+              your document as a sequence of tokens to understand context and
+              generate content.
             </p>
           </div>
           <div className="flex flex-col gap-1.5">
-            <p className="font-semibold text-[11px] uppercase tracking-wider" style={{ color: "#94a3b8" }}>
+            <p
+              className="font-semibold text-[11px] uppercase tracking-wider"
+              style={{ color: "#94a3b8" }}
+            >
               How is Cost Estimated?
             </p>
             <p>
-              Estimated cost uses the model's per-token pricing (input +
-              output tokens combined). Longer documents with more context
-              naturally consume more tokens and cost more.
+              Estimated cost uses the model's per-token pricing (input + output
+              tokens combined). Longer documents with more context naturally
+              consume more tokens and cost more.
             </p>
           </div>
           <div className="flex flex-col gap-1.5">
-            <p className="font-semibold text-[11px] uppercase tracking-wider" style={{ color: "#94a3b8" }}>
+            <p
+              className="font-semibold text-[11px] uppercase tracking-wider"
+              style={{ color: "#94a3b8" }}
+            >
               Tips for Optimization
             </p>
             <p>
@@ -611,13 +630,6 @@ export function TokenUsageModule({ records }: { records?: ReportRecord[] }) {
             </p>
           </div>
         </div>
-        <p
-          className="text-[11px] mt-4 pt-3 border-t border-[#e2e8f0]"
-          style={{ color: "#94a3b8" }}
-        >
-          Costs shown are approximations based on current model pricing and may
-          vary. Actual billing is determined by Anthropic's usage logs.
-        </p>
       </div>
     </div>
   );

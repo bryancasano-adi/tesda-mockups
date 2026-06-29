@@ -409,7 +409,7 @@ export function SectorAnalyticsModule({
                     className="text-[16px] font-bold"
                     style={{ color: "#0f172a" }}
                   >
-                    Intelligent Search & Advanced Filtering
+                    Advanced Search & Filtering
                   </p>
                   <p
                     className="text-[12px] mt-0.5"
@@ -446,7 +446,7 @@ export function SectorAnalyticsModule({
                     className="text-[14px] font-semibold"
                     style={{ color: "#0f172a" }}
                   >
-                    Advanced Filtering Options
+                    Filtering Options
                   </h3>
                   {activeFilterCount > 0 && (
                     <span className="ml-auto bg-[#1976d2] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">
@@ -573,7 +573,6 @@ export function SectorAnalyticsModule({
                 </div>
               </div>
 
-              {/* Intelligent Search */}
               <div
                 className="rounded-2xl p-5"
                 style={{
@@ -589,15 +588,15 @@ export function SectorAnalyticsModule({
                     className="text-[14px] font-semibold"
                     style={{ color: "#0f172a" }}
                   >
-                    Intelligent Search Function
+                    Search
                   </h3>
                 </div>
                 <p
                   className="text-[12px] mb-4 mt-0.5"
                   style={{ color: "#94a3b8" }}
                 >
-                  AI-powered semantic search retrieves related TESDA
-                  qualifications even if exact keywords don't match the title.
+                  Search retrieval of all related TESDA qualifications even if
+                  exact keywords don't match the title.
                 </p>
 
                 <div className="flex gap-2 mb-3">
@@ -838,655 +837,668 @@ export function SectorAnalyticsModule({
 
       {/* ── TRs/CSs per Sector + Status of Docs ── */}
       {(visibleSections.trCsBySector || visibleSections.statusDocuments) && (
-      <div
-        className={
-          visibleSections.trCsBySector && visibleSections.statusDocuments
-            ? "grid grid-cols-3 gap-4"
-            : "grid grid-cols-1 gap-4"
-        }
-      >
-        {visibleSections.trCsBySector && (
         <div
           className={
-            visibleSections.statusDocuments ? "col-span-2" : "col-span-1"
+            visibleSections.trCsBySector && visibleSections.statusDocuments
+              ? "grid grid-cols-3 gap-4"
+              : "grid grid-cols-1 gap-4"
           }
         >
-          <ChartCard
-            title="TRs and CSs per Sector"
-            subtitle="Training Regulations vs Competency Standards — hover for doc type breakdown"
-            action={
-              <div className="flex gap-4">
-                {[
-                  { c: "#1976d2", l: "TRs" },
-                  { c: "#f57c00", l: "CS" },
-                ].map((d, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-1.5 text-[11px]"
-                    style={{ color: "#64748b" }}
-                  >
-                    <div
-                      className="w-2.5 h-2.5 rounded-sm"
-                      style={{ background: d.c }}
-                    />
-                    {d.l}
-                  </div>
-                ))}
-              </div>
-            }
-          >
-            {hasFilteredSectorBarData ? (
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart
-                  data={filteredSectorData}
-                  barCategoryGap="25%"
-                  barGap={4}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis
-                    dataKey="sector"
-                    tick={{ fontSize: 9, fill: "#94a3b8" }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 10, fill: "#94a3b8" }}
-                    axisLine={false}
-                    tickLine={false}
-                    allowDecimals={false}
-                  />
-                  <Tooltip content={<SectorBreakdownTooltip />} />
-                  <Bar
-                    dataKey="tbs"
-                    fill="#1976d2"
-                    radius={[3, 3, 0, 0]}
-                    name="TRs"
-                  />
-                  <Bar
-                    dataKey="cs"
-                    fill="#f57c00"
-                    radius={[3, 3, 0, 0]}
-                    name="CS"
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
-              <EmptyChartState
-                height={220}
-                message="No TR or CS records match the selected role and filters."
-              />
-            )}
-          </ChartCard>
-        </div>
-        )}
-
-        {visibleSections.statusDocuments && (
-        <ChartCard
-          title="Status of Documents"
-          subtitle={`${totalDocs} total documents`}
-        >
-          {hasStatusData ? (
-            <>
-              <div className="flex flex-col items-center">
-                <div className="relative">
-                  <ResponsiveContainer width={160} height={160}>
-                    <PieChart>
-                      <Pie
-                        data={statusRows}
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={70}
-                        innerRadius={45}
-                        dataKey="value"
-                        strokeWidth={0}
-                      >
-                        {statusRows.map((e, i) => (
-                          <Cell key={i} fill={e.color} />
-                        ))}
-                      </Pie>
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <p
-                      className="text-[22px] font-bold"
-                      style={{ color: "#0f172a" }}
-                    >
-                      {totalDocs}
-                    </p>
-                    <p className="text-[10px]" style={{ color: "#94a3b8" }}>
-                      Total
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col gap-2 mt-2">
-                {statusRows.map((d, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center justify-between text-[12px]"
-                  >
-                    <div className="flex items-center gap-2">
+          {visibleSections.trCsBySector && (
+            <div
+              className={
+                visibleSections.statusDocuments ? "col-span-2" : "col-span-1"
+              }
+            >
+              <ChartCard
+                title="TRs and CSs per Sector"
+                subtitle="Training Regulations vs Competency Standards — hover for doc type breakdown"
+                action={
+                  <div className="flex gap-4">
+                    {[
+                      { c: "#1976d2", l: "TRs" },
+                      { c: "#f57c00", l: "CS" },
+                    ].map((d, i) => (
                       <div
-                        className="w-2.5 h-2.5 rounded-sm"
-                        style={{ background: d.color }}
-                      />
-                      <span style={{ color: "#475569" }}>{d.name}</span>
-                    </div>
-                    <span className="font-bold" style={{ color: "#0f172a" }}>
-                      {d.value}
-                    </span>
+                        key={i}
+                        className="flex items-center gap-1.5 text-[11px]"
+                        style={{ color: "#64748b" }}
+                      >
+                        <div
+                          className="w-2.5 h-2.5 rounded-sm"
+                          style={{ background: d.c }}
+                        />
+                        {d.l}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </>
-          ) : (
-            <EmptyChartState
-              height={190}
-              message="No document status records match the selected filters."
-            />
+                }
+              >
+                {hasFilteredSectorBarData ? (
+                  <ResponsiveContainer width="100%" height={220}>
+                    <BarChart
+                      data={filteredSectorData}
+                      barCategoryGap="25%"
+                      barGap={4}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                      <XAxis
+                        dataKey="sector"
+                        tick={{ fontSize: 9, fill: "#94a3b8" }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <YAxis
+                        tick={{ fontSize: 10, fill: "#94a3b8" }}
+                        axisLine={false}
+                        tickLine={false}
+                        allowDecimals={false}
+                      />
+                      <Tooltip content={<SectorBreakdownTooltip />} />
+                      <Bar
+                        dataKey="tbs"
+                        fill="#1976d2"
+                        radius={[3, 3, 0, 0]}
+                        name="TRs"
+                      />
+                      <Bar
+                        dataKey="cs"
+                        fill="#f57c00"
+                        radius={[3, 3, 0, 0]}
+                        name="CS"
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <EmptyChartState
+                    height={220}
+                    message="No TR or CS records match the selected role and filters."
+                  />
+                )}
+              </ChartCard>
+            </div>
           )}
-        </ChartCard>
-        )}
-      </div>
+
+          {visibleSections.statusDocuments && (
+            <ChartCard
+              title="Status of Documents"
+              subtitle={`${totalDocs} total documents`}
+            >
+              {hasStatusData ? (
+                <>
+                  <div className="flex flex-col items-center">
+                    <div className="relative">
+                      <ResponsiveContainer width={160} height={160}>
+                        <PieChart>
+                          <Pie
+                            data={statusRows}
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={70}
+                            innerRadius={45}
+                            dataKey="value"
+                            strokeWidth={0}
+                          >
+                            {statusRows.map((e, i) => (
+                              <Cell key={i} fill={e.color} />
+                            ))}
+                          </Pie>
+                        </PieChart>
+                      </ResponsiveContainer>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                        <p
+                          className="text-[22px] font-bold"
+                          style={{ color: "#0f172a" }}
+                        >
+                          {totalDocs}
+                        </p>
+                        <p className="text-[10px]" style={{ color: "#94a3b8" }}>
+                          Total
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2 mt-2">
+                    {statusRows.map((d, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center justify-between text-[12px]"
+                      >
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-2.5 h-2.5 rounded-sm"
+                            style={{ background: d.color }}
+                          />
+                          <span style={{ color: "#475569" }}>{d.name}</span>
+                        </div>
+                        <span
+                          className="font-bold"
+                          style={{ color: "#0f172a" }}
+                        >
+                          {d.value}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <EmptyChartState
+                  height={190}
+                  message="No document status records match the selected filters."
+                />
+              )}
+            </ChartCard>
+          )}
+        </div>
       )}
 
       {/* ── Top Priority Sectors (ranked by finalized) ── */}
       {visibleSections.topPriority && (
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-[14px] font-semibold" style={{ color: "#0f172a" }}>
-            Top Priority Sectors{" "}
-            <span
-              className="text-[11px] font-normal ml-1"
-              style={{ color: "#94a3b8" }}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <p
+              className="text-[14px] font-semibold"
+              style={{ color: "#0f172a" }}
             >
-              ranked by docs finalized
-            </span>
-          </p>
-          <button
-            onClick={() => setShowAllSectors((v) => !v)}
-            className="flex items-center gap-1 text-[12px] font-medium hover:underline cursor-pointer"
-            style={{ color: "#1976d2" }}
-          >
-            {showAllSectors ? "Show Top 5" : "View All"}
-            <ChevronRight
-              size={13}
-              style={{
-                transform: showAllSectors ? "rotate(90deg)" : "rotate(0deg)",
-                transition: "transform 0.2s",
-              }}
-            />
-          </button>
-        </div>
-
-        {topPrioritySectors.length === 0 ? (
-          <EmptyChartState
-            height={160}
-            message="No priority sectors match the selected role and filters."
-          />
-        ) : showAllSectors ? (
-          <div
-            className="rounded-2xl overflow-hidden"
-            style={{
-              background: "#ffffff",
-              boxShadow:
-                "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
-            }}
-          >
-            <DataTable
-              columns={[
-                {
-                  key: "rank",
-                  header: "#",
-                  render: (_, i) => (
-                    <span className="font-bold" style={{ color: "#94a3b8" }}>
-                      {i + 1}
-                    </span>
-                  ),
-                },
-                {
-                  key: "sector",
-                  header: "Sector",
-                  render: (row) => {
-                    const meta = SECTOR_ICON_MAP[row.sector];
-                    const Icon = meta?.Icon ?? BookOpen;
-                    return (
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
-                          style={{ background: meta?.bg ?? "#f1f5f9" }}
-                        >
-                          <Icon
-                            size={13}
-                            style={{ color: meta?.color ?? "#64748b" }}
-                          />
-                        </div>
-                        <span
-                          className="font-semibold"
-                          style={{ color: "#0f172a" }}
-                        >
-                          {row.sector}
-                        </span>
-                      </div>
-                    );
-                  },
-                },
-                {
-                  key: "finalized",
-                  header: "Docs Finalized",
-                  align: "right",
-                  render: (row) => (
-                    <span className="font-bold" style={{ color: "#16a34a" }}>
-                      {row.finalized}
-                    </span>
-                  ),
-                },
-                {
-                  key: "tbs",
-                  header: "TRs",
-                  align: "right",
-                  render: (row) => (
-                    <span
-                      className="font-semibold"
-                      style={{ color: "#1976d2" }}
-                    >
-                      {row.tbs}
-                    </span>
-                  ),
-                },
-                {
-                  key: "cs",
-                  header: "CS",
-                  align: "right",
-                  render: (row) => (
-                    <span
-                      className="font-semibold"
-                      style={{ color: "#f57c00" }}
-                    >
-                      {row.cs}
-                    </span>
-                  ),
-                },
-                {
-                  key: "activity",
-                  header: "Activity",
-                  align: "center",
-                  render: (row) => (
-                    <span
-                      className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${ACTIVITY_LEVELS[row.activity]}`}
-                    >
-                      {row.activity}
-                    </span>
-                  ),
-                },
-              ]}
-              rows={allSectorsByFinalized}
-              keyExtractor={(_, i) => i}
-            />
+              Top Priority Sectors{" "}
+              <span
+                className="text-[11px] font-normal ml-1"
+                style={{ color: "#94a3b8" }}
+              >
+                ranked by docs finalized
+              </span>
+            </p>
+            <button
+              onClick={() => setShowAllSectors((v) => !v)}
+              className="flex items-center gap-1 text-[12px] font-medium hover:underline cursor-pointer"
+              style={{ color: "#1976d2" }}
+            >
+              {showAllSectors ? "Show Top 5" : "View All"}
+              <ChevronRight
+                size={13}
+                style={{
+                  transform: showAllSectors ? "rotate(90deg)" : "rotate(0deg)",
+                  transition: "transform 0.2s",
+                }}
+              />
+            </button>
           </div>
-        ) : (
-          <div className="grid grid-cols-5 gap-3">
-            {topPrioritySectors.map((row, i) => {
-              const meta = SECTOR_ICON_MAP[row.sector];
-              const Icon = meta?.Icon ?? BookOpen;
-              return (
-                <div
-                  key={i}
-                  className="rounded-2xl p-4 flex flex-col items-center text-center gap-2"
-                  style={{
-                    background: "#ffffff",
-                    boxShadow:
-                      "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
-                  }}
-                >
-                  <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center"
-                    style={{ background: meta?.bg ?? "#f1f5f9" }}
-                  >
-                    <Icon
-                      size={20}
-                      style={{ color: meta?.color ?? "#64748b" }}
-                    />
-                  </div>
-                  <p
-                    className="text-[12px] font-semibold leading-tight"
-                    style={{ color: "#0f172a" }}
-                  >
-                    {row.sector}
-                  </p>
-                  <div className="flex gap-3 text-[11px]">
-                    <span>
+
+          {topPrioritySectors.length === 0 ? (
+            <EmptyChartState
+              height={160}
+              message="No priority sectors match the selected role and filters."
+            />
+          ) : showAllSectors ? (
+            <div
+              className="rounded-2xl overflow-hidden"
+              style={{
+                background: "#ffffff",
+                boxShadow:
+                  "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+              }}
+            >
+              <DataTable
+                columns={[
+                  {
+                    key: "rank",
+                    header: "#",
+                    render: (_, i) => (
+                      <span className="font-bold" style={{ color: "#94a3b8" }}>
+                        {i + 1}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "sector",
+                    header: "Sector",
+                    render: (row) => {
+                      const meta = SECTOR_ICON_MAP[row.sector];
+                      const Icon = meta?.Icon ?? BookOpen;
+                      return (
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
+                            style={{ background: meta?.bg ?? "#f1f5f9" }}
+                          >
+                            <Icon
+                              size={13}
+                              style={{ color: meta?.color ?? "#64748b" }}
+                            />
+                          </div>
+                          <span
+                            className="font-semibold"
+                            style={{ color: "#0f172a" }}
+                          >
+                            {row.sector}
+                          </span>
+                        </div>
+                      );
+                    },
+                  },
+                  {
+                    key: "finalized",
+                    header: "Docs Finalized",
+                    align: "right",
+                    render: (row) => (
+                      <span className="font-bold" style={{ color: "#16a34a" }}>
+                        {row.finalized}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "tbs",
+                    header: "TRs",
+                    align: "right",
+                    render: (row) => (
                       <span
-                        className="font-bold"
-                        style={{ color: meta?.color ?? "#64748b" }}
+                        className="font-semibold"
+                        style={{ color: "#1976d2" }}
                       >
                         {row.tbs}
-                      </span>{" "}
-                      <span style={{ color: "#94a3b8" }}>TR</span>
-                    </span>
-                    <span>
-                      <span className="font-bold" style={{ color: "#f57c00" }}>
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "cs",
+                    header: "CS",
+                    align: "right",
+                    render: (row) => (
+                      <span
+                        className="font-semibold"
+                        style={{ color: "#f57c00" }}
+                      >
                         {row.cs}
-                      </span>{" "}
-                      <span style={{ color: "#94a3b8" }}>CS</span>
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1 text-[11px]">
-                    <span className="font-bold" style={{ color: "#16a34a" }}>
-                      {row.finalized}
-                    </span>{" "}
-                    <span style={{ color: "#94a3b8" }}>finalized</span>
-                  </div>
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "activity",
+                    header: "Activity",
+                    align: "center",
+                    render: (row) => (
+                      <span
+                        className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${ACTIVITY_LEVELS[row.activity]}`}
+                      >
+                        {row.activity}
+                      </span>
+                    ),
+                  },
+                ]}
+                rows={allSectorsByFinalized}
+                keyExtractor={(_, i) => i}
+              />
+            </div>
+          ) : (
+            <div className="grid grid-cols-5 gap-3">
+              {topPrioritySectors.map((row, i) => {
+                const meta = SECTOR_ICON_MAP[row.sector];
+                const Icon = meta?.Icon ?? BookOpen;
+                return (
                   <div
-                    className="h-[2px] w-8 rounded-full"
-                    style={{ background: meta?.color ?? "#64748b" }}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+                    key={i}
+                    className="rounded-2xl p-4 flex flex-col items-center text-center gap-2"
+                    style={{
+                      background: "#ffffff",
+                      boxShadow:
+                        "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+                    }}
+                  >
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center"
+                      style={{ background: meta?.bg ?? "#f1f5f9" }}
+                    >
+                      <Icon
+                        size={20}
+                        style={{ color: meta?.color ?? "#64748b" }}
+                      />
+                    </div>
+                    <p
+                      className="text-[12px] font-semibold leading-tight"
+                      style={{ color: "#0f172a" }}
+                    >
+                      {row.sector}
+                    </p>
+                    <div className="flex gap-3 text-[11px]">
+                      <span>
+                        <span
+                          className="font-bold"
+                          style={{ color: meta?.color ?? "#64748b" }}
+                        >
+                          {row.tbs}
+                        </span>{" "}
+                        <span style={{ color: "#94a3b8" }}>TR</span>
+                      </span>
+                      <span>
+                        <span
+                          className="font-bold"
+                          style={{ color: "#f57c00" }}
+                        >
+                          {row.cs}
+                        </span>{" "}
+                        <span style={{ color: "#94a3b8" }}>CS</span>
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 text-[11px]">
+                      <span className="font-bold" style={{ color: "#16a34a" }}>
+                        {row.finalized}
+                      </span>{" "}
+                      <span style={{ color: "#94a3b8" }}>finalized</span>
+                    </div>
+                    <div
+                      className="h-[2px] w-8 rounded-full"
+                      style={{ background: meta?.color ?? "#64748b" }}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       )}
 
       {/* ── Regional Implementation ── */}
       {visibleSections.regionalImplementation && (
-      <ChartCard
-        title="Regional Implementation"
-        subtitle="TRs per region with activity level"
-        action={
-          <div className="flex gap-4">
-            {["High", "Medium", "Low"].map((lvl) => {
-              const c = REGIONAL_LEVEL_COLOR[lvl];
+        <ChartCard
+          title="Regional Implementation"
+          subtitle="TRs per region with activity level"
+          action={
+            <div className="flex gap-4">
+              {["High", "Medium", "Low"].map((lvl) => {
+                const c = REGIONAL_LEVEL_COLOR[lvl];
+                return (
+                  <div
+                    key={lvl}
+                    className="flex items-center gap-1.5 text-[11px]"
+                    style={{ color: "#64748b" }}
+                  >
+                    <div
+                      className="w-2.5 h-2.5 rounded-full"
+                      style={{ background: c.dot }}
+                    />
+                    {lvl}
+                  </div>
+                );
+              })}
+            </div>
+          }
+        >
+          <div className="grid grid-cols-3 gap-2 mt-1">
+            {regionalData.map((r, i) => {
+              const c = REGIONAL_LEVEL_COLOR[r.level];
               return (
                 <div
-                  key={lvl}
-                  className="flex items-center gap-1.5 text-[11px]"
-                  style={{ color: "#64748b" }}
+                  key={i}
+                  className={`flex items-center justify-between rounded-xl px-3 py-2.5 ${c.badge}`}
                 >
-                  <div
-                    className="w-2.5 h-2.5 rounded-full"
-                    style={{ background: c.dot }}
-                  />
-                  {lvl}
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-2 h-2 rounded-full"
+                      style={{ background: c.dot }}
+                    />
+                    <span
+                      className="text-[13px] font-medium"
+                      style={{ color: "#334155" }}
+                    >
+                      {r.region}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[12px] font-bold ${c.text}`}>
+                      {r.tbs} TRs
+                    </span>
+                    <span
+                      className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${c.badge} ${c.text}`}
+                    >
+                      {r.level}
+                    </span>
+                  </div>
                 </div>
               );
             })}
           </div>
-        }
-      >
-        <div className="grid grid-cols-3 gap-2 mt-1">
-          {regionalData.map((r, i) => {
-            const c = REGIONAL_LEVEL_COLOR[r.level];
-            return (
-              <div
-                key={i}
-                className={`flex items-center justify-between rounded-xl px-3 py-2.5 ${c.badge}`}
-              >
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-2 h-2 rounded-full"
-                    style={{ background: c.dot }}
-                  />
-                  <span
-                    className="text-[13px] font-medium"
-                    style={{ color: "#334155" }}
-                  >
-                    {r.region}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={`text-[12px] font-bold ${c.text}`}>
-                    {r.tbs} TRs
-                  </span>
-                  <span
-                    className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${c.badge} ${c.text}`}
-                  >
-                    {r.level}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </ChartCard>
+        </ChartCard>
       )}
 
       {/* ── Development Status per Sector ── */}
       {visibleSections.developmentStatus && (
-      <ChartCard
-        title="Development Status Per Sector"
-        subtitle="In-development, review, and approved counts by sector — hover for doc type breakdown"
-        action={
-          <div className="flex gap-4">
-            {[
-              { c: "#9c27b0", l: "In Development" },
-              { c: "#f57c00", l: "For Review" },
-              { c: "#16a34a", l: "Approved" },
-            ].map((d, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-1.5 text-[11px]"
-                style={{ color: "#64748b" }}
-              >
+        <ChartCard
+          title="Development Status Per Sector"
+          subtitle="In-development, review, and approved counts by sector — hover for doc type breakdown"
+          action={
+            <div className="flex gap-4">
+              {[
+                { c: "#9c27b0", l: "In Development" },
+                { c: "#f57c00", l: "For Review" },
+                { c: "#16a34a", l: "Approved" },
+              ].map((d, i) => (
                 <div
-                  className="w-2.5 h-2.5 rounded-sm"
-                  style={{ background: d.c }}
+                  key={i}
+                  className="flex items-center gap-1.5 text-[11px]"
+                  style={{ color: "#64748b" }}
+                >
+                  <div
+                    className="w-2.5 h-2.5 rounded-sm"
+                    style={{ background: d.c }}
+                  />
+                  {d.l}
+                </div>
+              ))}
+            </div>
+          }
+        >
+          {hasFilteredDevelopmentData ? (
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart
+                data={filteredSectorData}
+                barCategoryGap="25%"
+                barGap={3}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                <XAxis
+                  dataKey="sector"
+                  tick={{ fontSize: 9, fill: "#94a3b8" }}
+                  axisLine={false}
+                  tickLine={false}
                 />
-                {d.l}
-              </div>
-            ))}
-          </div>
-        }
-      >
-        {hasFilteredDevelopmentData ? (
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={filteredSectorData} barCategoryGap="25%" barGap={3}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis
-                dataKey="sector"
-                tick={{ fontSize: 9, fill: "#94a3b8" }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fontSize: 10, fill: "#94a3b8" }}
-                axisLine={false}
-                tickLine={false}
-                allowDecimals={false}
-              />
-              <Tooltip content={<SectorBreakdownTooltip />} />
-              <Bar
-                dataKey="inDev"
-                fill="#9c27b0"
-                radius={[3, 3, 0, 0]}
-                name="In Development"
-              />
-              <Bar
-                dataKey="forReview"
-                fill="#f57c00"
-                radius={[3, 3, 0, 0]}
-                name="For Review"
-              />
-              <Bar
-                dataKey="approved"
-                fill="#16a34a"
-                radius={[3, 3, 0, 0]}
-                name="Approved"
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        ) : (
-          <EmptyChartState
-            height={200}
-            message="No development status records match the selected filters."
-          />
-        )}
-      </ChartCard>
+                <YAxis
+                  tick={{ fontSize: 10, fill: "#94a3b8" }}
+                  axisLine={false}
+                  tickLine={false}
+                  allowDecimals={false}
+                />
+                <Tooltip content={<SectorBreakdownTooltip />} />
+                <Bar
+                  dataKey="inDev"
+                  fill="#9c27b0"
+                  radius={[3, 3, 0, 0]}
+                  name="In Development"
+                />
+                <Bar
+                  dataKey="forReview"
+                  fill="#f57c00"
+                  radius={[3, 3, 0, 0]}
+                  name="For Review"
+                />
+                <Bar
+                  dataKey="approved"
+                  fill="#16a34a"
+                  radius={[3, 3, 0, 0]}
+                  name="Approved"
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <EmptyChartState
+              height={200}
+              message="No development status records match the selected filters."
+            />
+          )}
+        </ChartCard>
       )}
 
       {/* ── Sector Summary Table ── */}
       {visibleSections.sectorSummary && (
-      <ChartCard
-        title="Sector Summary"
-        subtitle="All sectors with TRs, CS, finalized count, and development status"
-        action={
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Search
-                size={13}
-                className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
-                style={{ color: "#94a3b8" }}
-              />
-              <input
-                type="text"
-                value={summarySearch}
-                onChange={(e) => {
-                  setSummarySearch(e.target.value);
-                  setSummaryPage(1);
-                }}
-                placeholder="Search by sector..."
-                className="pl-8 pr-3 py-1.5 border border-[#e2e8f0] rounded-xl text-[12px] w-44 focus:outline-none focus:border-[#1976d2] focus:ring-1 focus:ring-[#1976d2] transition-colors"
-                style={{ color: "#334155" }}
-              />
+        <ChartCard
+          title="Sector Summary"
+          subtitle="All sectors with TRs, CS, finalized count, and development status"
+          action={
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <Search
+                  size={13}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                  style={{ color: "#94a3b8" }}
+                />
+                <input
+                  type="text"
+                  value={summarySearch}
+                  onChange={(e) => {
+                    setSummarySearch(e.target.value);
+                    setSummaryPage(1);
+                  }}
+                  placeholder="Search by sector..."
+                  className="pl-8 pr-3 py-1.5 border border-[#e2e8f0] rounded-xl text-[12px] w-44 focus:outline-none focus:border-[#1976d2] focus:ring-1 focus:ring-[#1976d2] transition-colors"
+                  style={{ color: "#334155" }}
+                />
+              </div>
+              <ActionButton
+                onClick={handleExportSectorSummary}
+                variant="outline"
+                size="sm"
+              >
+                <FileDown size={13} /> Export Excel
+              </ActionButton>
             </div>
-            <ActionButton
-              onClick={handleExportSectorSummary}
-              variant="outline"
-              size="sm"
-            >
-              <FileDown size={13} /> Export Excel
-            </ActionButton>
-          </div>
-        }
-      >
-        <DataTable
-          columns={[
-            {
-              key: "sector",
-              header: "Sector",
-              render: (row) => (
-                <span className="font-semibold" style={{ color: "#0f172a" }}>
-                  {row.sector}
-                </span>
-              ),
-            },
-            {
-              key: "tbs",
-              header: "TRs",
-              align: "center",
-              render: (row) => (
-                <span className="font-bold" style={{ color: "#1976d2" }}>
-                  {row.tbs}
-                </span>
-              ),
-            },
-            {
-              key: "cs",
-              header: "CS",
-              align: "center",
-              render: (row) => (
-                <span className="font-bold" style={{ color: "#f57c00" }}>
-                  {row.cs}
-                </span>
-              ),
-            },
-            {
-              key: "inDev",
-              header: "In Dev",
-              align: "center",
-              render: (row) => (
-                <span className="font-semibold" style={{ color: "#9c27b0" }}>
-                  {row.inDev}
-                </span>
-              ),
-            },
-            {
-              key: "forReview",
-              header: "For Review",
-              align: "center",
-              render: (row) => (
-                <span className="font-semibold" style={{ color: "#f57c00" }}>
-                  {row.forReview}
-                </span>
-              ),
-            },
-            {
-              key: "approved",
-              header: "Approved",
-              align: "center",
-              render: (row) => (
-                <span className="font-semibold" style={{ color: "#16a34a" }}>
-                  {row.approved}
-                </span>
-              ),
-            },
-            {
-              key: "finalized",
-              header: "Finalized",
-              align: "center",
-              render: (row) => (
-                <span className="font-bold" style={{ color: "#2196f3" }}>
-                  {row.finalized}
-                </span>
-              ),
-            },
-            {
-              key: "activity",
-              header: "Activity",
-              align: "center",
-              render: (row) => (
-                <span
-                  className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${ACTIVITY_LEVELS[row.activity]}`}
-                >
-                  {row.activity}
-                </span>
-              ),
-            },
-          ]}
-          rows={pagedSummary}
-          keyExtractor={(row) => row.sector}
-        />
+          }
+        >
+          <DataTable
+            columns={[
+              {
+                key: "sector",
+                header: "Sector",
+                render: (row) => (
+                  <span className="font-semibold" style={{ color: "#0f172a" }}>
+                    {row.sector}
+                  </span>
+                ),
+              },
+              {
+                key: "tbs",
+                header: "TRs",
+                align: "center",
+                render: (row) => (
+                  <span className="font-bold" style={{ color: "#1976d2" }}>
+                    {row.tbs}
+                  </span>
+                ),
+              },
+              {
+                key: "cs",
+                header: "CS",
+                align: "center",
+                render: (row) => (
+                  <span className="font-bold" style={{ color: "#f57c00" }}>
+                    {row.cs}
+                  </span>
+                ),
+              },
+              {
+                key: "inDev",
+                header: "In Dev",
+                align: "center",
+                render: (row) => (
+                  <span className="font-semibold" style={{ color: "#9c27b0" }}>
+                    {row.inDev}
+                  </span>
+                ),
+              },
+              {
+                key: "forReview",
+                header: "For Review",
+                align: "center",
+                render: (row) => (
+                  <span className="font-semibold" style={{ color: "#f57c00" }}>
+                    {row.forReview}
+                  </span>
+                ),
+              },
+              {
+                key: "approved",
+                header: "Approved",
+                align: "center",
+                render: (row) => (
+                  <span className="font-semibold" style={{ color: "#16a34a" }}>
+                    {row.approved}
+                  </span>
+                ),
+              },
+              {
+                key: "finalized",
+                header: "Finalized",
+                align: "center",
+                render: (row) => (
+                  <span className="font-bold" style={{ color: "#2196f3" }}>
+                    {row.finalized}
+                  </span>
+                ),
+              },
+              {
+                key: "activity",
+                header: "Activity",
+                align: "center",
+                render: (row) => (
+                  <span
+                    className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${ACTIVITY_LEVELS[row.activity]}`}
+                  >
+                    {row.activity}
+                  </span>
+                ),
+              },
+            ]}
+            rows={pagedSummary}
+            keyExtractor={(row) => row.sector}
+          />
 
-        {/* Pagination */}
-        {summaryPageCount > 1 && (
-          <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#f1f5f9]">
-            <p className="text-[12px]" style={{ color: "#94a3b8" }}>
-              Showing{" "}
-              {filteredSummary.length === 0
-                ? 0
-                : (summaryPage - 1) * SECTOR_SUMMARY_PER_PAGE + 1}
-              –
-              {Math.min(
-                summaryPage * SECTOR_SUMMARY_PER_PAGE,
-                filteredSummary.length,
-              )}{" "}
-              of {filteredSummary.length}
-            </p>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setSummaryPage((p) => Math.max(1, p - 1))}
-                disabled={summaryPage === 1}
-                className="w-7 h-7 flex items-center justify-center rounded-lg border border-[#e2e8f0] bg-white disabled:opacity-40 hover:bg-[#f8fafc] transition-colors cursor-pointer disabled:cursor-default"
-              >
-                <ChevronLeft size={13} style={{ color: "#475569" }} />
-              </button>
-              <span className="text-[12px] px-2" style={{ color: "#475569" }}>
-                {summaryPage} / {summaryPageCount}
-              </span>
-              <button
-                onClick={() =>
-                  setSummaryPage((p) => Math.min(summaryPageCount, p + 1))
-                }
-                disabled={summaryPage === summaryPageCount}
-                className="w-7 h-7 flex items-center justify-center rounded-lg border border-[#e2e8f0] bg-white disabled:opacity-40 hover:bg-[#f8fafc] transition-colors cursor-pointer disabled:cursor-default"
-              >
-                <ChevronRight size={13} style={{ color: "#475569" }} />
-              </button>
+          {/* Pagination */}
+          {summaryPageCount > 1 && (
+            <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#f1f5f9]">
+              <p className="text-[12px]" style={{ color: "#94a3b8" }}>
+                Showing{" "}
+                {filteredSummary.length === 0
+                  ? 0
+                  : (summaryPage - 1) * SECTOR_SUMMARY_PER_PAGE + 1}
+                –
+                {Math.min(
+                  summaryPage * SECTOR_SUMMARY_PER_PAGE,
+                  filteredSummary.length,
+                )}{" "}
+                of {filteredSummary.length}
+              </p>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setSummaryPage((p) => Math.max(1, p - 1))}
+                  disabled={summaryPage === 1}
+                  className="w-7 h-7 flex items-center justify-center rounded-lg border border-[#e2e8f0] bg-white disabled:opacity-40 hover:bg-[#f8fafc] transition-colors cursor-pointer disabled:cursor-default"
+                >
+                  <ChevronLeft size={13} style={{ color: "#475569" }} />
+                </button>
+                <span className="text-[12px] px-2" style={{ color: "#475569" }}>
+                  {summaryPage} / {summaryPageCount}
+                </span>
+                <button
+                  onClick={() =>
+                    setSummaryPage((p) => Math.min(summaryPageCount, p + 1))
+                  }
+                  disabled={summaryPage === summaryPageCount}
+                  className="w-7 h-7 flex items-center justify-center rounded-lg border border-[#e2e8f0] bg-white disabled:opacity-40 hover:bg-[#f8fafc] transition-colors cursor-pointer disabled:cursor-default"
+                >
+                  <ChevronRight size={13} style={{ color: "#475569" }} />
+                </button>
+              </div>
             </div>
-          </div>
-        )}
-      </ChartCard>
+          )}
+        </ChartCard>
       )}
     </div>
   );
