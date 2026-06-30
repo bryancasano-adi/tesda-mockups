@@ -11,14 +11,25 @@ import {
 import { LogIn, Users, FileDown, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { StatCard, ChartCard, DataTable, ActionButton, exportToExcel } from "./PagePrimitives";
 import { loginsByDay, loginsByUser, dailyActiveUsers } from "./sharedData";
+import { REPORT_RECORDS } from "./reportData";
 
 const LOGINS_PER_PAGE = 5;
+const GENERATED_PER_PAGE = 5;
+const GENERATED_DOC_TYPES = ["FM", "QLS", "JAT", "CS", "CATS", "LAM", "CBC"];
 
-export function UserActivityModule() {
+export function UserActivityModule({
+  dateFrom = "2025-05-04",
+  dateTo = "2025-05-15",
+}: {
+  dateFrom?: string;
+  dateTo?: string;
+}) {
   const totalLogins = loginsByDay.reduce((s, d) => s + d.logins, 0);
 
   const [loginSearch, setLoginSearch] = useState("");
   const [loginPage, setLoginPage] = useState(1);
+  const [generatedSearch, setGeneratedSearch] = useState("");
+  const [generatedPage, setGeneratedPage] = useState(1);
 
   const filteredLogins = loginsByUser.filter((r) =>
     r.email.toLowerCase().includes(loginSearch.toLowerCase()),
@@ -28,12 +39,86 @@ export function UserActivityModule() {
     (loginPage - 1) * LOGINS_PER_PAGE,
     loginPage * LOGINS_PER_PAGE,
   );
+  const generatedByUser = Object.values(
+    REPORT_RECORDS.filter(
+      (record) =>
+        record.date >= dateFrom &&
+        record.date <= dateTo &&
+        GENERATED_DOC_TYPES.includes(record.documentType),
+    ).reduce<
+      Record<
+        string,
+        {
+          person: string;
+          email: string;
+          total: number;
+          FM: number;
+          QLS: number;
+          JAT: number;
+          CS: number;
+          CATS: number;
+          LAM: number;
+          CBC: number;
+        }
+      >
+    >((acc, record) => {
+      acc[record.email] = acc[record.email] ?? {
+        person: record.person,
+        email: record.email,
+        total: 0,
+        FM: 0,
+        QLS: 0,
+        JAT: 0,
+        CS: 0,
+        CATS: 0,
+        LAM: 0,
+        CBC: 0,
+      };
+      acc[record.email][record.documentType as "FM" | "QLS" | "JAT" | "CS" | "CATS" | "LAM" | "CBC"] +=
+        record.generated;
+      acc[record.email].total += record.generated;
+      return acc;
+    }, {}),
+  ).sort((a, b) => b.total - a.total);
+  const filteredGenerated = generatedByUser.filter(
+    (row) =>
+      row.person.toLowerCase().includes(generatedSearch.toLowerCase()) ||
+      row.email.toLowerCase().includes(generatedSearch.toLowerCase()),
+  );
+  const generatedPageCount = Math.max(
+    1,
+    Math.ceil(filteredGenerated.length / GENERATED_PER_PAGE),
+  );
+  const pagedGenerated = filteredGenerated.slice(
+    (generatedPage - 1) * GENERATED_PER_PAGE,
+    generatedPage * GENERATED_PER_PAGE,
+  );
 
   function handleExport() {
     exportToExcel(
       ["#", "User Email", "Total Logins"],
       loginsByUser.map((r, i) => [i + 1, r.email, r.logins]),
       "logins_by_user",
+    );
+  }
+
+  function handleExportGeneratedByUser() {
+    exportToExcel(
+      ["#", "User", "Email", ...GENERATED_DOC_TYPES, "Total Generated"],
+      generatedByUser.map((row, i) => [
+        i + 1,
+        row.person,
+        row.email,
+        row.FM,
+        row.QLS,
+        row.JAT,
+        row.CS,
+        row.CATS,
+        row.LAM,
+        row.CBC,
+        row.total,
+      ]),
+      "generated_documents_by_user",
     );
   }
 
@@ -251,6 +336,131 @@ export function UserActivityModule() {
                   setLoginPage((p) => Math.min(loginPageCount, p + 1))
                 }
                 disabled={loginPage === loginPageCount}
+                className="w-7 h-7 flex items-center justify-center rounded-lg border border-[#e2e8f0] bg-white disabled:opacity-40 hover:bg-[#f8fafc] transition-colors cursor-pointer disabled:cursor-default"
+              >
+                <ChevronRight size={13} style={{ color: "#475569" }} />
+              </button>
+            </div>
+          </div>
+        )}
+      </ChartCard>
+
+      <ChartCard
+        title="Generated Documents by User"
+        subtitle="Per focal/user generated counts for FM, QLS, JAT, CS, CATs, LAM, and CBC"
+        action={
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Search
+                size={13}
+                className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                style={{ color: "#94a3b8" }}
+              />
+              <input
+                type="text"
+                value={generatedSearch}
+                onChange={(e) => {
+                  setGeneratedSearch(e.target.value);
+                  setGeneratedPage(1);
+                }}
+                placeholder="Search by user..."
+                className="pl-8 pr-3 py-1.5 border border-[#e2e8f0] rounded-xl text-[12px] w-48 focus:outline-none focus:border-[#1976d2] focus:ring-1 focus:ring-[#1976d2] transition-colors"
+                style={{ color: "#334155" }}
+              />
+            </div>
+            <ActionButton
+              onClick={handleExportGeneratedByUser}
+              variant="outline"
+              size="sm"
+            >
+              <FileDown size={13} /> Export Excel
+            </ActionButton>
+          </div>
+        }
+      >
+        <DataTable
+          columns={[
+            {
+              key: "#",
+              header: "#",
+              render: (_, i) => (
+                <span style={{ color: "#94a3b8" }}>
+                  {(generatedPage - 1) * GENERATED_PER_PAGE + i + 1}
+                </span>
+              ),
+            },
+            {
+              key: "person",
+              header: "User",
+              render: (row) => (
+                <div>
+                  <p className="font-semibold" style={{ color: "#0f172a" }}>
+                    {row.person}
+                  </p>
+                  <p className="text-[11px]" style={{ color: "#94a3b8" }}>
+                    {row.email}
+                  </p>
+                </div>
+              ),
+            },
+            ...GENERATED_DOC_TYPES.map((type) => ({
+              key: type,
+              header: type === "CATS" ? "CATs" : type,
+              align: "center" as const,
+              render: (row: (typeof pagedGenerated)[number]) => (
+                <span className="font-semibold" style={{ color: "#334155" }}>
+                  {row[type as keyof typeof row]}
+                </span>
+              ),
+            })),
+            {
+              key: "total",
+              header: "Total",
+              align: "right",
+              render: (row) => (
+                <span className="font-bold" style={{ color: "#1976d2" }}>
+                  {row.total}
+                </span>
+              ),
+            },
+          ]}
+          rows={pagedGenerated}
+          keyExtractor={(row) => row.email}
+          emptyMessage="No generated document activity is available for the selected period."
+        />
+
+        {generatedPageCount > 1 && (
+          <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#f1f5f9]">
+            <p className="text-[12px]" style={{ color: "#94a3b8" }}>
+              Showing{" "}
+              {filteredGenerated.length === 0
+                ? 0
+                : (generatedPage - 1) * GENERATED_PER_PAGE + 1}
+              –
+              {Math.min(
+                generatedPage * GENERATED_PER_PAGE,
+                filteredGenerated.length,
+              )}{" "}
+              of {filteredGenerated.length}
+            </p>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setGeneratedPage((p) => Math.max(1, p - 1))}
+                disabled={generatedPage === 1}
+                className="w-7 h-7 flex items-center justify-center rounded-lg border border-[#e2e8f0] bg-white disabled:opacity-40 hover:bg-[#f8fafc] transition-colors cursor-pointer disabled:cursor-default"
+              >
+                <ChevronLeft size={13} style={{ color: "#475569" }} />
+              </button>
+              <span className="text-[12px] px-2" style={{ color: "#475569" }}>
+                {generatedPage} / {generatedPageCount}
+              </span>
+              <button
+                onClick={() =>
+                  setGeneratedPage((p) =>
+                    Math.min(generatedPageCount, p + 1),
+                  )
+                }
+                disabled={generatedPage === generatedPageCount}
                 className="w-7 h-7 flex items-center justify-center rounded-lg border border-[#e2e8f0] bg-white disabled:opacity-40 hover:bg-[#f8fafc] transition-colors cursor-pointer disabled:cursor-default"
               >
                 <ChevronRight size={13} style={{ color: "#475569" }} />

@@ -362,7 +362,9 @@ export function ControlDashboard() {
 
         {/* Module content */}
         <div>
-          {safeActiveTab === "user-activity" && <UserActivityModule />}
+          {safeActiveTab === "user-activity" && (
+            <UserActivityModule dateFrom={dateFrom} dateTo={dateTo} />
+          )}
           {safeActiveTab === "upload-export" && (
             <DocExportModule records={filteredRecords} />
           )}
