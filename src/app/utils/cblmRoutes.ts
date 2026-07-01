@@ -27,10 +27,14 @@ export function cblmEditorPath(
   cblmId = MOCK_CBLM_ID,
   page = "information-sheet",
   sheet?: string,
+  edit = false,
 ) {
   const params = new URLSearchParams({ page });
   if (sheet) {
     params.set("sheet", sheet);
+  }
+  if (edit) {
+    params.set("edit", "true");
   }
   return `${CBLM_BASE}/${cblmId}/editor?${params.toString()}`;
 }

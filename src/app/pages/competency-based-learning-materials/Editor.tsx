@@ -1,4 +1,5 @@
 import { Navigate, useSearchParams } from "react-router-dom";
+import { useEffect, useRef } from "react";
 import { SheetKind, sheetMeta } from "./Dashboard";
 import { CblmEditorLayout } from "@/app/components/competency-based-learning-materials/CblmEditorLayout";
 import { SheetEditorShell } from "@/app/components/competency-based-learning-materials/SheetEditorShell";
@@ -29,7 +30,9 @@ const CONSOLIDATION_EDITOR_PAGES: Partial<
 
 export function CBLMEditor() {
   const [searchParams] = useSearchParams();
-  const { toast } = useCblmToast();
+  const { toast, showToast } = useCblmToast();
+  const editParamApplied = useRef(false);
+  const editParam = searchParams.get("edit") === "true";
 
   const page = searchParams.get("page") as SheetKind | null;
   const sheetParam = searchParams.get("sheet");
@@ -55,6 +58,15 @@ export function CBLMEditor() {
   const activeSheetType =
     navItem?.sheetType ?? pageConfig?.sheetType ?? "information-sheet";
   const sheetStatus = navItem?.status ?? pageConfig?.status;
+  const isEditing =
+    editParam && sheetStatus !== "finalized" && sheetStatus !== undefined;
+
+  useEffect(() => {
+    if (isEditing && !editParamApplied.current) {
+      editParamApplied.current = true;
+      showToast("Edit mode enabled", "#1565C0");
+    }
+  }, [isEditing, showToast]);
 
   const renderEditor = () => {
     const editorKey = `${kind}:${activeSheetCode}`;
@@ -88,6 +100,7 @@ export function CBLMEditor() {
           <SheetEditorShell
             activeSheetCode={activeSheetCode}
             activeSheetType={activeSheetType}
+            isEditing={isEditing}
             sheetStatus={sheetStatus ?? "draft"}
           >
             {renderEditor()}
@@ -104,6 +117,7 @@ export function CBLMEditor() {
         <SheetEditorShell
           activeSheetCode={activeSheetCode}
           activeSheetType={activeSheetType}
+          isEditing={isEditing}
           sheetStatus={sheetStatus}
         >
           {renderEditor()}

@@ -32,6 +32,7 @@ import {
 export function CBLMModule() {
   const { toast, showToast } = useCblmToast();
   const [showFinalize, setShowFinalize] = useState(false);
+  const [loGroups, setLoGroups] = useState(mockLoGroups);
   const unlocked = consolidationUnlocked;
 
   const consolidationLinks: { page: ConsolidationPageId; label: string }[] = [
@@ -152,7 +153,11 @@ export function CBLMModule() {
           title="Step 2 — Sheet Generation"
         >
           <div className="p-5">
-            <CblmSheetGenerationView loGroups={mockLoGroups} />
+            <CblmSheetGenerationView
+              loGroups={loGroups}
+              onLoGroupsChange={setLoGroups}
+              onSheetFinalized={() => showToast("Sheet finalized", "#15803D")}
+            />
           </div>
           <div className="border-t border-gray-100 bg-gray-50 px-5 py-3 text-xs text-gray-600">
             Sheets are generated per learning outcome: Information Sheet →

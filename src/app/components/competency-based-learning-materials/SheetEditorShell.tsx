@@ -119,12 +119,14 @@ export function SheetEditorShell({
   activeSheetCode,
   activeSheetType,
   sheetStatus,
+  isEditing = false,
   cblmId = MOCK_CBLM_ID,
   children,
 }: {
   activeSheetCode: string;
   activeSheetType: MockSheetType;
   sheetStatus?: "draft" | "finalized";
+  isEditing?: boolean;
   cblmId?: string;
   children: ReactNode;
 }) {
@@ -167,6 +169,11 @@ export function SheetEditorShell({
                   {formatSheetNumber(activeSheetCode)}
                 </span>
                 {sheetStatus ? <CBLMStatusBadge status={sheetStatus} /> : null}
+                {isEditing && sheetStatus !== "finalized" ? (
+                  <span className="inline-flex shrink-0 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700">
+                    Editing
+                  </span>
+                ) : null}
               </div>
             </div>
           </div>
